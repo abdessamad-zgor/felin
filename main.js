@@ -20,4 +20,7 @@
  *    p(state.value.toString())
  *  ])
  * ])
+ *
+ * let hsDocument = new HSDocument()
+ * hs.render('query', page)
  */
