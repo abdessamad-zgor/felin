@@ -27268,7 +27268,7 @@ interface WebCodecsErrorCallback {
     (error: DOMException): void;
 }
 
-interface HTMLElementTagNameMap {
+export interface HTMLElementTagNameMap {
     "a": HTMLAnchorElement;
     "abbr": HTMLElement;
     "address": HTMLElement;
