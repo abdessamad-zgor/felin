@@ -1,7 +1,7 @@
 {
   "name": "hsjs",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "main.js",
   "author": "Abdessamad Zgor <abdessamadzgor@gmail.com>",
   "license": "MIT",
   "type": "module",

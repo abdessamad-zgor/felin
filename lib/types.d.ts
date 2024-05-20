@@ -5,12 +5,12 @@ export type HsDocument = Document | {};
 
 export type HsEvent = Event | CustomEvent;
 
-export interface HsHTMLElement {
-  child(e: HsHTMLElement): HsHTMLElement;
-  children(es: HsHTMLElement[]): HsHTMLElement;
-  class(cl: string): HsHTMLElement;
-  listener(event: string, callback: (e: HsEvent) => void): HsHTMLElement;
-  style(style: CSS.Properties): HsHTMLElement;
+export interface HsElement {
+  child(e: HsElement): HsElement;
+  children(es: HsElement[]): HsElement;
+  class(cl: string): HsElement;
+  listener(event: string, callback: (e: HsEvent) => void): HsElement;
+  style(style: CSS.Properties): HsElement;
 }
 
 export type HTMLElementTagNames = keyof HTMLElementTagNameMap
