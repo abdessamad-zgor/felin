@@ -1,3 +1,4 @@
+import { main, div, p, button, HsDocument } from "./src/hsjs.js";
 /*
  * let state = $state(0)
  *
@@ -7,20 +8,23 @@
  *
  * let page = main([
  *  div([
- *    p("hello world"),
- *    button("hello").style({backgroundColor: 'blue'}).listener('click', (e)=>{
- *    state.l7wa()
- *    console.log('hello, from hsjs')
- *    })])
- *    .style({
- *    width: '100%',
- *    display: 'flex',
- *  }).class("hello"),
- *  div([
- *    p(state.value.toString())
- *  ])
+ *    p("hello world"+state()),
+ *    button("Click")
+ *      .style({backgroundColor: 'blue'})
+ *      .listener('click', (e)=>state.set(s=>s++))
+ *  ]).style({width: '100%', display: 'flex'}).class("hello"),
  * ])
  *
  * let hsDocument = new HSDocument()
- * hs.render('query', page)
+ * hsDocument.render('query', page)
  */
+
+let page = main([
+  div([
+    p("hello world")
+  ]).style({ background: "red", color: "blue" })
+])
+
+let hsDocument = new HsDocument();
+hsDocument.render('page', page)
+

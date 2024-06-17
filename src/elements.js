@@ -532,7 +532,7 @@ export const link = (children) => {
 }
 
 /**
-* @param {import('./types').HsElement[] | undefined} children 
+* @param {import('./types').HsElement[]| string | undefined} children 
 * @returns {HsHTMLElement}*/
 
 export const main = (children) => {

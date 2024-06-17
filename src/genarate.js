@@ -110,7 +110,7 @@ let htmlTags = ["a",
   "track",
   "u",
   "ul",
-  "var",
+  "$var",
   "video",
   "wbr",
 ]
@@ -118,17 +118,37 @@ let htmlTags = ["a",
 function generateHSElementFucntion() {
   let __dirname = import.meta.dirname
   let filePath = join(__dirname, "elements.js");
-  let fileBuffer = "import {HsHTMLElement} from './core.js'\n\n";
+  let fileBuffer = "import {HsHTMLElement,HsTextContent} from './core.js'\n\n";
   let template = (tag) => {
-    return `/**\n* @param {import('./types').HsElement[] | undefined} children \n* @returns {HsHTMLElement}*/\n\nexport const ${tag} = (children) => {\n\tlet element = new HsHTMLElement(name = "${tag}", children = children)\n\treturn element;\n}\n\n`;
+    return `
+    /**\n
+     * * @param {import('./types').HsElement[]| undefined} children \n
+     * * @returns {HsHTMLElement}*/\n
+    \n
+    export const ${tag} = (children) => {\n
+    \tlet element = new HsHTMLElement(name = "${tag}", children = children)\n
+    \treturn element;\n
+    }\n
+    \n
+    `;
   }
   let htmlLength = htmlTags.length;
   for (let i = 0; i < htmlLength; i++) {
     fileBuffer += template(htmlTags[i]);
   }
 
+  fileBuffer += `
+  /**\n
+   * 
+   */
+  export const text = (text)=>{
+    \tlet element = new HsTextContent(text);\n
+    \treturn element;\n
+  }\n
+  `;
+
   writeFile(filePath, fileBuffer, (err) => {
-    if (err) console.log('failed to enerate file.')
+    if (err) console.log('failed to generate file.')
     console.log('Successfully generated file.')
   });
 }
