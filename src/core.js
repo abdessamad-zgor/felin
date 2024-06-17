@@ -11,7 +11,6 @@ export class HsTextNode {
     this.text = text
   }
 
-
   element() {
     return document.createTextNode(this.text)
   }

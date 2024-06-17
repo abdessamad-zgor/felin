@@ -6,6 +6,7 @@ var HsTextNode = class {
     this.text = text;
   }
   element() {
+    return document.createTextNode(this.text);
   }
 };
 var HsHTMLElement = class _HsHTMLElement {
@@ -25,7 +26,7 @@ var HsHTMLElement = class _HsHTMLElement {
   constructor(name2, children, style2) {
     this.name = name2;
     if (typeof children == "string") {
-      this.$children = new HsTextNode(children);
+      this.$children = [new HsTextNode(children)];
     } else if (Array.isArray(children)) {
       this.$children = [];
       for (let child of children)
@@ -71,6 +72,7 @@ var HsHTMLElement = class _HsHTMLElement {
     } else {
       for (let child of this.children()) {
         if (child instanceof HsTextNode) {
+          console.log(child);
           element.appendChild(child.element());
         } else if (child instanceof _HsHTMLElement) {
           element.appendChild(child.element());

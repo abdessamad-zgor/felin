@@ -1,4 +1,4 @@
-import { main, div, p, button, HsDocument } from "./src/hsjs.js";
+import { main, div, p, button, HsDocument, span } from "./src/hsjs.js";
 /*
  * let state = $state(0)
  *
@@ -21,7 +21,13 @@ import { main, div, p, button, HsDocument } from "./src/hsjs.js";
 
 let page = main([
   div([
-    p("hello world")
+    p("hello world").style({ border: '1px solid red', }),
+    div([
+      span([
+        "I am also here",
+        button("Click me")
+      ])
+    ])
   ]).style({ background: "red", color: "blue" })
 ])
 

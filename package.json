@@ -13,5 +13,8 @@
     "build": "esbuild ./src/hsjs.js --format=esm --bundle --outfile=./dist/hsjs.js",
     "prestart": "yarn run build",
     "start": "python3 -m http.server 4444"
+  },
+  "dependencies": {
+    "jsdom": "^24.1.0"
   }
 }

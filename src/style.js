@@ -1,3 +1,4 @@
-export function toCssString() {
+/***/
+export function toCssString(style) {
 
 }
