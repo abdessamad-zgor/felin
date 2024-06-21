@@ -1,11 +1,11 @@
-import { HsHTMLElement as HsElement } from "../src/hsjs"
+import { HsHTMLElement as HsElement, HsHTMLElement, HsTextNode } from "../src/hsjs"
 //import { DOMWindow, JSDOM } from 'jsdom'
 
 export class HsDocument {
   //env: "browser" | "node"
   window: Window
   document: Document
-  rootId: string;
+  rootSelector: string;
   rootElement: HsElement;
 
   constructor() {
@@ -15,21 +15,38 @@ export class HsDocument {
     }
   }
 
-  render(id: string, element: HsElement) {
+  render(selector: string, element: HsElement) {
     if (this.document instanceof Document) {
-      let target = this.document.getElementById(id)
+      let target = this.document.querySelector(selector)
       if (target instanceof HTMLElement || element instanceof Node) {
         //let { element, selector, state } = element.getStateCalls(root, this)
         let domElementRoot = element.element()
         target.appendChild(domElementRoot)
-        this.rootId = id;
-        this.rootElement = element
+        this.rootSelector = selector;
+        this.rootElement = element;
         let stateCalls = element.getStateCalls()
-        HSJS.registerHsDocumentRoot(id, this)
-        HSJS.registerStateCalls(id, stateCalls)
-        HSJS.run(id)
+        HSJS.registerHsDocumentRoot(selector, this)
+        HSJS.registerStateCalls(selector, stateCalls)
+        HSJS.run(selector)
       } else
-        throw Error("HsJsError: no element found with id " + id)
+        throw Error("HsJsError: no element found with selector " + selector)
     }
+  }
+
+  selector(element: HsElement) {
+    let elementPath: HsHTMLElement[] = []
+    let currentElement = element
+    console.log(currentElement)
+    let selector = `${this.rootSelector}>${this.rootElement.name}`
+    while (currentElement.id != this.rootElement.id) {
+      if (currentElement instanceof HsHTMLElement) {
+        elementPath.push(currentElement)
+      }
+      currentElement = currentElement.parentNode
+    }
+    for (let pathElement of elementPath) {
+      selector += `>${pathElement.name}`
+    }
+    return selector
   }
 }

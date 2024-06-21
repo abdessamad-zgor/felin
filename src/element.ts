@@ -5,7 +5,8 @@ import { text } from "stream/consumers";
 
 export class HsTextNode<T extends any[]> {
   id: string
-  stateCalls: HsState[];
+  stateCalls: HsState[] = [];
+  parentNode: HsHTMLElement;
   text: string
 
   constructor(text: string, ...args: T) {
@@ -22,54 +23,18 @@ export class HsTextNode<T extends any[]> {
     this.text = text
   }
 
-  element() {
+  element(parent?: HsHTMLElement) {
+    if (parent) {
+      this.parentNode = parent
+    }
     return document.createTextNode(this.text)
   }
 
   getStateCalls(accumulator?: { state: HsState, element: HsElement }[]) {
     let acc = accumulator || []
     let stateCalls = this.stateCalls.map(sc => ({ state: sc, element: this }))
-    acc.concat(...stateCalls)
+    acc = acc.concat(...stateCalls)
     return acc
-  }
-
-  selector(root: string, rootElement?: HsElement) {
-    let selector: string = "";
-    if (rootElement) {
-
-    }
-    if (rootElement instanceof HsTextNode) {
-      selector += `${root}`
-    } else if (rootElement instanceof HsHTMLElement) {
-      let rootElementChildren = rootElement?.children() as HsElement[]
-      if (rootElementChildren.length == 0) {
-        if (rootElement instanceof HsTextNode) {
-          selector += `${root}`
-        } else {
-          selector += `${root}>${rootElement.name}`
-        }
-      } else {
-        for (let i = 0; i < rootElementChildren.length; i++) {
-          let child = rootElementChildren[i]
-          if (child.id == this.id) {
-            if (child instanceof HsTextNode) {
-              selector += `${root}>${rootElement.name}:nth-child(${i + 1})`
-            } else if (child instanceof HsHTMLElement) {
-              selector += `${root}>${rootElement.name}:nth-child(${i + 1})>${child.name}`
-            }
-            break;
-          } else {
-            if (child instanceof HsTextNode) {
-              selector += `${root}>${rootElement.name}:nth-child(${i + 1})`
-            } else if (child instanceof HsHTMLElement) {
-              let newRootSelector = `${root}>${child}:nth-child(${i + 1})`
-              selector += `${root}>${child}:nth-child(${i + 1})>${child.selector(newRootSelector, rootElementChildren[i])}`
-            }
-          }
-        }
-      }
-    }
-    return selector
   }
 
 }
@@ -78,7 +43,8 @@ export class HsTextNode<T extends any[]> {
 export class HsHTMLElement {
   id: string;
   name: keyof HTMLElementTagNameMap;
-  stateCalls: HsState[];
+  parentNode: HsHTMLElement;
+  stateCalls: HsState[] = [];
   $children: HsElement[];
   $style: CssStyle | null;
   $listeners: Map<keyof HTMLElementEventMap, (event: HsEvent) => void>
@@ -102,6 +68,7 @@ export class HsHTMLElement {
       this.$children = []
     }
     this.$style = style || null
+    this.$listeners = new Map()
   }
 
   style(style: CssStyle) {
@@ -127,7 +94,7 @@ export class HsHTMLElement {
   getStateCalls(accumulator?: { state: HsState, element: HsElement }[]) {
     let acc = accumulator || []
     let stateCalls = this.stateCalls.map(sc => ({ state: sc, element: this }))
-    acc.concat(...stateCalls)
+    acc = acc.concat(...stateCalls)
     if (this.$children.length != 0) {
       for (let child of this.$children) {
         acc = child.getStateCalls(acc)
@@ -147,54 +114,24 @@ export class HsHTMLElement {
     return this
   }
 
-  element(): HTMLElement {
+  element(parent?: HsHTMLElement): HTMLElement {
+    if (parent) {
+      this.parentNode = parent
+    }
     let element = document.createElement(this.name)
     //element.style.cssText = toCssString(this.$style)
+    for (let entry of this.$listeners.entries()) {
+      element.addEventListener(entry[0], entry[1])
+    }
     let elementChildren = this.children() as HsElement[]
     if (elementChildren.length == 0) {
       return element
     } else {
       for (let child of elementChildren) {
-        element.appendChild(child.element())
+        element.appendChild(child.element(this))
       }
       return element
     }
-  }
-
-  selector(root: string, rootElement: HsElement) {
-    let selector: string = "";
-    if (rootElement instanceof HsTextNode) {
-      selector += `${root}`
-    } else if (rootElement instanceof HsHTMLElement) {
-      let rootElementChildren = rootElement?.children() as HsElement[]
-      if (rootElementChildren.length == 0) {
-        if (rootElement instanceof HsTextNode) {
-          selector += `${root}`
-        } else {
-          selector += `${root}>${this.name}`
-        }
-      } else {
-        for (let i = 0; i < rootElementChildren.length; i++) {
-          let child = rootElementChildren[i]
-          if (child == this) {
-            if (child instanceof HsTextNode) {
-              selector += `${root}>${rootElement.name}:nth-child(${i + 1})`
-            } else if (child instanceof HsHTMLElement) {
-              selector += `${root}>${rootElement.name}:nth-child(${i + 1})>${this.name}`
-            }
-            break;
-          } else {
-            if (child instanceof HsTextNode) {
-              selector += `${root}>${rootElement.name}:nth-child(${i + 1})`
-            } else if (child instanceof HsHTMLElement) {
-              let newRootSelector = `${root}>${child}:nth-child(${i + 1})`
-              selector += `${root}>${child}:nth-child(${i + 1})>${child.selector(newRootSelector, rootElementChildren[i])}`
-            }
-          }
-        }
-      }
-    }
-    return selector
   }
 }
 

@@ -1,4 +1,4 @@
-import { main, div, p, button, HsDocument, span, state } from "./dist/hsjs.js";
+import { main, div, p, button, HsDocument, span, state, text } from "./dist/hsjs.js";
 /*
  * let state = $state(0)
  *
@@ -30,14 +30,15 @@ let page = main([
   div([
     p("hello world").style({ border: '1px solid red', }),
     div([
-      span([
-        "I am also here",
-        button("Click me").listen('click', () => counter.set(s => ++s))
+      div([
+        p("I am also here"),
+        text("Count {}", counter),
+        button("Click me").listen('click', () => counter.set(69))
       ])
     ])
   ]).style({ background: "red", color: "blue" })
 ])
 
 let hsDocument = new HsDocument();
-hsDocument.render('page', page)
+hsDocument.render('#page', page)
 

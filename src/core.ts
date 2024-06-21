@@ -1,5 +1,5 @@
 import { Properties as CssStyle } from "csstype"
-import { HsDocument, HsElement, HsState } from "./hsjs"
+import { HsDocument, HsElement, HsHTMLElement, HsState, HsTextNode } from "./hsjs"
 
 export interface HsTask<A = { [key: string]: any }, R = void> {
   priority: number
@@ -19,10 +19,16 @@ export class HsDOMUpdate implements HsTask<DOMUpdateArgs, void> {
 
   call(args: DOMUpdateArgs) {
     let newValue = this.args.state()
-    let nodeSelector = this.args.element.selector(this.args.hsDocument.rootId, this.args.hsDocument.rootElement)
+    let nodeSelector = this.args.hsDocument.selector(this.args.element as HsHTMLElement)
+    console.log(nodeSelector)
 
     let domElement = this.args.hsDocument.document.querySelector(nodeSelector)
-    this.args.hsDocument.document.replaceChild(domElement, this.args.element.element())
+    console.log(nodeSelector)
+    if (domElement) {
+      console.log(domElement)
+      console.log(this.args.element.element())
+      domElement.replaceWith(this.args.element.element())
+    }
   }
 }
 
@@ -67,7 +73,7 @@ export class HsStack {
 
   pop(): HsTask {
     if (this.tasks.length > 0) {
-      let highestPriorityTask = { ...(this.tasks[0]) }
+      let highestPriorityTask = this.tasks[0]
       this.tasks = this.tasks.slice(1)
       return highestPriorityTask
     }
@@ -93,19 +99,29 @@ export class HsRuntime {
     this.running = true
   }
 
-  run(documentMap: { [key: string]: HsDocument }, root: string) {
-    while (true) {
-      if (!this.stack.empty()) {
-        let task = this.stack.pop()
-        if (task instanceof HsDOMUpdate) {
-          task.call(task.args)
-        } else if (task instanceof HsComputedState) {
+  run() {
+    if (!this.running) this.running = true
+    while (this.running) {
+      if (this.stack.empty()) {
+        this.running = false
+        break;
+      }
+      let task = this.stack.pop()
+      console.log(task)
+      if (task instanceof HsDOMUpdate) {
+        console.log(task)
+        task.call(task.args)
+      } else if (task instanceof HsComputedState) {
 
-        } else if (task instanceof HsEffectCall) {
+      } else if (task instanceof HsEffectCall) {
 
-        }
       }
     }
+  }
+
+  pushTask(task: HsTask) {
+    this.stack.push(task)
+    if (!this.running) this.run()
   }
 }
 
@@ -121,7 +137,7 @@ export class HsRegistry {
   }
 
   register(task: HsTask) {
-    this.runtime.stack.push(task)
+    this.runtime.pushTask(task)
   }
 
   registerStateCalls(root: string, stateCalls: { state: HsState, element: HsElement }[]) {
@@ -134,7 +150,12 @@ export class HsRegistry {
       let hsDocument = this.documentRootsMap[root]
       let stateCalls = this.documentStates[root].filter(s => s.state.id == state.id);
       for (let stateCall of stateCalls) {
-        this.runtime.stack.push(new HsDOMUpdate({ hsDocument, state: stateCall.state, element: stateCall.element }));
+        let targetElement: HsHTMLElement = stateCall.element as HsHTMLElement
+        if (stateCall.element instanceof HsTextNode) {
+          targetElement = stateCall.element.parentNode
+        }
+        let domUpdate = new HsDOMUpdate({ hsDocument, state: stateCall.state, element: targetElement })
+        this.runtime.pushTask(domUpdate);
       }
     }
   }
@@ -146,7 +167,7 @@ export class HsRegistry {
   }
 
   run(root: string) {
-    this.runtime.run(this.documentRootsMap, root)
+    this.runtime.run()
   }
 }
 

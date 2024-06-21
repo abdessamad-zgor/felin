@@ -25,6 +25,7 @@ export class HsState<StateType = unknown> extends ExtensibleFunction {
     } else {
       newValue = value;
     }
+    console.log(newValue, this.value)
     if (newValue != this.value) {
       this.value = newValue
       HSJS.registerStateUpdate(this)
