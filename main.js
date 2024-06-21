@@ -1,4 +1,4 @@
-import { main, div, p, button, HsDocument, span } from "./src/hsjs.js";
+import { main, div, p, button, HsDocument, span, state } from "./dist/hsjs.js";
 /*
  * let state = $state(0)
  *
@@ -19,13 +19,20 @@ import { main, div, p, button, HsDocument, span } from "./src/hsjs.js";
  * hsDocument.render('query', page)
  */
 
+let counter = state(0)
+console.log(counter())
+counter.set(1)
+console.log(counter())
+counter.set((s) => ++s)
+console.log(counter())
+
 let page = main([
   div([
     p("hello world").style({ border: '1px solid red', }),
     div([
       span([
         "I am also here",
-        button("Click me")
+        button("Click me").listen('click', () => counter.set(s => ++s))
       ])
     ])
   ]).style({ background: "red", color: "blue" })

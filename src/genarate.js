@@ -117,35 +117,20 @@ let htmlTags = ["a",
 
 function generateHSElementFucntion() {
   let __dirname = import.meta.dirname
-  let filePath = join(__dirname, "elements.js");
-  let fileBuffer = "import {HsHTMLElement,HsTextContent} from './core.js'\n\n";
+  let filePath = join(__dirname, "elements.ts");
+  let fileBuffer = `import {HsHTMLElement, HsElement} from './element'\n`;
   let template = (tag) => {
     return `
-    /**\n
-     * * @param {import('./types').HsElement[]| undefined} children \n
-     * * @returns {HsHTMLElement}*/\n
-    \n
-    export const ${tag} = (children) => {\n
-    \tlet element = new HsHTMLElement(name = "${tag}", children = children)\n
-    \treturn element;\n
-    }\n
-    \n
-    `;
+export const ${tag} = (children?: HsElement[]):HsElement => {
+\tlet element = new HsHTMLElement("${tag == '$var' ? 'var' : tag}", children = children)
+\treturn element;
+}
+`;
   }
   let htmlLength = htmlTags.length;
   for (let i = 0; i < htmlLength; i++) {
     fileBuffer += template(htmlTags[i]);
   }
-
-  fileBuffer += `
-  /**\n
-   * 
-   */
-  export const text = (text)=>{
-    \tlet element = new HsTextContent(text);\n
-    \treturn element;\n
-  }\n
-  `;
 
   writeFile(filePath, fileBuffer, (err) => {
     if (err) console.log('failed to generate file.')
