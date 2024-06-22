@@ -14,7 +14,6 @@ export class HsTextNode<T extends any[]> {
     if (args.length > 0)
       for (let arg of args) {
         if (arg instanceof HsState) {
-          text = text.replace("{}", arg())
           this.stateCalls.push(arg)
         } else {
           text = text.replace("{}", arg)
@@ -27,7 +26,11 @@ export class HsTextNode<T extends any[]> {
     if (parent) {
       this.parentNode = parent
     }
-    return document.createTextNode(this.text)
+    let textContent = this.text
+    for (let state of this.stateCalls) {
+      textContent = textContent.replace("{}", state())
+    }
+    return document.createTextNode(textContent)
   }
 
   getStateCalls(accumulator?: { state: HsState, element: HsElement }[]) {

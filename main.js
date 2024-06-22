@@ -33,7 +33,7 @@ let page = main([
       div([
         p("I am also here"),
         text("Count {}", counter),
-        button("Click me").listen('click', () => counter.set(69))
+        button("Click me").listen('click', () => counter.set(s => ++s))
       ])
     ])
   ]).style({ background: "red", color: "blue" })

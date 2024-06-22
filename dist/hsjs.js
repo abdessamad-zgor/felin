@@ -12,6 +12,7 @@ var HsDOMUpdate = class {
   }
   call(args) {
     let newValue = this.args.state();
+    console.log(newValue);
     let nodeSelector = this.args.hsDocument.selector(this.args.element);
     console.log(nodeSelector);
     let domElement = this.args.hsDocument.document.querySelector(nodeSelector);
@@ -188,7 +189,6 @@ var HsTextNode = class {
     if (args.length > 0)
       for (let arg of args) {
         if (arg instanceof HsState2) {
-          text2 = text2.replace("{}", arg());
           this.stateCalls.push(arg);
         } else {
           text2 = text2.replace("{}", arg);
@@ -203,7 +203,11 @@ var HsTextNode = class {
     if (parent) {
       this.parentNode = parent;
     }
-    return document.createTextNode(this.text);
+    let textContent = this.text;
+    for (let state2 of this.stateCalls) {
+      textContent = textContent.replace("{}", state2());
+    }
+    return document.createTextNode(textContent);
   }
   getStateCalls(accumulator) {
     let acc = accumulator || [];

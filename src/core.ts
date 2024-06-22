@@ -19,6 +19,7 @@ export class HsDOMUpdate implements HsTask<DOMUpdateArgs, void> {
 
   call(args: DOMUpdateArgs) {
     let newValue = this.args.state()
+    console.log(newValue)
     let nodeSelector = this.args.hsDocument.selector(this.args.element as HsHTMLElement)
     console.log(nodeSelector)
 
