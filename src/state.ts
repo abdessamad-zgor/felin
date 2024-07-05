@@ -131,6 +131,12 @@ export class HsArray extends ExtensibleFunction implements HsState<any[]> {
     for (let key of Object.keys(value)) {
       this[key] = createState(value[key], this)
     }
+
+    Object.defineProperty(this, 'length', {
+      get(){
+        return this.value.length
+      }
+    })
   }
 
   set(value: any[] | Partial<any[]> | StateTypeMutation<any[]>) {
@@ -159,7 +165,8 @@ export class HsArray extends ExtensibleFunction implements HsState<any[]> {
   }
 
   get length(){
-    return this.value.length
+    let length = this.value.length
+    return length
   }
 }
 

@@ -379,6 +379,11 @@ var HsArray = class extends ExtensibleFunction {
     for (let key of Object.keys(value)) {
       this[key] = createState(value[key], this);
     }
+    Object.defineProperty(this, "length", {
+      get() {
+        return this.value.length;
+      }
+    });
   }
   set(value) {
     let newValue;
@@ -402,6 +407,10 @@ var HsArray = class extends ExtensibleFunction {
     if (this.parent) {
       this.parent.update(this);
     }
+  }
+  get length() {
+    let length = this.value.length;
+    return length;
   }
 };
 function createState(value, parent) {

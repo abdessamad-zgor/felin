@@ -20,6 +20,7 @@ import { main, div, p, button, HsDocument, span, state, text } from "./dist/hsjs
  */
 
 let counter = state([1,3])
+console.log(counter.length)
 
 let page = main([
   div([
@@ -27,10 +28,11 @@ let page = main([
     div([
       div([
         p("I am also here"),
-        text("Count {}", counter[0]),
+        text("Count {}", counter[counter.length-1]),
         button("Click me").listen('click', () => {
           counter.set(s => [...s, s[s.length-1]+1])
           console.log(counter.value)
+          console.log(counter.length)
         })
       ])
     ])
