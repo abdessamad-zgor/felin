@@ -13,7 +13,7 @@ export class HsTextNode<T extends any[]> {
     this.id = crypto.randomUUID()
     if (args.length > 0)
       for (let arg of args) {
-        if (arg instanceof HsState) {
+        if (arg instanceof Function) {
           this.stateCalls.push(arg)
         } else {
           text = text.replace("{}", arg)
@@ -60,9 +60,10 @@ export class HsHTMLElement {
     } else if (Array.isArray(children)) {
       this.$children = []
       for (let child of children) {
-        if (child instanceof HsState) {
+        if (child instanceof Function) {
           this.$children.push(new HsTextNode("{}", child))
-          this.stateCalls.push(child)
+          //@ts-ignore
+          this.stateCalls.push(child as HsState)
         } else {
           this.$children.push(typeof child == "string" ? new HsTextNode(child) : child)
         }
@@ -84,7 +85,7 @@ export class HsHTMLElement {
       return this.$children
     else {
       for (let child of children) {
-        if (child instanceof HsState) {
+        if (child instanceof Function) {
           this.$children.push(new HsTextNode("{}", child))
         } else {
           this.$children.push(child)

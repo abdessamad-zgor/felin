@@ -145,42 +145,6 @@ var HsRegistry = class {
 };
 var HSJS2 = new HsRegistry();
 
-// src/state.ts
-var ExtensibleFunction = class extends Function {
-  static {
-    __name(this, "ExtensibleFunction");
-  }
-  constructor(f) {
-    super();
-    return Object.setPrototypeOf(f, new.target.prototype);
-  }
-};
-var HsState2 = class extends ExtensibleFunction {
-  static {
-    __name(this, "HsState");
-  }
-  constructor(value) {
-    super(() => {
-      return this.value;
-    });
-    this.id = crypto.randomUUID();
-    this.value = value;
-  }
-  set(value) {
-    let newValue;
-    if (typeof value === "function") {
-      newValue = value(this.value);
-    } else {
-      newValue = value;
-    }
-    console.log(newValue, this.value);
-    if (newValue != this.value) {
-      this.value = newValue;
-      HSJS.registerStateUpdate(this);
-    }
-  }
-};
-
 // src/element.ts
 var HsTextNode = class {
   constructor(text2, ...args) {
@@ -188,7 +152,7 @@ var HsTextNode = class {
     this.id = crypto.randomUUID();
     if (args.length > 0)
       for (let arg of args) {
-        if (arg instanceof HsState2) {
+        if (arg instanceof Function) {
           this.stateCalls.push(arg);
         } else {
           text2 = text2.replace("{}", arg);
@@ -226,7 +190,7 @@ var HsHTMLElement2 = class {
     } else if (Array.isArray(children)) {
       this.$children = [];
       for (let child of children) {
-        if (child instanceof HsState2) {
+        if (child instanceof Function) {
           this.$children.push(new HsTextNode("{}", child));
           this.stateCalls.push(child);
         } else {
@@ -251,7 +215,7 @@ var HsHTMLElement2 = class {
       return this.$children;
     else {
       for (let child of children) {
-        if (child instanceof HsState2) {
+        if (child instanceof Function) {
           this.$children.push(new HsTextNode("{}", child));
         } else {
           this.$children.push(child);
@@ -299,6 +263,160 @@ var HsHTMLElement2 = class {
     }
   }
 };
+
+// src/state.ts
+var ExtensibleFunction = class extends Function {
+  static {
+    __name(this, "ExtensibleFunction");
+  }
+  constructor(f) {
+    super();
+    return Object.setPrototypeOf(f, new.target.prototype);
+  }
+};
+var HsString = class extends ExtensibleFunction {
+  static {
+    __name(this, "HsString");
+  }
+  constructor(value, parent) {
+    super(() => {
+      return this.value;
+    });
+    this.id = crypto.randomUUID();
+    this.value = value;
+    this.parent = parent;
+  }
+  set(value) {
+    let newValue;
+    if (typeof value === "function") {
+      newValue = value(this.value);
+    } else {
+      newValue = value;
+    }
+    if (newValue != this.value) {
+      this.value = newValue;
+      this.parent?.update(this);
+      HSJS.registerStateUpdate(this);
+    }
+  }
+};
+var HsNumber = class extends ExtensibleFunction {
+  static {
+    __name(this, "HsNumber");
+  }
+  constructor(value, parent) {
+    super(() => {
+      return this.value;
+    });
+    this.id = crypto.randomUUID();
+    this.value = value;
+    this.parent = parent;
+  }
+  set(value) {
+    let newValue;
+    if (typeof value === "function") {
+      newValue = value(this.value);
+    } else {
+      newValue = value;
+    }
+    if (newValue != this.value) {
+      this.value = newValue;
+      this.parent?.update(this);
+      HSJS.registerStateUpdate(this);
+    }
+  }
+};
+var HsMappedObject = class extends ExtensibleFunction {
+  static {
+    __name(this, "HsMappedObject");
+  }
+  constructor(value, parent) {
+    super(() => {
+      return this.value;
+    });
+    this.id = crypto.randomUUID();
+    this.value = value;
+    this.parent = parent;
+    for (let key of Object.keys(value)) {
+      this[key] = createState(value[key], this);
+    }
+  }
+  set(value) {
+    let newValue;
+    if (typeof value === "function") {
+      newValue = value(this.value);
+    } else {
+      newValue = value;
+    }
+    if (newValue != this.value) {
+      this.value = newValue;
+      this.parent?.update(this);
+      HSJS.registerStateUpdate(this);
+    }
+  }
+  update(child) {
+    for (let key of Object.keys(this)) {
+      if (Object.keys(this.value).includes(key) && this[key].id == child.id) {
+        this.value[key] = child.value;
+      }
+    }
+    if (this.parent) {
+      this.parent.update(this);
+    }
+  }
+};
+var HsArray = class extends ExtensibleFunction {
+  static {
+    __name(this, "HsArray");
+  }
+  constructor(value, parent) {
+    super(() => {
+      return this.value;
+    });
+    this.id = crypto.randomUUID();
+    this.value = value;
+    this.parent = parent;
+    for (let key of Object.keys(value)) {
+      this[key] = createState(value[key], this);
+    }
+  }
+  set(value) {
+    let newValue;
+    if (typeof value === "function") {
+      newValue = value(this.value);
+    } else {
+      newValue = value;
+    }
+    if (newValue != this.value) {
+      this.value = newValue;
+      this.parent?.update(this);
+      HSJS.registerStateUpdate(this);
+    }
+  }
+  update(child) {
+    for (let key of Object.keys(this)) {
+      if (Object.keys(this.value).includes(key) && this[key].id == child.id) {
+        this.value[key] = child.value;
+      }
+    }
+    if (this.parent) {
+      this.parent.update(this);
+    }
+  }
+};
+function createState(value, parent) {
+  let typeofValue = typeof value;
+  if (typeofValue == "string") {
+    return new HsString(value, parent);
+  } else if (typeofValue == "number") {
+    return new HsNumber(value, parent);
+  } else if (Array.isArray(value)) {
+    return new HsArray(value, parent);
+  } else if (typeofValue == "object") {
+    return new HsMappedObject(value, parent);
+  }
+}
+__name(createState, "createState");
 
 // src/elements.ts
 var a = /* @__PURE__ */ __name((children) => {
@@ -801,7 +919,7 @@ function text(text2, ...args) {
 }
 __name(text, "text");
 function state(value) {
-  return new HsState2(value);
+  return createState(value);
 }
 __name(state, "state");
 
@@ -810,15 +928,18 @@ window.HSJS = HSJS2;
 export {
   $var,
   HSJS2 as HSJS,
+  HsArray,
   HsComputedState,
   HsDOMUpdate,
   HsDocument2 as HsDocument,
   HsEffectCall,
   HsHTMLElement2 as HsHTMLElement,
+  HsMappedObject,
+  HsNumber,
   HsRegistry,
   HsRuntime,
   HsStack,
-  HsState2 as HsState,
+  HsString,
   HsTextNode,
   a,
   abbr,
@@ -841,6 +962,7 @@ export {
   code,
   col,
   colgroup,
+  createState,
   data,
   datalist,
   dd,
