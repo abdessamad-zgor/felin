@@ -36,7 +36,6 @@ export class HsDocument {
   selector(element: HsElement) {
     let elementPath: HsHTMLElement[] = []
     let currentElement = element
-    console.log(currentElement)
     let selector = `${this.rootSelector}>${this.rootElement.name}`
     while (currentElement.id != this.rootElement.id) {
       if (currentElement instanceof HsHTMLElement) {

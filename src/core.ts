@@ -20,15 +20,10 @@ export class HsDOMUpdate implements HsTask<DOMUpdateArgs, void> {
 
   call(args: DOMUpdateArgs) {
     let newValue = this.args.state()
-    console.log(newValue)
     let nodeSelector = this.args.hsDocument.selector(this.args.element as HsHTMLElement)
-    console.log(nodeSelector)
 
     let domElement = this.args.hsDocument.document.querySelector(nodeSelector)
-    console.log(nodeSelector)
     if (domElement) {
-      console.log(domElement)
-      console.log(this.args.element.element())
       domElement.replaceWith(this.args.element.element())
     }
   }
@@ -91,7 +86,6 @@ export class HsStack {
   push(task: HsTask) {
     this.tasks.push(task)
     this.tasks = quickSortByPriority(this.tasks)
-    console.log(this.tasks.map(t => t.priority))
   }
 
   empty() {
@@ -116,9 +110,7 @@ export class HsRuntime {
         break;
       }
       let task = this.stack.pop()
-      console.log(task)
       if (task instanceof HsDOMUpdate) {
-        console.log(task)
         task.call(task.args)
       } else if (task instanceof HsComputedState) {
 
@@ -189,7 +181,6 @@ export class HsRegistry {
   registerEffect(effect: HsEffect) {
     if(!this.effects.some(e=>e.id==effect.id))
       this.effects.push(effect)
-    console.log(this.effects)
   }
 }
 
