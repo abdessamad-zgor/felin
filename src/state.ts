@@ -3,7 +3,7 @@ type StateTypeMutation<StateType> = StateType extends { [key: string]: any } | a
   ? <T>(state: StateType | Partial<StateType>) => StateType | Partial<StateType> | T :
   (state: StateType) => StateType
 
-class ExtensibleFunction extends Function {
+export class ExtensibleFunction extends Function {
   constructor(f) {
     super()
     return Object.setPrototypeOf(f, new.target.prototype)

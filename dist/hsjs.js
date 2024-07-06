@@ -35,7 +35,12 @@ var HsEffectCall = class {
   static {
     __name(this, "HsEffectCall");
   }
+  constructor(args) {
+    this.args = args;
+    this.priority = 2;
+  }
   call(args) {
+    args.fn(...args.dependents);
   }
 };
 function quickSortByPriority(array) {
@@ -96,6 +101,7 @@ var HsRuntime = class {
         task.call(task.args);
       } else if (task instanceof HsComputedState) {
       } else if (task instanceof HsEffectCall) {
+        task.call(task.args);
       }
     }
   }
@@ -112,6 +118,7 @@ var HsRegistry = class {
     this.runtime = new HsRuntime();
     this.documentRootsMap = {};
     this.documentStates = {};
+    this.effects = [];
   }
   register(task) {
     this.runtime.pushTask(task);
@@ -133,6 +140,11 @@ var HsRegistry = class {
         this.runtime.pushTask(domUpdate);
       }
     }
+    let effect2 = this.effects.find((e) => e.dependants.some((s2) => s2.id == state2.id));
+    if (effect2) {
+      let effectCall = new HsEffectCall({ fn: effect2.effect, dependents: effect2.dependants });
+      this.runtime.pushTask(effectCall);
+    }
   }
   registerHsDocumentRoot(root, document2) {
     if (!Object.keys(this.documentRootsMap).includes(root)) {
@@ -141,6 +153,11 @@ var HsRegistry = class {
   }
   run(root) {
     this.runtime.run();
+  }
+  registerEffect(effect2) {
+    if (!this.effects.some((e) => e.id == effect2.id))
+      this.effects.push(effect2);
+    console.log(this.effects);
   }
 };
 var HSJS2 = new HsRegistry();
@@ -922,6 +939,21 @@ var HsDocument2 = class {
   }
 };
 
+// src/effect.ts
+var HsEffect = class extends ExtensibleFunction {
+  static {
+    __name(this, "HsEffect");
+  }
+  constructor(fn) {
+    super((...args) => {
+      this.effect = fn;
+      this.dependants = args;
+      this.id = crypto.randomUUID();
+      HSJS.registerEffect(this);
+    });
+  }
+};
+
 // src/helpers.ts
 function text(text2, ...args) {
   return new HsTextNode(text2, ...args);
@@ -931,11 +963,16 @@ function state(value) {
   return createState(value);
 }
 __name(state, "state");
+function effect(fn) {
+  return new HsEffect(fn);
+}
+__name(effect, "effect");
 
 // src/hsjs.ts
 window.HSJS = HSJS2;
 export {
   $var,
+  ExtensibleFunction,
   HSJS2 as HSJS,
   HsArray,
   HsComputedState,
@@ -982,6 +1019,7 @@ export {
   div,
   dl,
   dt,
+  effect,
   em,
   embed,
   fieldset,

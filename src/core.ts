@@ -1,5 +1,6 @@
 import { Properties as CssStyle } from "csstype"
 import { HsDocument, HsElement, HsHTMLElement, HsState, HsTextNode } from "./hsjs"
+import { HsEffect } from "./effect"
 
 export interface HsTask<A = { [key: string]: any }, R = void> {
   priority: number
@@ -43,12 +44,19 @@ export class HsComputedState implements HsTask {
 
 }
 
+type HsEffectArgs = { fn: (...args: HsState[]) => void, dependents: HsState[] }
+
 export class HsEffectCall implements HsTask {
   priority: number
-  args: {}
+  args: HsEffectArgs
 
-  call(args) {
+  constructor(args: HsEffectArgs) {
+    this.args = args
+    this.priority = 2
+  }
 
+  call(args: HsEffectArgs) {
+    args.fn(...args.dependents)
   }
 }
 
@@ -115,7 +123,7 @@ export class HsRuntime {
       } else if (task instanceof HsComputedState) {
 
       } else if (task instanceof HsEffectCall) {
-
+        task.call(task.args)
       }
     }
   }
@@ -130,11 +138,13 @@ export class HsRegistry {
   runtime: HsRuntime
   documentStates: { [key: string]: { state: HsState, element: HsElement }[] }
   documentRootsMap: { [key: string]: HsDocument }
+  effects: HsEffect[]
 
   constructor() {
     this.runtime = new HsRuntime();
     this.documentRootsMap = {}
     this.documentStates = {}
+    this.effects = []
   }
 
   register(task: HsTask) {
@@ -159,6 +169,11 @@ export class HsRegistry {
         this.runtime.pushTask(domUpdate);
       }
     }
+    let effect = this.effects.find(e => e.dependants.some(s => s.id == state.id))
+    if(effect){
+      let effectCall = new HsEffectCall({ fn: effect.effect, dependents: effect.dependants })
+      this.runtime.pushTask(effectCall)
+    }
   }
 
   registerHsDocumentRoot(root: string, document: HsDocument) {
@@ -169,6 +184,12 @@ export class HsRegistry {
 
   run(root: string) {
     this.runtime.run()
+  }
+
+  registerEffect(effect: HsEffect) {
+    if(!this.effects.some(e=>e.id==effect.id))
+      this.effects.push(effect)
+    console.log(this.effects)
   }
 }
 

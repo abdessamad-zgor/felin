@@ -1,4 +1,4 @@
-import { main, div, p, button, HsDocument, span, state, text } from "./dist/hsjs.js";
+import { main, div, p, button, HsDocument, span, state, text, effect } from "./dist/hsjs.js";
 /*
  * let state = $state(0)
  *
@@ -19,8 +19,14 @@ import { main, div, p, button, HsDocument, span, state, text } from "./dist/hsjs
  * hsDocument.render('query', page)
  */
 
-let counter = state([1,3])
-console.log(counter.length)
+let counter = state({count: 0})
+
+let counterLogger = effect((counter)=>{
+  let value = counter()
+  console.log("Count value is: ", value)
+})
+
+counterLogger(counter.count)
 
 let page = main([
   div([
@@ -28,11 +34,10 @@ let page = main([
     div([
       div([
         p("I am also here"),
-        text("Count {}", counter[counter.length-1]),
+        text("Count {}", counter.count),
         button("Click me").listen('click', () => {
-          counter.set(s => [...s, s[s.length-1]+1])
+          counter.count.set(s => ++s)
           console.log(counter.value)
-          console.log(counter.length)
         })
       ])
     ])
