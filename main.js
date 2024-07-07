@@ -19,35 +19,37 @@ import { main, div, p, button, HsDocument, span, state, text, effect, computed }
  * hsDocument.render('query', page)
  */
 
-let counter = state({count: 0})
 
-let msg = computed((count)=>{
-  return `the count is ${count()}`
-}, counter.count)
-console.log(msg)
+let page = () => {
+  let counter = state({ count: 0 })
 
-let counterLogger = effect((counter)=>{
-  console.log("msg is: ", msg())
-})
+  let msg = computed((count) => {
+    return `the count is ${count()}`
+  }, counter.count)
 
-counterLogger(counter.count)
+  console.log(msg)
 
-let page = main([
-  div([
-    p("hello world").style({ border: '1px solid red', }),
+  effect((counter) => {
+    console.log("msg is: ", msg())
+  })(counter.count)
+
+  return main([
     div([
+      p("hello world").style({ border: '1px solid red', }),
       div([
-        p("I am also here"),
-        msg,
-        button("Click me").listen('click', () => {
-          counter.count.set(s => ++s)
-          console.log(counter.value)
-        })
+        div([
+          p("I am also here"),
+          msg,
+          button("Click me").listen('click', () => {
+            counter.count.set(s => ++s)
+            console.log(counter.value)
+          })
+        ])
       ])
-    ])
-  ]).style({ background: "red", color: "blue" })
-])
+    ]).style({ background: "red", color: "blue" })
+  ])
+}
 
 let hsDocument = new HsDocument();
-hsDocument.render('#page', page)
+hsDocument.render('#page', page())
 

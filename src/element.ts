@@ -2,6 +2,7 @@ import { Properties as CssStyle } from "csstype";
 import { HsEvent } from "./event";
 import { HsState } from "./state";
 import { text } from "stream/consumers";
+import { toCssString } from "./style";
 
 export class HsTextNode<T extends any[]> {
   id: string
@@ -126,6 +127,9 @@ export class HsHTMLElement {
     //element.style.cssText = toCssString(this.$style)
     for (let entry of this.$listeners.entries()) {
       element.addEventListener(entry[0], entry[1])
+    }
+    if(this.$style){
+      element.style.cssText = toCssString(this.$style)
     }
     let elementChildren = this.children() as HsElement[]
     if (elementChildren.length == 0) {
