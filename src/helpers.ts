@@ -1,3 +1,4 @@
+import { HsComputed } from "./computed";
 import { HsEffect } from "./effect";
 import { HsTextNode, createState, HsTask, HsState } from "./hsjs";
 
@@ -11,4 +12,8 @@ export function state<T>(value: T) {
 
 export function effect(fn: (...args: HsState[])=>void){
   return new HsEffect(fn)
+}
+
+export function computed(fn: (...args: HsState[])=>void, ...states: HsState[]){
+  return new HsComputed(fn, ...states)
 }

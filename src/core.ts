@@ -1,13 +1,14 @@
 import { Properties as CssStyle } from "csstype"
 import { HsDocument, HsElement, HsHTMLElement, HsState, HsTextNode } from "./hsjs"
 import { HsEffect } from "./effect"
+import { HsComputed } from "./computed"
 
 export interface HsTask<A = { [key: string]: any }, R = void> {
   priority: number
   call(args: A): R
 }
 
-type DOMUpdateArgs = { state: HsState, hsDocument: HsDocument, element: HsElement }
+type DOMUpdateArgs = { state: HsState|HsComputed, hsDocument: HsDocument, element: HsElement }
 
 export class HsDOMUpdate implements HsTask<DOMUpdateArgs, void> {
   priority: number
@@ -19,7 +20,8 @@ export class HsDOMUpdate implements HsTask<DOMUpdateArgs, void> {
   }
 
   call(args: DOMUpdateArgs) {
-    let newValue = this.args.state()
+    let newValue = (this.args.state as Function)()
+    console.log(newValue)
     let nodeSelector = this.args.hsDocument.selector(this.args.element as HsHTMLElement)
 
     let domElement = this.args.hsDocument.document.querySelector(nodeSelector)
@@ -29,12 +31,19 @@ export class HsDOMUpdate implements HsTask<DOMUpdateArgs, void> {
   }
 }
 
-export class HsComputedState implements HsTask {
+
+export class HsComputedRefresh implements HsTask {
   priority: number
-  args: {}
+  args: HsComputed
+
+  constructor(args: HsComputed){
+    this.args = args
+    this.priority = 2
+  }
 
   call(args) {
-
+    let newValue = this.args.fn(...this.args.states)
+    this.args.value = newValue
   }
 
 }
@@ -47,7 +56,7 @@ export class HsEffectCall implements HsTask {
 
   constructor(args: HsEffectArgs) {
     this.args = args
-    this.priority = 2
+    this.priority = 3
   }
 
   call(args: HsEffectArgs) {
@@ -112,8 +121,8 @@ export class HsRuntime {
       let task = this.stack.pop()
       if (task instanceof HsDOMUpdate) {
         task.call(task.args)
-      } else if (task instanceof HsComputedState) {
-
+      } else if (task instanceof HsComputedRefresh) {
+        task.call(task.args)
       } else if (task instanceof HsEffectCall) {
         task.call(task.args)
       }
@@ -131,12 +140,14 @@ export class HsRegistry {
   documentStates: { [key: string]: { state: HsState, element: HsElement }[] }
   documentRootsMap: { [key: string]: HsDocument }
   effects: HsEffect[]
+  computed: HsComputed[]
 
   constructor() {
     this.runtime = new HsRuntime();
     this.documentRootsMap = {}
     this.documentStates = {}
     this.effects = []
+    this.computed = []
   }
 
   register(task: HsTask) {
@@ -161,6 +172,28 @@ export class HsRegistry {
         this.runtime.pushTask(domUpdate);
       }
     }
+
+    let computed = this.computed.find(e=>e.states.some(s=>s.id==state.id))
+    console.log(computed)
+    if(computed){
+      let computedRefresh = new HsComputedRefresh(computed)
+      this.runtime.pushTask(computedRefresh)
+      console.log(this.documentStates)
+      let computedStateRoot = Object.keys(this.documentStates).find(r => this.documentStates[r].some(s => s.state.id == computed.id))
+      if(computedStateRoot){
+        let computedHsDocument = this.documentRootsMap[computedStateRoot]
+        let computedStateCalls = this.documentStates[computedStateRoot].filter(s=>s.state.id == computed.id);
+        for (let computedStateCall of computedStateCalls){
+          let computedTargetElement: HsHTMLElement = computedStateCall.element as HsHTMLElement
+          if(computedStateCall.element instanceof HsTextNode){
+            computedTargetElement = computedStateCall.element.parentNode
+          }
+          let computedDomUpdate = new HsDOMUpdate({hsDocument: computedHsDocument, state: computedStateCall.state, element: computedTargetElement})
+          this.runtime.pushTask(computedDomUpdate)
+        }
+      }
+    }
+
     let effect = this.effects.find(e => e.dependants.some(s => s.id == state.id))
     if(effect){
       let effectCall = new HsEffectCall({ fn: effect.effect, dependents: effect.dependants })
@@ -181,6 +214,11 @@ export class HsRegistry {
   registerEffect(effect: HsEffect) {
     if(!this.effects.some(e=>e.id==effect.id))
       this.effects.push(effect)
+  }
+
+  registerComputedState(state: HsComputed){
+    if(!this.computed.some(c=>c.id == state.id))
+      this.computed.push(state)
   }
 }
 

@@ -14,21 +14,23 @@ var HsDOMUpdate = class {
     let newValue = this.args.state();
     console.log(newValue);
     let nodeSelector = this.args.hsDocument.selector(this.args.element);
-    console.log(nodeSelector);
     let domElement = this.args.hsDocument.document.querySelector(nodeSelector);
-    console.log(nodeSelector);
     if (domElement) {
-      console.log(domElement);
-      console.log(this.args.element.element());
       domElement.replaceWith(this.args.element.element());
     }
   }
 };
-var HsComputedState = class {
+var HsComputedRefresh = class {
   static {
-    __name(this, "HsComputedState");
+    __name(this, "HsComputedRefresh");
+  }
+  constructor(args) {
+    this.args = args;
+    this.priority = 2;
   }
   call(args) {
+    let newValue = this.args.fn(...this.args.states);
+    this.args.value = newValue;
   }
 };
 var HsEffectCall = class {
@@ -37,7 +39,7 @@ var HsEffectCall = class {
   }
   constructor(args) {
     this.args = args;
-    this.priority = 2;
+    this.priority = 3;
   }
   call(args) {
     args.fn(...args.dependents);
@@ -73,7 +75,6 @@ var HsStack = class {
   push(task) {
     this.tasks.push(task);
     this.tasks = quickSortByPriority(this.tasks);
-    console.log(this.tasks.map((t) => t.priority));
   }
   empty() {
     return this.tasks.length == 0;
@@ -95,11 +96,10 @@ var HsRuntime = class {
         break;
       }
       let task = this.stack.pop();
-      console.log(task);
       if (task instanceof HsDOMUpdate) {
-        console.log(task);
         task.call(task.args);
-      } else if (task instanceof HsComputedState) {
+      } else if (task instanceof HsComputedRefresh) {
+        task.call(task.args);
       } else if (task instanceof HsEffectCall) {
         task.call(task.args);
       }
@@ -119,6 +119,7 @@ var HsRegistry = class {
     this.documentRootsMap = {};
     this.documentStates = {};
     this.effects = [];
+    this.computed = [];
   }
   register(task) {
     this.runtime.pushTask(task);
@@ -140,6 +141,26 @@ var HsRegistry = class {
         this.runtime.pushTask(domUpdate);
       }
     }
+    let computed2 = this.computed.find((e) => e.states.some((s2) => s2.id == state2.id));
+    console.log(computed2);
+    if (computed2) {
+      let computedRefresh = new HsComputedRefresh(computed2);
+      this.runtime.pushTask(computedRefresh);
+      console.log(this.documentStates);
+      let computedStateRoot = Object.keys(this.documentStates).find((r) => this.documentStates[r].some((s2) => s2.state.id == computed2.id));
+      if (computedStateRoot) {
+        let computedHsDocument = this.documentRootsMap[computedStateRoot];
+        let computedStateCalls = this.documentStates[computedStateRoot].filter((s2) => s2.state.id == computed2.id);
+        for (let computedStateCall of computedStateCalls) {
+          let computedTargetElement = computedStateCall.element;
+          if (computedStateCall.element instanceof HsTextNode) {
+            computedTargetElement = computedStateCall.element.parentNode;
+          }
+          let computedDomUpdate = new HsDOMUpdate({ hsDocument: computedHsDocument, state: computedStateCall.state, element: computedTargetElement });
+          this.runtime.pushTask(computedDomUpdate);
+        }
+      }
+    }
     let effect2 = this.effects.find((e) => e.dependants.some((s2) => s2.id == state2.id));
     if (effect2) {
       let effectCall = new HsEffectCall({ fn: effect2.effect, dependents: effect2.dependants });
@@ -157,7 +178,10 @@ var HsRegistry = class {
   registerEffect(effect2) {
     if (!this.effects.some((e) => e.id == effect2.id))
       this.effects.push(effect2);
-    console.log(this.effects);
+  }
+  registerComputedState(state2) {
+    if (!this.computed.some((c) => c.id == state2.id))
+      this.computed.push(state2);
   }
 };
 var HSJS2 = new HsRegistry();
@@ -924,7 +948,6 @@ var HsDocument2 = class {
   selector(element) {
     let elementPath = [];
     let currentElement = element;
-    console.log(currentElement);
     let selector = `${this.rootSelector}>${this.rootElement.name}`;
     while (currentElement.id != this.rootElement.id) {
       if (currentElement instanceof HsHTMLElement2) {
@@ -936,6 +959,24 @@ var HsDocument2 = class {
       selector += `>${pathElement.name}`;
     }
     return selector;
+  }
+};
+
+// src/computed.ts
+var HsComputed = class extends ExtensibleFunction {
+  static {
+    __name(this, "HsComputed");
+  }
+  constructor(fn, ...states) {
+    super(() => {
+      this.value = this.fn(...this.states);
+      return this.value;
+    });
+    this.fn = fn;
+    this.states = states;
+    this.value = fn(...states);
+    this.id = crypto.randomUUID();
+    HSJS.registerComputedState(this);
   }
 };
 
@@ -967,6 +1008,10 @@ function effect(fn) {
   return new HsEffect(fn);
 }
 __name(effect, "effect");
+function computed(fn, ...states) {
+  return new HsComputed(fn, ...states);
+}
+__name(computed, "computed");
 
 // src/hsjs.ts
 window.HSJS = HSJS2;
@@ -975,7 +1020,7 @@ export {
   ExtensibleFunction,
   HSJS2 as HSJS,
   HsArray,
-  HsComputedState,
+  HsComputedRefresh,
   HsDOMUpdate,
   HsDocument2 as HsDocument,
   HsEffectCall,
@@ -1008,6 +1053,7 @@ export {
   code,
   col,
   colgroup,
+  computed,
   createState,
   data,
   datalist,
