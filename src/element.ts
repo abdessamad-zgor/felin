@@ -52,6 +52,8 @@ export class HsHTMLElement {
   $children: HsElement[];
   $style: CssStyle | null;
   $listeners: Map<keyof HTMLElementEventMap, (event: HsEvent) => void>
+  $classname: string
+  $attributes: {[attr: string]: any}
 
   constructor(name: keyof HTMLElementTagNameMap, children?: (HsElement | string)[] | string, style?: CssStyle) {
     this.id = crypto.randomUUID()
@@ -131,6 +133,14 @@ export class HsHTMLElement {
     if(this.$style){
       element.style.cssText = toCssString(this.$style)
     }
+    if(this.$classname){
+      element.classList.add(...this.$classname.split(" "))
+    }
+    
+    for(let key of Object.keys(this.$attributes)){
+      element.setAttribute(key, this.$attributes[key] as string)
+    }
+
     let elementChildren = this.children() as HsElement[]
     if (elementChildren.length == 0) {
       return element
@@ -140,6 +150,18 @@ export class HsHTMLElement {
       }
       return element
     }
+  }
+
+  class(classname: string){
+    this.$classname = classname
+  }
+
+  attr(name: string, value: any){
+    this.$attributes[name] = value
+  }
+
+  attrs(attrs: {[attr: string]: any}){
+    this.$attributes = {...this.$attributes, ...attrs}
   }
 }
 

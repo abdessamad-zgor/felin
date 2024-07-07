@@ -1,8 +1,6 @@
 import { HsHTMLElement as HsElement, HsHTMLElement, HsTextNode } from "../src/hsjs"
-//import { DOMWindow, JSDOM } from 'jsdom'
 
 export class HsDocument {
-  //env: "browser" | "node"
   window: Window
   document: Document
   rootSelector: string;
