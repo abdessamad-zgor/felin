@@ -33,21 +33,21 @@ let page = () => {
     console.log("msg is: ", msg())
   })(counter.count)
 
-  return main([
-    div([
-      p("hello world").style({ border: '1px solid red', }),
-      div([
-        div([
+  return main(
+    div(
+      p("hello world"),
+      div(
+        div(
           p("I am also here"),
           msg,
           button("Click me").listen('click', () => {
             counter.count.set(s => ++s)
             console.log(counter.value)
           })
-        ])
-      ])
-    ]).style({ background: "red", color: "blue" })
-  ])
+        )
+      )
+    )
+  )
 }
 
 let hsDocument = new HsDocument();

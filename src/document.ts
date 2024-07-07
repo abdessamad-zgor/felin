@@ -19,7 +19,6 @@ export class HsDocument {
     if (this.document instanceof Document) {
       let target = this.document.querySelector(selector)
       if (target instanceof HTMLElement || element instanceof Node) {
-        //let { element, selector, state } = element.getStateCalls(root, this)
         let domElementRoot = element.element()
         target.appendChild(domElementRoot)
         this.rootSelector = selector;
@@ -27,7 +26,7 @@ export class HsDocument {
         let stateCalls = element.getStateCalls()
         HSJS.registerHsDocumentRoot(selector, this)
         HSJS.registerStateCalls(selector, stateCalls)
-        HSJS.run(selector)
+        HSJS.run()
       } else
         throw Error("HsJsError: no element found with selector " + selector)
     }

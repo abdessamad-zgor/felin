@@ -207,7 +207,7 @@ export class HsRegistry {
     }
   }
 
-  run(root: string) {
+  run() {
     this.runtime.run()
   }
 

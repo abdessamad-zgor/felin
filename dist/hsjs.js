@@ -186,6 +186,23 @@ var HsRegistry = class {
 };
 var HSJS2 = new HsRegistry();
 
+// src/style.ts
+function toCssString(style2) {
+  let styleString = "";
+  for (let property of Object.keys(style2)) {
+    let key = property.split("").map((char, i2) => {
+      if (property.charCodeAt(i2) >= 65 && property.charCodeAt(i2) <= 90) {
+        return "-" + char.toLowerCase();
+      }
+      return char;
+    });
+    styleString += key.join("") + ": " + style2[property] + ";";
+  }
+  console.log(styleString);
+  return styleString;
+}
+__name(toCssString, "toCssString");
+
 // src/element.ts
 var HsTextNode = class {
   constructor(text2, ...args) {
@@ -292,6 +309,9 @@ var HsHTMLElement2 = class {
     let element = document.createElement(this.name);
     for (let entry of this.$listeners.entries()) {
       element.addEventListener(entry[0], entry[1]);
+    }
+    if (this.$style) {
+      element.style.cssText = toCssString(this.$style);
     }
     let elementChildren = this.children();
     if (elementChildren.length == 0) {
@@ -469,451 +489,451 @@ function createState(value, parent) {
 __name(createState, "createState");
 
 // src/elements.ts
-var a = /* @__PURE__ */ __name((children) => {
+var a = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("a", children = children);
   return element;
 }, "a");
-var abbr = /* @__PURE__ */ __name((children) => {
+var abbr = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("abbr", children = children);
   return element;
 }, "abbr");
-var address = /* @__PURE__ */ __name((children) => {
+var address = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("address", children = children);
   return element;
 }, "address");
-var area = /* @__PURE__ */ __name((children) => {
+var area = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("area", children = children);
   return element;
 }, "area");
-var article = /* @__PURE__ */ __name((children) => {
+var article = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("article", children = children);
   return element;
 }, "article");
-var aside = /* @__PURE__ */ __name((children) => {
+var aside = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("aside", children = children);
   return element;
 }, "aside");
-var audio = /* @__PURE__ */ __name((children) => {
+var audio = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("audio", children = children);
   return element;
 }, "audio");
-var b = /* @__PURE__ */ __name((children) => {
+var b = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("b", children = children);
   return element;
 }, "b");
-var base = /* @__PURE__ */ __name((children) => {
+var base = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("base", children = children);
   return element;
 }, "base");
-var bdi = /* @__PURE__ */ __name((children) => {
+var bdi = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("bdi", children = children);
   return element;
 }, "bdi");
-var bdo = /* @__PURE__ */ __name((children) => {
+var bdo = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("bdo", children = children);
   return element;
 }, "bdo");
-var blockquote = /* @__PURE__ */ __name((children) => {
+var blockquote = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("blockquote", children = children);
   return element;
 }, "blockquote");
-var body = /* @__PURE__ */ __name((children) => {
+var body = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("body", children = children);
   return element;
 }, "body");
-var br = /* @__PURE__ */ __name((children) => {
+var br = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("br", children = children);
   return element;
 }, "br");
-var button = /* @__PURE__ */ __name((children) => {
+var button = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("button", children = children);
   return element;
 }, "button");
-var canvas = /* @__PURE__ */ __name((children) => {
+var canvas = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("canvas", children = children);
   return element;
 }, "canvas");
-var caption = /* @__PURE__ */ __name((children) => {
+var caption = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("caption", children = children);
   return element;
 }, "caption");
-var cite = /* @__PURE__ */ __name((children) => {
+var cite = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("cite", children = children);
   return element;
 }, "cite");
-var code = /* @__PURE__ */ __name((children) => {
+var code = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("code", children = children);
   return element;
 }, "code");
-var col = /* @__PURE__ */ __name((children) => {
+var col = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("col", children = children);
   return element;
 }, "col");
-var colgroup = /* @__PURE__ */ __name((children) => {
+var colgroup = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("colgroup", children = children);
   return element;
 }, "colgroup");
-var data = /* @__PURE__ */ __name((children) => {
+var data = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("data", children = children);
   return element;
 }, "data");
-var datalist = /* @__PURE__ */ __name((children) => {
+var datalist = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("datalist", children = children);
   return element;
 }, "datalist");
-var dd = /* @__PURE__ */ __name((children) => {
+var dd = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("dd", children = children);
   return element;
 }, "dd");
-var del = /* @__PURE__ */ __name((children) => {
+var del = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("del", children = children);
   return element;
 }, "del");
-var details = /* @__PURE__ */ __name((children) => {
+var details = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("details", children = children);
   return element;
 }, "details");
-var dfn = /* @__PURE__ */ __name((children) => {
+var dfn = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("dfn", children = children);
   return element;
 }, "dfn");
-var dialog = /* @__PURE__ */ __name((children) => {
+var dialog = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("dialog", children = children);
   return element;
 }, "dialog");
-var div = /* @__PURE__ */ __name((children) => {
+var div = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("div", children = children);
   return element;
 }, "div");
-var dl = /* @__PURE__ */ __name((children) => {
+var dl = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("dl", children = children);
   return element;
 }, "dl");
-var dt = /* @__PURE__ */ __name((children) => {
+var dt = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("dt", children = children);
   return element;
 }, "dt");
-var em = /* @__PURE__ */ __name((children) => {
+var em = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("em", children = children);
   return element;
 }, "em");
-var embed = /* @__PURE__ */ __name((children) => {
+var embed = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("embed", children = children);
   return element;
 }, "embed");
-var fieldset = /* @__PURE__ */ __name((children) => {
+var fieldset = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("fieldset", children = children);
   return element;
 }, "fieldset");
-var figcaption = /* @__PURE__ */ __name((children) => {
+var figcaption = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("figcaption", children = children);
   return element;
 }, "figcaption");
-var figure = /* @__PURE__ */ __name((children) => {
+var figure = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("figure", children = children);
   return element;
 }, "figure");
-var footer = /* @__PURE__ */ __name((children) => {
+var footer = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("footer", children = children);
   return element;
 }, "footer");
-var form = /* @__PURE__ */ __name((children) => {
+var form = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("form", children = children);
   return element;
 }, "form");
-var h1 = /* @__PURE__ */ __name((children) => {
+var h1 = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("h1", children = children);
   return element;
 }, "h1");
-var h2 = /* @__PURE__ */ __name((children) => {
+var h2 = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("h2", children = children);
   return element;
 }, "h2");
-var h3 = /* @__PURE__ */ __name((children) => {
+var h3 = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("h3", children = children);
   return element;
 }, "h3");
-var h4 = /* @__PURE__ */ __name((children) => {
+var h4 = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("h4", children = children);
   return element;
 }, "h4");
-var h5 = /* @__PURE__ */ __name((children) => {
+var h5 = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("h5", children = children);
   return element;
 }, "h5");
-var h6 = /* @__PURE__ */ __name((children) => {
+var h6 = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("h6", children = children);
   return element;
 }, "h6");
-var head = /* @__PURE__ */ __name((children) => {
+var head = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("head", children = children);
   return element;
 }, "head");
-var header = /* @__PURE__ */ __name((children) => {
+var header = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("header", children = children);
   return element;
 }, "header");
-var hgroup = /* @__PURE__ */ __name((children) => {
+var hgroup = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("hgroup", children = children);
   return element;
 }, "hgroup");
-var hr = /* @__PURE__ */ __name((children) => {
+var hr = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("hr", children = children);
   return element;
 }, "hr");
-var html = /* @__PURE__ */ __name((children) => {
+var html = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("html", children = children);
   return element;
 }, "html");
-var i = /* @__PURE__ */ __name((children) => {
+var i = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("i", children = children);
   return element;
 }, "i");
-var iframe = /* @__PURE__ */ __name((children) => {
+var iframe = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("iframe", children = children);
   return element;
 }, "iframe");
-var img = /* @__PURE__ */ __name((children) => {
+var img = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("img", children = children);
   return element;
 }, "img");
-var input = /* @__PURE__ */ __name((children) => {
+var input = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("input", children = children);
   return element;
 }, "input");
-var ins = /* @__PURE__ */ __name((children) => {
+var ins = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("ins", children = children);
   return element;
 }, "ins");
-var kbd = /* @__PURE__ */ __name((children) => {
+var kbd = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("kbd", children = children);
   return element;
 }, "kbd");
-var label = /* @__PURE__ */ __name((children) => {
+var label = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("label", children = children);
   return element;
 }, "label");
-var legend = /* @__PURE__ */ __name((children) => {
+var legend = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("legend", children = children);
   return element;
 }, "legend");
-var li = /* @__PURE__ */ __name((children) => {
+var li = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("li", children = children);
   return element;
 }, "li");
-var link = /* @__PURE__ */ __name((children) => {
+var link = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("link", children = children);
   return element;
 }, "link");
-var main = /* @__PURE__ */ __name((children) => {
+var main = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("main", children = children);
   return element;
 }, "main");
-var map = /* @__PURE__ */ __name((children) => {
+var map = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("map", children = children);
   return element;
 }, "map");
-var mark = /* @__PURE__ */ __name((children) => {
+var mark = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("mark", children = children);
   return element;
 }, "mark");
-var menu = /* @__PURE__ */ __name((children) => {
+var menu = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("menu", children = children);
   return element;
 }, "menu");
-var meta = /* @__PURE__ */ __name((children) => {
+var meta = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("meta", children = children);
   return element;
 }, "meta");
-var meter = /* @__PURE__ */ __name((children) => {
+var meter = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("meter", children = children);
   return element;
 }, "meter");
-var nav = /* @__PURE__ */ __name((children) => {
+var nav = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("nav", children = children);
   return element;
 }, "nav");
-var noscript = /* @__PURE__ */ __name((children) => {
+var noscript = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("noscript", children = children);
   return element;
 }, "noscript");
-var object = /* @__PURE__ */ __name((children) => {
+var object = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("object", children = children);
   return element;
 }, "object");
-var ol = /* @__PURE__ */ __name((children) => {
+var ol = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("ol", children = children);
   return element;
 }, "ol");
-var optgroup = /* @__PURE__ */ __name((children) => {
+var optgroup = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("optgroup", children = children);
   return element;
 }, "optgroup");
-var option = /* @__PURE__ */ __name((children) => {
+var option = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("option", children = children);
   return element;
 }, "option");
-var output = /* @__PURE__ */ __name((children) => {
+var output = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("output", children = children);
   return element;
 }, "output");
-var p = /* @__PURE__ */ __name((children) => {
+var p = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("p", children = children);
   return element;
 }, "p");
-var picture = /* @__PURE__ */ __name((children) => {
+var picture = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("picture", children = children);
   return element;
 }, "picture");
-var pre = /* @__PURE__ */ __name((children) => {
+var pre = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("pre", children = children);
   return element;
 }, "pre");
-var progress = /* @__PURE__ */ __name((children) => {
+var progress = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("progress", children = children);
   return element;
 }, "progress");
-var q = /* @__PURE__ */ __name((children) => {
+var q = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("q", children = children);
   return element;
 }, "q");
-var rp = /* @__PURE__ */ __name((children) => {
+var rp = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("rp", children = children);
   return element;
 }, "rp");
-var rt = /* @__PURE__ */ __name((children) => {
+var rt = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("rt", children = children);
   return element;
 }, "rt");
-var ruby = /* @__PURE__ */ __name((children) => {
+var ruby = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("ruby", children = children);
   return element;
 }, "ruby");
-var s = /* @__PURE__ */ __name((children) => {
+var s = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("s", children = children);
   return element;
 }, "s");
-var samp = /* @__PURE__ */ __name((children) => {
+var samp = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("samp", children = children);
   return element;
 }, "samp");
-var script = /* @__PURE__ */ __name((children) => {
+var script = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("script", children = children);
   return element;
 }, "script");
-var search = /* @__PURE__ */ __name((children) => {
+var search = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("search", children = children);
   return element;
 }, "search");
-var section = /* @__PURE__ */ __name((children) => {
+var section = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("section", children = children);
   return element;
 }, "section");
-var select = /* @__PURE__ */ __name((children) => {
+var select = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("select", children = children);
   return element;
 }, "select");
-var slot = /* @__PURE__ */ __name((children) => {
+var slot = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("slot", children = children);
   return element;
 }, "slot");
-var small = /* @__PURE__ */ __name((children) => {
+var small = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("small", children = children);
   return element;
 }, "small");
-var source = /* @__PURE__ */ __name((children) => {
+var source = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("source", children = children);
   return element;
 }, "source");
-var span = /* @__PURE__ */ __name((children) => {
+var span = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("span", children = children);
   return element;
 }, "span");
-var strong = /* @__PURE__ */ __name((children) => {
+var strong = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("strong", children = children);
   return element;
 }, "strong");
-var style = /* @__PURE__ */ __name((children) => {
+var style = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("style", children = children);
   return element;
 }, "style");
-var sub = /* @__PURE__ */ __name((children) => {
+var sub = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("sub", children = children);
   return element;
 }, "sub");
-var summary = /* @__PURE__ */ __name((children) => {
+var summary = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("summary", children = children);
   return element;
 }, "summary");
-var sup = /* @__PURE__ */ __name((children) => {
+var sup = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("sup", children = children);
   return element;
 }, "sup");
-var table = /* @__PURE__ */ __name((children) => {
+var table = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("table", children = children);
   return element;
 }, "table");
-var tbody = /* @__PURE__ */ __name((children) => {
+var tbody = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("tbody", children = children);
   return element;
 }, "tbody");
-var td = /* @__PURE__ */ __name((children) => {
+var td = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("td", children = children);
   return element;
 }, "td");
-var template = /* @__PURE__ */ __name((children) => {
+var template = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("template", children = children);
   return element;
 }, "template");
-var textarea = /* @__PURE__ */ __name((children) => {
+var textarea = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("textarea", children = children);
   return element;
 }, "textarea");
-var tfoot = /* @__PURE__ */ __name((children) => {
+var tfoot = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("tfoot", children = children);
   return element;
 }, "tfoot");
-var th = /* @__PURE__ */ __name((children) => {
+var th = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("th", children = children);
   return element;
 }, "th");
-var thead = /* @__PURE__ */ __name((children) => {
+var thead = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("thead", children = children);
   return element;
 }, "thead");
-var time = /* @__PURE__ */ __name((children) => {
+var time = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("time", children = children);
   return element;
 }, "time");
-var title = /* @__PURE__ */ __name((children) => {
+var title = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("title", children = children);
   return element;
 }, "title");
-var tr = /* @__PURE__ */ __name((children) => {
+var tr = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("tr", children = children);
   return element;
 }, "tr");
-var track = /* @__PURE__ */ __name((children) => {
+var track = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("track", children = children);
   return element;
 }, "track");
-var u = /* @__PURE__ */ __name((children) => {
+var u = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("u", children = children);
   return element;
 }, "u");
-var ul = /* @__PURE__ */ __name((children) => {
+var ul = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("ul", children = children);
   return element;
 }, "ul");
-var $var = /* @__PURE__ */ __name((children) => {
+var $var = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("var", children = children);
   return element;
 }, "$var");
-var video = /* @__PURE__ */ __name((children) => {
+var video = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("video", children = children);
   return element;
 }, "video");
-var wbr = /* @__PURE__ */ __name((children) => {
+var wbr = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("wbr", children = children);
   return element;
 }, "wbr");

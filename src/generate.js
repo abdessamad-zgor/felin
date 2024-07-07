@@ -121,7 +121,7 @@ function generateHSElementFucntion() {
   let fileBuffer = `import {HsHTMLElement, HsElement} from './element'\n`;
   let template = (tag) => {
     return `
-export const ${tag} = (children?: HsElement[]):HsElement => {
+export const ${tag} = (...children: HsElement[]):HsElement => {
 \tlet element = new HsHTMLElement("${tag == '$var' ? 'var' : tag}", children = children)
 \treturn element;
 }
