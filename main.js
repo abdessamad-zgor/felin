@@ -1,5 +1,8 @@
-import { main, div, p, button, HsDocument, span, state, text, effect, computed } from "./dist/hsjs.js";
+import { main, div, p, button, FlexDocument, span, state, text, effect, computed } from "./dist/flex.js";
 /*
+ * import {div, p, button, main} from "flex"
+ * 
+ *
  * let state = $state(0)
  *
  * let effect = state.effect(()=>{
@@ -50,6 +53,6 @@ let page = () => {
   )
 }
 
-let hsDocument = new HsDocument();
+let hsDocument = new FlexDocument();
 hsDocument.render('#page', page())
 

@@ -1,13 +1,13 @@
 import { Properties as CssStyle } from "csstype";
-import { HsEvent } from "./event";
-import { HsState } from "./state";
+import { FlexEvent } from "./event";
+import { FlexState } from "./state";
 import { text } from "stream/consumers";
 import { toCssString } from "./style";
 
-export class HsTextNode<T extends any[]> {
+export class FlexTextNode<T extends any[]> {
   id: string
-  stateCalls: HsState[] = [];
-  parentNode: HsHTMLElement;
+  stateCalls: FlexState[] = [];
+  parentNode: FlexHTMLElement;
   text: string
 
   constructor(text: string, ...args: T) {
@@ -23,7 +23,7 @@ export class HsTextNode<T extends any[]> {
     this.text = text
   }
 
-  element(parent?: HsHTMLElement) {
+  element(parent?: FlexHTMLElement) {
     if (parent) {
       this.parentNode = parent
     }
@@ -34,41 +34,40 @@ export class HsTextNode<T extends any[]> {
     return document.createTextNode(textContent)
   }
 
-  getStateCalls(accumulator?: { state: HsState, element: HsElement }[]) {
+  getStateCalls(accumulator?: { state: FlexState, element: FlexElement }[]) {
     let acc = accumulator || []
     let stateCalls = this.stateCalls.map(sc => ({ state: sc, element: this }))
     acc = acc.concat(...stateCalls)
     return acc
   }
-
 }
 
-// TODO: MAKE `element()` ACCEPT AN `HsDocument`
-export class HsHTMLElement {
+// TODO: MAKE `element()` ACCEPT AN `FlexDocument`
+export class FlexHTMLElement {
   id: string;
   name: keyof HTMLElementTagNameMap;
-  parentNode: HsHTMLElement;
-  stateCalls: HsState[] = [];
-  $children: HsElement[];
+  parentNode: FlexHTMLElement;
+  stateCalls: FlexState[] = [];
+  $children: FlexElement[];
   $style: CssStyle | null;
-  $listeners: Map<keyof HTMLElementEventMap, (event: HsEvent) => void>
+  $listeners: Map<keyof HTMLElementEventMap, (event: FlexEvent) => void>
   $classname: string
   $attributes: { [attr: string]: any }
 
-  constructor(name: keyof HTMLElementTagNameMap, children?: (HsElement | string)[] | string, style?: CssStyle) {
+  constructor(name: keyof HTMLElementTagNameMap, children?: (FlexElement | string)[] | string, style?: CssStyle) {
     this.id = crypto.randomUUID()
     this.name = name
     if (typeof children == "string") {
-      this.$children = [new HsTextNode(children)]
+      this.$children = [new FlexTextNode(children)]
     } else if (Array.isArray(children)) {
       this.$children = []
       for (let child of children) {
         if (child instanceof Function) {
-          this.$children.push(new HsTextNode("{}", child))
+          this.$children.push(new FlexTextNode("{}", child))
           //@ts-ignore
-          this.stateCalls.push(child as HsState)
+          this.stateCalls.push(child as FlexState)
         } else {
-          this.$children.push(typeof child == "string" ? new HsTextNode(child) : child)
+          this.$children.push(typeof child == "string" ? new FlexTextNode(child) : child)
         }
       }
     } else {
@@ -83,13 +82,13 @@ export class HsHTMLElement {
     return this
   }
 
-  children(children?: HsElement[]) {
+  children(children?: FlexElement[]) {
     if (!children)
       return this.$children
     else {
       for (let child of children) {
         if (child instanceof Function) {
-          this.$children.push(new HsTextNode("{}", child))
+          this.$children.push(new FlexTextNode("{}", child))
         } else {
           this.$children.push(child)
         }
@@ -98,7 +97,7 @@ export class HsHTMLElement {
     }
   }
 
-  getStateCalls(accumulator?: { state: HsState, element: HsElement }[]) {
+  getStateCalls(accumulator?: { state: FlexState, element: FlexElement }[]) {
     let acc = accumulator || []
     let stateCalls = this.stateCalls.map(sc => ({ state: sc, element: this }))
     acc = acc.concat(...stateCalls)
@@ -114,14 +113,14 @@ export class HsHTMLElement {
     return this
   }
 
-  listen(eventname: keyof HTMLElementEventMap, callback: (event: HsEvent) => void) {
+  listen(eventname: keyof HTMLElementEventMap, callback: (event: FlexEvent) => void) {
     if (!this.$listeners.has(eventname)) {
       this.$listeners.set(eventname, callback)
     }
     return this
   }
 
-  element(parent?: HsHTMLElement): HTMLElement {
+  element(parent?: FlexHTMLElement): HTMLElement {
     if (parent) {
       this.parentNode = parent
     }
@@ -141,7 +140,7 @@ export class HsHTMLElement {
       element.setAttribute(key, this.$attributes[key] as string)
     }
 
-    let elementChildren = this.children() as HsElement[]
+    let elementChildren = this.children() as FlexElement[]
     if (elementChildren.length == 0) {
       return element
     } else {
@@ -166,29 +165,29 @@ export class HsHTMLElement {
   }
 }
 
-export class HsSVGElement {
+export class FlexSVGElement {
   id: string;
   name: keyof SVGElementTagNameMap;
-  parentNode: HsSVGElement;
-  stateCalls: HsState[] = [];
-  $children: HsElement[];
+  parentNode: FlexSVGElement;
+  stateCalls: FlexState[] = [];
+  $children: FlexElement[];
   $style: CssStyle | null;
-  $listeners: Map<keyof SVGElementEventMap, (event: HsEvent) => void>
+  $listeners: Map<keyof SVGElementEventMap, (event: FlexEvent) => void>
   $classname: string
   $attributes: { [attr: string]: any }
 
-  constructor(name: keyof SVGElementTagNameMap, children?: HsElement[], style?: CssStyle) {
+  constructor(name: keyof SVGElementTagNameMap, children?: FlexElement[], style?: CssStyle) {
     this.id = crypto.randomUUID();
     this.name = name;
 
     this.$children = []
     for (let child of children) {
       if (child instanceof Function) {
-        this.$children.push(new HsTextNode("{}", child))
+        this.$children.push(new FlexTextNode("{}", child))
         //@ts-ignore
-        this.stateCalls.push(child as HsState)
+        this.stateCalls.push(child as FlexState)
       } else {
-        this.$children.push(typeof child == "string" ? new HsTextNode(child) : child)
+        this.$children.push(typeof child == "string" ? new FlexTextNode(child) : child)
       }
     }
     this.$style = style || null
@@ -200,13 +199,13 @@ export class HsSVGElement {
     return this
   }
 
-  children(children?: HsElement[]) {
+  children(children?: FlexElement[]) {
     if (!children)
       return this.$children
     else {
       for (let child of children) {
         if (child instanceof Function) {
-          this.$children.push(new HsTextNode("{}", child))
+          this.$children.push(new FlexTextNode("{}", child))
         } else {
           this.$children.push(child)
         }
@@ -215,7 +214,7 @@ export class HsSVGElement {
     }
   }
 
-  getStateCalls(accumulator?: { state: HsState, element: HsElement }[]) {
+  getStateCalls(accumulator?: { state: FlexState, element: FlexElement }[]) {
     let acc = accumulator || []
     let stateCalls = this.stateCalls.map(sc => ({ state: sc, element: this }))
     acc = acc.concat(...stateCalls)
@@ -231,14 +230,14 @@ export class HsSVGElement {
     return this
   }
 
-  listen(eventname: keyof SVGElementEventMap, callback: (event: HsEvent) => void) {
+  listen(eventname: keyof SVGElementEventMap, callback: (event: FlexEvent) => void) {
     if (!this.$listeners.has(eventname)) {
       this.$listeners.set(eventname, callback)
     }
     return this
   }
 
-  element(parent?: HsSVGElement): SVGElement {
+  element(parent?: FlexSVGElement): SVGElement {
     if (parent) {
       this.parentNode = parent
     }
@@ -258,7 +257,7 @@ export class HsSVGElement {
       element.setAttribute(key, this.$attributes[key] as string)
     }
 
-    let elementChildren = this.children() as HsElement[]
+    let elementChildren = this.children() as FlexElement[]
     if (elementChildren.length == 0) {
       return element
     } else {
@@ -283,4 +282,4 @@ export class HsSVGElement {
   }
 }
 
-export type HsElement = HsTextNode<any[]> | HsHTMLElement | HsSVGElement
+export type FlexElement = FlexTextNode<any[]> | FlexHTMLElement | FlexSVGElement

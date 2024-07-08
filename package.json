@@ -1,7 +1,7 @@
 {
-  "name": "hsjs",
+  "name": "flex",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "lib/flex.js",
   "author": "Abdessamad Zgor <abdessamadzgor@gmail.com>",
   "license": "MIT",
   "type": "module",
@@ -10,10 +10,11 @@
     "@types/node": "^20.12.12",
     "csstype": "^3.1.3",
     "esbuild": "^0.23.0",
+    "parcel": "^2.12.0",
     "typescript": "^5.4.5"
   },
   "scripts": {
-    "build": "tsc && esbuild ./src/hsjs.js --format=esm --platform=node --keep-names --bundle --outfile=./dist/hsjs.js",
+    "build-dev": "tsc && esbuild ./src/flex.js --format=esm --platform=node --keep-names --bundle --minify --outfile=./dist/flex.js",
     "prestart": "yarn run build",
     "start": "python3 -m http.server 4444"
   },

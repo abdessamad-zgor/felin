@@ -1,10 +1,10 @@
-import { HsHTMLElement as HsElement, HsHTMLElement, HsTextNode } from "../src/hsjs"
+import { FlexHTMLElement as FlexElement, FlexHTMLElement, FlexTextNode } from "../src/flex"
 
-export class HsDocument {
+export class FlexDocument {
   window: Window
   document: Document
   rootSelector: string;
-  rootElement: HsElement;
+  rootElement: FlexElement;
 
   constructor() {
     if (window) {
@@ -13,7 +13,7 @@ export class HsDocument {
     }
   }
 
-  render(selector: string, element: HsElement) {
+  render(selector: string, element: FlexElement) {
     if (this.document instanceof Document) {
       let target = this.document.querySelector(selector)
       if (target instanceof HTMLElement || element instanceof Node) {
@@ -22,20 +22,20 @@ export class HsDocument {
         this.rootSelector = selector;
         this.rootElement = element;
         let stateCalls = element.getStateCalls()
-        HSJS.registerHsDocumentRoot(selector, this)
-        HSJS.registerStateCalls(selector, stateCalls)
-        HSJS.run()
+        FLEX.registerFlexDocumentRoot(selector, this)
+        FLEX.registerStateCalls(selector, stateCalls)
+        FLEX.run()
       } else
-        throw Error("HsJsError: no element found with selector " + selector)
+        throw Error("FlexJsError: no element found with selector " + selector)
     }
   }
 
-  selector(element: HsElement) {
-    let elementPath: HsHTMLElement[] = []
+  selector(element: FlexElement) {
+    let elementPath: FlexHTMLElement[] = []
     let currentElement = element
     let selector = `${this.rootSelector}>${this.rootElement.name}`
     while (currentElement.id != this.rootElement.id) {
-      if (currentElement instanceof HsHTMLElement) {
+      if (currentElement instanceof FlexHTMLElement) {
         elementPath.push(currentElement)
       }
       currentElement = currentElement.parentNode

@@ -1,16 +1,16 @@
 import { Properties as CssStyle } from "csstype"
-import { HsDocument, HsElement, HsHTMLElement, HsState, HsTextNode } from "./hsjs"
-import { HsEffect } from "./effect"
-import { HsComputed } from "./computed"
+import { FlexDocument, FlexElement, FlexHTMLElement, FlexState, FlexTextNode } from "./flex"
+import { FlexEffect } from "./effect"
+import { FlexComputed } from "./computed"
 
-export interface HsTask<A = { [key: string]: any }, R = void> {
+export interface FlexTask<A = { [key: string]: any }, R = void> {
   priority: number
   call(args: A): R
 }
 
-type DOMUpdateArgs = { state: HsState|HsComputed, hsDocument: HsDocument, element: HsElement }
+type DOMUpdateArgs = { state: FlexState|FlexComputed, hsDocument: FlexDocument, element: FlexElement }
 
-export class HsDOMUpdate implements HsTask<DOMUpdateArgs, void> {
+export class FlexDOMUpdate implements FlexTask<DOMUpdateArgs, void> {
   priority: number
   args: DOMUpdateArgs
 
@@ -22,7 +22,7 @@ export class HsDOMUpdate implements HsTask<DOMUpdateArgs, void> {
   call(args: DOMUpdateArgs) {
     let newValue = (this.args.state as Function)()
     console.log(newValue)
-    let nodeSelector = this.args.hsDocument.selector(this.args.element as HsHTMLElement)
+    let nodeSelector = this.args.hsDocument.selector(this.args.element as FlexHTMLElement)
 
     let domElement = this.args.hsDocument.document.querySelector(nodeSelector)
     if (domElement) {
@@ -32,11 +32,11 @@ export class HsDOMUpdate implements HsTask<DOMUpdateArgs, void> {
 }
 
 
-export class HsComputedRefresh implements HsTask {
+export class FlexComputedRefresh implements FlexTask {
   priority: number
-  args: HsComputed
+  args: FlexComputed
 
-  constructor(args: HsComputed){
+  constructor(args: FlexComputed){
     this.args = args
     this.priority = 2
   }
@@ -48,23 +48,23 @@ export class HsComputedRefresh implements HsTask {
 
 }
 
-type HsEffectArgs = { fn: (...args: HsState[]) => void, dependents: HsState[] }
+type FlexEffectArgs = { fn: (...args: FlexState[]) => void, dependents: FlexState[] }
 
-export class HsEffectCall implements HsTask {
+export class FlexEffectCall implements FlexTask {
   priority: number
-  args: HsEffectArgs
+  args: FlexEffectArgs
 
-  constructor(args: HsEffectArgs) {
+  constructor(args: FlexEffectArgs) {
     this.args = args
     this.priority = 3
   }
 
-  call(args: HsEffectArgs) {
+  call(args: FlexEffectArgs) {
     args.fn(...args.dependents)
   }
 }
 
-function quickSortByPriority(array: HsTask[]) {
+function quickSortByPriority(array: FlexTask[]) {
   if (array.length <= 1) {
     return array;
   }
@@ -79,12 +79,12 @@ function quickSortByPriority(array: HsTask[]) {
   return quickSortByPriority(left).concat(pivot, quickSortByPriority(right));
 };
 
-export class HsStack {
-  tasks: HsTask[] = []
+export class FlexStack {
+  tasks: FlexTask[] = []
   constructor() {
   }
 
-  pop(): HsTask {
+  pop(): FlexTask {
     if (this.tasks.length > 0) {
       let highestPriorityTask = this.tasks[0]
       this.tasks = this.tasks.slice(1)
@@ -92,7 +92,7 @@ export class HsStack {
     }
   }
 
-  push(task: HsTask) {
+  push(task: FlexTask) {
     this.tasks.push(task)
     this.tasks = quickSortByPriority(this.tasks)
   }
@@ -102,12 +102,12 @@ export class HsStack {
   }
 }
 
-export class HsRuntime {
-  stack: HsStack
+export class FlexRuntime {
+  stack: FlexStack
   running: boolean
 
   constructor() {
-    this.stack = new HsStack()
+    this.stack = new FlexStack()
     this.running = true
   }
 
@@ -119,56 +119,56 @@ export class HsRuntime {
         break;
       }
       let task = this.stack.pop()
-      if (task instanceof HsDOMUpdate) {
+      if (task instanceof FlexDOMUpdate) {
         task.call(task.args)
-      } else if (task instanceof HsComputedRefresh) {
+      } else if (task instanceof FlexComputedRefresh) {
         task.call(task.args)
-      } else if (task instanceof HsEffectCall) {
+      } else if (task instanceof FlexEffectCall) {
         task.call(task.args)
       }
     }
   }
 
-  pushTask(task: HsTask) {
+  pushTask(task: FlexTask) {
     this.stack.push(task)
     if (!this.running) this.run()
   }
 }
 
-export class HsRegistry {
-  runtime: HsRuntime
-  documentStates: { [key: string]: { state: HsState, element: HsElement }[] }
-  documentRootsMap: { [key: string]: HsDocument }
-  effects: HsEffect[]
-  computed: HsComputed[]
+export class FlexRegistry {
+  runtime: FlexRuntime
+  documentStates: { [key: string]: { state: FlexState, element: FlexElement }[] }
+  documentRootsMap: { [key: string]: FlexDocument }
+  effects: FlexEffect[]
+  computed: FlexComputed[]
 
   constructor() {
-    this.runtime = new HsRuntime();
+    this.runtime = new FlexRuntime();
     this.documentRootsMap = {}
     this.documentStates = {}
     this.effects = []
     this.computed = []
   }
 
-  register(task: HsTask) {
+  register(task: FlexTask) {
     this.runtime.pushTask(task)
   }
 
-  registerStateCalls(root: string, stateCalls: { state: HsState, element: HsElement }[]) {
+  registerStateCalls(root: string, stateCalls: { state: FlexState, element: FlexElement }[]) {
     this.documentStates[root] = stateCalls
   }
 
-  registerStateUpdate(state: HsState) {
+  registerStateUpdate(state: FlexState) {
     let root = Object.keys(this.documentStates).find(r => this.documentStates[r].some(s => s.state.id == state.id))
     if (root) {
       let hsDocument = this.documentRootsMap[root]
       let stateCalls = this.documentStates[root].filter(s => s.state.id == state.id);
       for (let stateCall of stateCalls) {
-        let targetElement: HsHTMLElement = stateCall.element as HsHTMLElement
-        if (stateCall.element instanceof HsTextNode) {
+        let targetElement: FlexHTMLElement = stateCall.element as FlexHTMLElement
+        if (stateCall.element instanceof FlexTextNode) {
           targetElement = stateCall.element.parentNode
         }
-        let domUpdate = new HsDOMUpdate({ hsDocument, state: stateCall.state, element: targetElement })
+        let domUpdate = new FlexDOMUpdate({ hsDocument, state: stateCall.state, element: targetElement })
         this.runtime.pushTask(domUpdate);
       }
     }
@@ -176,19 +176,19 @@ export class HsRegistry {
     let computed = this.computed.find(e=>e.states.some(s=>s.id==state.id))
     console.log(computed)
     if(computed){
-      let computedRefresh = new HsComputedRefresh(computed)
+      let computedRefresh = new FlexComputedRefresh(computed)
       this.runtime.pushTask(computedRefresh)
       console.log(this.documentStates)
       let computedStateRoot = Object.keys(this.documentStates).find(r => this.documentStates[r].some(s => s.state.id == computed.id))
       if(computedStateRoot){
-        let computedHsDocument = this.documentRootsMap[computedStateRoot]
+        let computedFlexDocument = this.documentRootsMap[computedStateRoot]
         let computedStateCalls = this.documentStates[computedStateRoot].filter(s=>s.state.id == computed.id);
         for (let computedStateCall of computedStateCalls){
-          let computedTargetElement: HsHTMLElement = computedStateCall.element as HsHTMLElement
-          if(computedStateCall.element instanceof HsTextNode){
+          let computedTargetElement: FlexHTMLElement = computedStateCall.element as FlexHTMLElement
+          if(computedStateCall.element instanceof FlexTextNode){
             computedTargetElement = computedStateCall.element.parentNode
           }
-          let computedDomUpdate = new HsDOMUpdate({hsDocument: computedHsDocument, state: computedStateCall.state, element: computedTargetElement})
+          let computedDomUpdate = new FlexDOMUpdate({hsDocument: computedFlexDocument, state: computedStateCall.state, element: computedTargetElement})
           this.runtime.pushTask(computedDomUpdate)
         }
       }
@@ -196,12 +196,12 @@ export class HsRegistry {
 
     let effect = this.effects.find(e => e.dependants.some(s => s.id == state.id))
     if(effect){
-      let effectCall = new HsEffectCall({ fn: effect.effect, dependents: effect.dependants })
+      let effectCall = new FlexEffectCall({ fn: effect.effect, dependents: effect.dependants })
       this.runtime.pushTask(effectCall)
     }
   }
 
-  registerHsDocumentRoot(root: string, document: HsDocument) {
+  registerFlexDocumentRoot(root: string, document: FlexDocument) {
     if (!Object.keys(this.documentRootsMap).includes(root)) {
       this.documentRootsMap[root] = document
     }
@@ -211,16 +211,16 @@ export class HsRegistry {
     this.runtime.run()
   }
 
-  registerEffect(effect: HsEffect) {
+  registerEffect(effect: FlexEffect) {
     if(!this.effects.some(e=>e.id==effect.id))
       this.effects.push(effect)
   }
 
-  registerComputedState(state: HsComputed){
+  registerComputedState(state: FlexComputed){
     if(!this.computed.some(c=>c.id == state.id))
       this.computed.push(state)
   }
 }
 
-export const HSJS = new HsRegistry()
+export const FLEX = new FlexRegistry()
 

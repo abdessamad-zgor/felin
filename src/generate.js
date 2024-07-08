@@ -181,11 +181,11 @@ let svgTags = [
 function generateHSElementFucntion() {
   let __dirname = import.meta.dirname
   let filePath = join(__dirname, "elements.ts");
-  let fileBuffer = `import {HsHTMLElement, HsSVGElement, HsElement} from './element'\n`;
+  let fileBuffer = `import {FlexHTMLElement, FlexSVGElement, FlexElement} from './element'\n`;
   let htmlTemplate = (tag) => {
     return `
-export const ${tag} = (...children: HsElement[]):HsElement => {
-\tlet element = new HsHTMLElement("${tag == '$var' ? 'var' : tag}", children = children)
+export const ${tag} = (...children: FlexElement[]):FlexElement => {
+\tlet element = new FlexHTMLElement("${tag == '$var' ? 'var' : tag}", children = children)
 \treturn element;
 }
 `;
@@ -197,8 +197,8 @@ export const ${tag} = (...children: HsElement[]):HsElement => {
 
   let svgTemplate = (tag) => {
     return `
-export const ${tag} = (...children: HsElement[]):HsElement => {
-\tlet element = new HsSVGElement("${tag == '$a' ? 'a' : tag == '$title' ? 'title' : tag == '$text' ? 'text' : tag == '$switch' ? 'switch' : tag}", children = children)
+export const ${tag} = (...children: FlexElement[]):FlexElement => {
+\tlet element = new FlexSVGElement("${tag == '$a' ? 'a' : tag == '$title' ? 'title' : tag == '$text' ? 'text' : tag == '$switch' ? 'switch' : tag}", children = children)
 \treturn element;
 }
 `

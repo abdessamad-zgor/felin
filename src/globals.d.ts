@@ -1,6 +1,6 @@
-import { HsRegistry } from "./core"
+import { FlexRegistry } from "./core"
 
 declare global {
-  var HSJS: HsRegistry
+  var FLEX: FlexRegistry
 }
 

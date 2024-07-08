@@ -10,22 +10,22 @@ export class ExtensibleFunction extends Function {
   }
 }
 
-export interface HsStateClass<T> {
+export interface FlexStateClass<T> {
   id: string;
   value: T;
-  parent?: HsState;
+  parent?: FlexState;
   set(fnOrValue: T | StateTypeMutation<T>): void;
-  update?: (child: HsState) => void
+  update?: (child: FlexState) => void
 }
 
-export type HsState<T = any> = Function & HsStateClass<T>
+export type FlexState<T = any> = Function & FlexStateClass<T>
 
-export class HsString extends ExtensibleFunction implements HsState<string> {
+export class FlexString extends ExtensibleFunction implements FlexState<string> {
   id: string
   value: string
-  parent?: HsState
+  parent?: FlexState
 
-  constructor(value: string, parent?: HsState) {
+  constructor(value: string, parent?: FlexState) {
     super(() => { return this.value })
     this.id = crypto.randomUUID()
     this.value = value
@@ -42,17 +42,17 @@ export class HsString extends ExtensibleFunction implements HsState<string> {
     if (newValue != this.value) {
       this.value = newValue
       this.parent?.update(this)
-      HSJS.registerStateUpdate(this)
+      FLEX.registerStateUpdate(this)
     }
   }
 }
 
-export class HsNumber extends ExtensibleFunction implements HsState<number> {
+export class FlexNumber extends ExtensibleFunction implements FlexState<number> {
   id: string
   value: number
-  parent?: HsState
+  parent?: FlexState
 
-  constructor(value: number, parent: HsState) {
+  constructor(value: number, parent: FlexState) {
     super(() => { return this.value })
     this.id = crypto.randomUUID()
     this.value = value
@@ -69,7 +69,7 @@ export class HsNumber extends ExtensibleFunction implements HsState<number> {
     if (newValue != this.value) {
       this.value = newValue
       this.parent?.update(this)
-      HSJS.registerStateUpdate(this)
+      FLEX.registerStateUpdate(this)
     }
   }
 
@@ -77,12 +77,12 @@ export class HsNumber extends ExtensibleFunction implements HsState<number> {
 
 export type MappedObject = { [key: string]: any }
 
-export class HsMappedObject extends ExtensibleFunction implements HsState<MappedObject> {
+export class FlexMappedObject extends ExtensibleFunction implements FlexState<MappedObject> {
   id: string
   value: MappedObject
-  parent?: HsState
+  parent?: FlexState
 
-  constructor(value: MappedObject, parent?: HsState) {
+  constructor(value: MappedObject, parent?: FlexState) {
     super(() => { return this.value })
     this.id = crypto.randomUUID()
     this.value = value
@@ -102,11 +102,11 @@ export class HsMappedObject extends ExtensibleFunction implements HsState<Mapped
     if (newValue != this.value) {
       this.value = newValue
       this.parent?.update(this)
-      HSJS.registerStateUpdate(this)
+      FLEX.registerStateUpdate(this)
     }
   }
 
-  update(child: HsState) {
+  update(child: FlexState) {
     for (let key of Object.keys(this)) {
       if (Object.keys(this.value).includes(key) && this[key].id == child.id) {
         this.value[key] = child.value
@@ -118,12 +118,12 @@ export class HsMappedObject extends ExtensibleFunction implements HsState<Mapped
   }
 }
 
-export class HsArray extends ExtensibleFunction implements HsState<any[]> {
+export class FlexArray extends ExtensibleFunction implements FlexState<any[]> {
   id: string
   value: any[]
-  parent?: HsState
+  parent?: FlexState
 
-  constructor(value: any[], parent?: HsState) {
+  constructor(value: any[], parent?: FlexState) {
     super(() => { return this.value })
     this.id = crypto.randomUUID()
     this.value = value
@@ -149,11 +149,11 @@ export class HsArray extends ExtensibleFunction implements HsState<any[]> {
     if (newValue != this.value) {
       this.value = newValue
       this.parent?.update(this)
-      HSJS.registerStateUpdate(this)
+      FLEX.registerStateUpdate(this)
     }
   }
 
-  update(child: HsState) {
+  update(child: FlexState) {
     for (let key of Object.keys(this)) {
       if (Object.keys(this.value).includes(key) && this[key].id == child.id) {
         this.value[key] = child.value
@@ -170,15 +170,15 @@ export class HsArray extends ExtensibleFunction implements HsState<any[]> {
   }
 }
 
-export function createState(value: any, parent?: HsState): HsState {
+export function createState(value: any, parent?: FlexState): FlexState {
   let typeofValue = typeof value
   if (typeofValue == "string") {
-    return new HsString(value as string, parent)
+    return new FlexString(value as string, parent)
   } else if (typeofValue == "number") {
-    return new HsNumber(value, parent)
+    return new FlexNumber(value, parent)
   } else if (Array.isArray(value)) {
-    return new HsArray(value, parent)
+    return new FlexArray(value, parent)
   } else if (typeofValue == "object") {
-    return new HsMappedObject(value, parent)
+    return new FlexMappedObject(value, parent)
   }
 }

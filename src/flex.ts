@@ -1,5 +1,5 @@
-import { HSJS } from "./core";
-window.HSJS = HSJS
+import { FLEX } from "./core";
+window.FLEX = FLEX
 
 export * from "./element";
 export * from "./state";
