@@ -1,4 +1,4 @@
-import {HsHTMLElement, HsElement} from './element'
+import {HsHTMLElement, HsSVGElement, HsElement} from './element'
 
 export const a = (...children: HsElement[]):HsElement => {
 	let element = new HsHTMLElement("a", children = children)
@@ -410,11 +410,6 @@ export const samp = (...children: HsElement[]):HsElement => {
 	return element;
 }
 
-export const script = (...children: HsElement[]):HsElement => {
-	let element = new HsHTMLElement("script", children = children)
-	return element;
-}
-
 export const search = (...children: HsElement[]):HsElement => {
 	let element = new HsHTMLElement("search", children = children)
 	return element;
@@ -452,11 +447,6 @@ export const span = (...children: HsElement[]):HsElement => {
 
 export const strong = (...children: HsElement[]):HsElement => {
 	let element = new HsHTMLElement("strong", children = children)
-	return element;
-}
-
-export const style = (...children: HsElement[]):HsElement => {
-	let element = new HsHTMLElement("style", children = children)
 	return element;
 }
 
@@ -557,5 +547,310 @@ export const video = (...children: HsElement[]):HsElement => {
 
 export const wbr = (...children: HsElement[]):HsElement => {
 	let element = new HsHTMLElement("wbr", children = children)
+	return element;
+}
+
+export const $a = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("a", children = children)
+	return element;
+}
+
+export const animate = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("animate", children = children)
+	return element;
+}
+
+export const animateMotion = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("animateMotion", children = children)
+	return element;
+}
+
+export const animateTransform = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("animateTransform", children = children)
+	return element;
+}
+
+export const circle = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("circle", children = children)
+	return element;
+}
+
+export const clipPath = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("clipPath", children = children)
+	return element;
+}
+
+export const defs = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("defs", children = children)
+	return element;
+}
+
+export const desc = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("desc", children = children)
+	return element;
+}
+
+export const ellipse = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("ellipse", children = children)
+	return element;
+}
+
+export const feBlend = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feBlend", children = children)
+	return element;
+}
+
+export const feColorMatrix = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feColorMatrix", children = children)
+	return element;
+}
+
+export const feComponentTransfer = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feComponentTransfer", children = children)
+	return element;
+}
+
+export const feComposite = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feComposite", children = children)
+	return element;
+}
+
+export const feConvolveMatrix = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feConvolveMatrix", children = children)
+	return element;
+}
+
+export const feDiffuseLighting = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feDiffuseLighting", children = children)
+	return element;
+}
+
+export const feDisplacementMap = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feDisplacementMap", children = children)
+	return element;
+}
+
+export const feDistantLight = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feDistantLight", children = children)
+	return element;
+}
+
+export const feDropShadow = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feDropShadow", children = children)
+	return element;
+}
+
+export const feFlood = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feFlood", children = children)
+	return element;
+}
+
+export const feFuncA = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feFuncA", children = children)
+	return element;
+}
+
+export const feFuncB = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feFuncB", children = children)
+	return element;
+}
+
+export const feFuncG = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feFuncG", children = children)
+	return element;
+}
+
+export const feFuncR = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feFuncR", children = children)
+	return element;
+}
+
+export const feGaussianBlur = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feGaussianBlur", children = children)
+	return element;
+}
+
+export const feImage = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feImage", children = children)
+	return element;
+}
+
+export const feMerge = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feMerge", children = children)
+	return element;
+}
+
+export const feMergeNode = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feMergeNode", children = children)
+	return element;
+}
+
+export const feMorphology = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feMorphology", children = children)
+	return element;
+}
+
+export const feOffset = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feOffset", children = children)
+	return element;
+}
+
+export const fePointLight = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("fePointLight", children = children)
+	return element;
+}
+
+export const feSpecularLighting = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feSpecularLighting", children = children)
+	return element;
+}
+
+export const feSpotLight = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feSpotLight", children = children)
+	return element;
+}
+
+export const feTile = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feTile", children = children)
+	return element;
+}
+
+export const feTurbulence = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("feTurbulence", children = children)
+	return element;
+}
+
+export const filter = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("filter", children = children)
+	return element;
+}
+
+export const foreignObject = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("foreignObject", children = children)
+	return element;
+}
+
+export const g = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("g", children = children)
+	return element;
+}
+
+export const image = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("image", children = children)
+	return element;
+}
+
+export const line = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("line", children = children)
+	return element;
+}
+
+export const linearGradient = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("linearGradient", children = children)
+	return element;
+}
+
+export const marker = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("marker", children = children)
+	return element;
+}
+
+export const mask = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("mask", children = children)
+	return element;
+}
+
+export const metadata = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("metadata", children = children)
+	return element;
+}
+
+export const mpath = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("mpath", children = children)
+	return element;
+}
+
+export const path = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("path", children = children)
+	return element;
+}
+
+export const pattern = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("pattern", children = children)
+	return element;
+}
+
+export const polygon = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("polygon", children = children)
+	return element;
+}
+
+export const polyline = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("polyline", children = children)
+	return element;
+}
+
+export const radialGradient = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("radialGradient", children = children)
+	return element;
+}
+
+export const rect = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("rect", children = children)
+	return element;
+}
+
+export const set = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("set", children = children)
+	return element;
+}
+
+export const stop = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("stop", children = children)
+	return element;
+}
+
+export const svg = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("svg", children = children)
+	return element;
+}
+
+export const $switch = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("switch", children = children)
+	return element;
+}
+
+export const symbol = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("symbol", children = children)
+	return element;
+}
+
+export const $text = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("text", children = children)
+	return element;
+}
+
+export const textPath = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("textPath", children = children)
+	return element;
+}
+
+export const $title = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("title", children = children)
+	return element;
+}
+
+export const tspan = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("tspan", children = children)
+	return element;
+}
+
+export const use = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("use", children = children)
+	return element;
+}
+
+export const view = (...children: HsElement[]):HsElement => {
+	let element = new HsSVGElement("view", children = children)
 	return element;
 }

@@ -172,7 +172,7 @@ var HsRegistry = class {
       this.documentRootsMap[root] = document2;
     }
   }
-  run(root) {
+  run() {
     this.runtime.run();
   }
   registerEffect(effect2) {
@@ -187,16 +187,16 @@ var HsRegistry = class {
 var HSJS2 = new HsRegistry();
 
 // src/style.ts
-function toCssString(style2) {
+function toCssString(style) {
   let styleString = "";
-  for (let property of Object.keys(style2)) {
+  for (let property of Object.keys(style)) {
     let key = property.split("").map((char, i2) => {
       if (property.charCodeAt(i2) >= 65 && property.charCodeAt(i2) <= 90) {
         return "-" + char.toLowerCase();
       }
       return char;
     });
-    styleString += key.join("") + ": " + style2[property] + ";";
+    styleString += key.join("") + ": " + style[property] + ";";
   }
   console.log(styleString);
   return styleString;
@@ -239,7 +239,7 @@ var HsTextNode = class {
   }
 };
 var HsHTMLElement2 = class {
-  constructor(name, children, style2) {
+  constructor(name, children, style) {
     this.stateCalls = [];
     this.id = crypto.randomUUID();
     this.name = name;
@@ -258,14 +258,14 @@ var HsHTMLElement2 = class {
     } else {
       this.$children = [];
     }
-    this.$style = style2 || null;
+    this.$style = style || null;
     this.$listeners = /* @__PURE__ */ new Map();
   }
   static {
     __name(this, "HsHTMLElement");
   }
-  style(style2) {
-    this.$style = style2;
+  style(style) {
+    this.$style = style;
     return this;
   }
   children(children) {
@@ -313,6 +313,12 @@ var HsHTMLElement2 = class {
     if (this.$style) {
       element.style.cssText = toCssString(this.$style);
     }
+    if (this.$classname) {
+      element.classList.add(...this.$classname.split(" "));
+    }
+    for (let key of Object.keys(this.$attributes)) {
+      element.setAttribute(key, this.$attributes[key]);
+    }
     let elementChildren = this.children();
     if (elementChildren.length == 0) {
       return element;
@@ -322,6 +328,110 @@ var HsHTMLElement2 = class {
       }
       return element;
     }
+  }
+  class(classname) {
+    this.$classname = classname;
+  }
+  attr(name, value) {
+    this.$attributes[name] = value;
+  }
+  attrs(attrs) {
+    this.$attributes = { ...this.$attributes, ...attrs };
+  }
+};
+var HsSVGElement = class {
+  constructor(name, children, style) {
+    this.stateCalls = [];
+    this.id = crypto.randomUUID();
+    this.name = name;
+    this.$children = [];
+    for (let child of children) {
+      if (child instanceof Function) {
+        this.$children.push(new HsTextNode("{}", child));
+        this.stateCalls.push(child);
+      } else {
+        this.$children.push(typeof child == "string" ? new HsTextNode(child) : child);
+      }
+    }
+    this.$style = style || null;
+    this.$listeners = /* @__PURE__ */ new Map();
+  }
+  static {
+    __name(this, "HsSVGElement");
+  }
+  style(style) {
+    this.$style = style;
+    return this;
+  }
+  children(children) {
+    if (!children)
+      return this.$children;
+    else {
+      for (let child of children) {
+        if (child instanceof Function) {
+          this.$children.push(new HsTextNode("{}", child));
+        } else {
+          this.$children.push(child);
+        }
+      }
+      return this;
+    }
+  }
+  getStateCalls(accumulator) {
+    let acc = accumulator || [];
+    let stateCalls = this.stateCalls.map((sc) => ({ state: sc, element: this }));
+    acc = acc.concat(...stateCalls);
+    if (this.$children.length != 0) {
+      for (let child of this.$children) {
+        acc = child.getStateCalls(acc);
+      }
+    }
+    return acc;
+  }
+  child() {
+    return this;
+  }
+  listen(eventname, callback) {
+    if (!this.$listeners.has(eventname)) {
+      this.$listeners.set(eventname, callback);
+    }
+    return this;
+  }
+  element(parent) {
+    if (parent) {
+      this.parentNode = parent;
+    }
+    let element = document.createElementNS("http://www.w3.org/2000/svg", this.name);
+    for (let entry of this.$listeners.entries()) {
+      element.addEventListener(entry[0], entry[1]);
+    }
+    if (this.$style) {
+      element.style.cssText = toCssString(this.$style);
+    }
+    if (this.$classname) {
+      element.classList.add(...this.$classname.split(" "));
+    }
+    for (let key of Object.keys(this.$attributes)) {
+      element.setAttribute(key, this.$attributes[key]);
+    }
+    let elementChildren = this.children();
+    if (elementChildren.length == 0) {
+      return element;
+    } else {
+      for (let child of elementChildren) {
+        element.appendChild(child.element(this));
+      }
+      return element;
+    }
+  }
+  class(classname) {
+    this.$classname = classname;
+  }
+  attr(name, value) {
+    this.$attributes[name] = value;
+  }
+  attrs(attrs) {
+    this.$attributes = { ...this.$attributes, ...attrs };
   }
 };
 
@@ -817,10 +927,6 @@ var samp = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("samp", children = children);
   return element;
 }, "samp");
-var script = /* @__PURE__ */ __name((...children) => {
-  let element = new HsHTMLElement2("script", children = children);
-  return element;
-}, "script");
 var search = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("search", children = children);
   return element;
@@ -853,10 +959,6 @@ var strong = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("strong", children = children);
   return element;
 }, "strong");
-var style = /* @__PURE__ */ __name((...children) => {
-  let element = new HsHTMLElement2("style", children = children);
-  return element;
-}, "style");
 var sub = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("sub", children = children);
   return element;
@@ -937,6 +1039,250 @@ var wbr = /* @__PURE__ */ __name((...children) => {
   let element = new HsHTMLElement2("wbr", children = children);
   return element;
 }, "wbr");
+var $a = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("a", children = children);
+  return element;
+}, "$a");
+var animate = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("animate", children = children);
+  return element;
+}, "animate");
+var animateMotion = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("animateMotion", children = children);
+  return element;
+}, "animateMotion");
+var animateTransform = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("animateTransform", children = children);
+  return element;
+}, "animateTransform");
+var circle = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("circle", children = children);
+  return element;
+}, "circle");
+var clipPath = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("clipPath", children = children);
+  return element;
+}, "clipPath");
+var defs = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("defs", children = children);
+  return element;
+}, "defs");
+var desc = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("desc", children = children);
+  return element;
+}, "desc");
+var ellipse = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("ellipse", children = children);
+  return element;
+}, "ellipse");
+var feBlend = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feBlend", children = children);
+  return element;
+}, "feBlend");
+var feColorMatrix = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feColorMatrix", children = children);
+  return element;
+}, "feColorMatrix");
+var feComponentTransfer = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feComponentTransfer", children = children);
+  return element;
+}, "feComponentTransfer");
+var feComposite = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feComposite", children = children);
+  return element;
+}, "feComposite");
+var feConvolveMatrix = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feConvolveMatrix", children = children);
+  return element;
+}, "feConvolveMatrix");
+var feDiffuseLighting = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feDiffuseLighting", children = children);
+  return element;
+}, "feDiffuseLighting");
+var feDisplacementMap = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feDisplacementMap", children = children);
+  return element;
+}, "feDisplacementMap");
+var feDistantLight = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feDistantLight", children = children);
+  return element;
+}, "feDistantLight");
+var feDropShadow = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feDropShadow", children = children);
+  return element;
+}, "feDropShadow");
+var feFlood = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feFlood", children = children);
+  return element;
+}, "feFlood");
+var feFuncA = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feFuncA", children = children);
+  return element;
+}, "feFuncA");
+var feFuncB = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feFuncB", children = children);
+  return element;
+}, "feFuncB");
+var feFuncG = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feFuncG", children = children);
+  return element;
+}, "feFuncG");
+var feFuncR = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feFuncR", children = children);
+  return element;
+}, "feFuncR");
+var feGaussianBlur = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feGaussianBlur", children = children);
+  return element;
+}, "feGaussianBlur");
+var feImage = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feImage", children = children);
+  return element;
+}, "feImage");
+var feMerge = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feMerge", children = children);
+  return element;
+}, "feMerge");
+var feMergeNode = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feMergeNode", children = children);
+  return element;
+}, "feMergeNode");
+var feMorphology = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feMorphology", children = children);
+  return element;
+}, "feMorphology");
+var feOffset = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feOffset", children = children);
+  return element;
+}, "feOffset");
+var fePointLight = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("fePointLight", children = children);
+  return element;
+}, "fePointLight");
+var feSpecularLighting = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feSpecularLighting", children = children);
+  return element;
+}, "feSpecularLighting");
+var feSpotLight = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feSpotLight", children = children);
+  return element;
+}, "feSpotLight");
+var feTile = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feTile", children = children);
+  return element;
+}, "feTile");
+var feTurbulence = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("feTurbulence", children = children);
+  return element;
+}, "feTurbulence");
+var filter = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("filter", children = children);
+  return element;
+}, "filter");
+var foreignObject = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("foreignObject", children = children);
+  return element;
+}, "foreignObject");
+var g = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("g", children = children);
+  return element;
+}, "g");
+var image = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("image", children = children);
+  return element;
+}, "image");
+var line = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("line", children = children);
+  return element;
+}, "line");
+var linearGradient = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("linearGradient", children = children);
+  return element;
+}, "linearGradient");
+var marker = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("marker", children = children);
+  return element;
+}, "marker");
+var mask = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("mask", children = children);
+  return element;
+}, "mask");
+var metadata = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("metadata", children = children);
+  return element;
+}, "metadata");
+var mpath = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("mpath", children = children);
+  return element;
+}, "mpath");
+var path = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("path", children = children);
+  return element;
+}, "path");
+var pattern = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("pattern", children = children);
+  return element;
+}, "pattern");
+var polygon = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("polygon", children = children);
+  return element;
+}, "polygon");
+var polyline = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("polyline", children = children);
+  return element;
+}, "polyline");
+var radialGradient = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("radialGradient", children = children);
+  return element;
+}, "radialGradient");
+var rect = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("rect", children = children);
+  return element;
+}, "rect");
+var set = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("set", children = children);
+  return element;
+}, "set");
+var stop = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("stop", children = children);
+  return element;
+}, "stop");
+var svg = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("svg", children = children);
+  return element;
+}, "svg");
+var $switch = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("switch", children = children);
+  return element;
+}, "$switch");
+var symbol = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("symbol", children = children);
+  return element;
+}, "symbol");
+var $text = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("text", children = children);
+  return element;
+}, "$text");
+var textPath = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("textPath", children = children);
+  return element;
+}, "textPath");
+var $title = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("title", children = children);
+  return element;
+}, "$title");
+var tspan = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("tspan", children = children);
+  return element;
+}, "tspan");
+var use = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("use", children = children);
+  return element;
+}, "use");
+var view = /* @__PURE__ */ __name((...children) => {
+  let element = new HsSVGElement("view", children = children);
+  return element;
+}, "view");
 
 // src/document.ts
 var HsDocument2 = class {
@@ -960,7 +1306,7 @@ var HsDocument2 = class {
         let stateCalls = element.getStateCalls();
         HSJS.registerHsDocumentRoot(selector, this);
         HSJS.registerStateCalls(selector, stateCalls);
-        HSJS.run(selector);
+        HSJS.run();
       } else
         throw Error("HsJsError: no element found with selector " + selector);
     }
@@ -1036,6 +1382,10 @@ __name(computed, "computed");
 // src/hsjs.ts
 window.HSJS = HSJS2;
 export {
+  $a,
+  $switch,
+  $text,
+  $title,
   $var,
   ExtensibleFunction,
   HSJS2 as HSJS,
@@ -1049,12 +1399,16 @@ export {
   HsNumber,
   HsRegistry,
   HsRuntime,
+  HsSVGElement,
   HsStack,
   HsString,
   HsTextNode,
   a,
   abbr,
   address,
+  animate,
+  animateMotion,
+  animateTransform,
   area,
   article,
   aside,
@@ -1069,7 +1423,9 @@ export {
   button,
   canvas,
   caption,
+  circle,
   cite,
+  clipPath,
   code,
   col,
   colgroup,
@@ -1078,7 +1434,9 @@ export {
   data,
   datalist,
   dd,
+  defs,
   del,
+  desc,
   details,
   dfn,
   dialog,
@@ -1086,13 +1444,42 @@ export {
   dl,
   dt,
   effect,
+  ellipse,
   em,
   embed,
+  feBlend,
+  feColorMatrix,
+  feComponentTransfer,
+  feComposite,
+  feConvolveMatrix,
+  feDiffuseLighting,
+  feDisplacementMap,
+  feDistantLight,
+  feDropShadow,
+  feFlood,
+  feFuncA,
+  feFuncB,
+  feFuncG,
+  feFuncR,
+  feGaussianBlur,
+  feImage,
+  feMerge,
+  feMergeNode,
+  feMorphology,
+  feOffset,
+  fePointLight,
+  feSpecularLighting,
+  feSpotLight,
+  feTile,
+  feTurbulence,
   fieldset,
   figcaption,
   figure,
+  filter,
   footer,
+  foreignObject,
   form,
+  g,
   h1,
   h2,
   h3,
@@ -1106,6 +1493,7 @@ export {
   html,
   i,
   iframe,
+  image,
   img,
   input,
   ins,
@@ -1113,13 +1501,19 @@ export {
   label,
   legend,
   li,
+  line,
+  linearGradient,
   link,
   main,
   map,
   mark,
+  marker,
+  mask,
   menu,
   meta,
+  metadata,
   meter,
+  mpath,
   nav,
   noscript,
   object,
@@ -1128,34 +1522,43 @@ export {
   option,
   output,
   p,
+  path,
+  pattern,
   picture,
+  polygon,
+  polyline,
   pre,
   progress,
   q,
+  radialGradient,
+  rect,
   rp,
   rt,
   ruby,
   s,
   samp,
-  script,
   search,
   section,
   select,
+  set,
   slot,
   small,
   source,
   span,
   state,
+  stop,
   strong,
-  style,
   sub,
   summary,
   sup,
+  svg,
+  symbol,
   table,
   tbody,
   td,
   template,
   text,
+  textPath,
   textarea,
   tfoot,
   th,
@@ -1164,8 +1567,11 @@ export {
   title,
   tr,
   track,
+  tspan,
   u,
   ul,
+  use,
   video,
+  view,
   wbr
 };

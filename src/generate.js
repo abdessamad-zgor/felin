@@ -1,7 +1,8 @@
 import { writeFile } from "fs";
 import { join } from "path";
 
-let htmlTags = ["a",
+let htmlTags = [
+  "a",
   "abbr",
   "address",
   "area",
@@ -83,7 +84,6 @@ let htmlTags = ["a",
   "ruby",
   "s",
   "samp",
-  "script",
   "search",
   "section",
   "select",
@@ -92,7 +92,6 @@ let htmlTags = ["a",
   "source",
   "span",
   "strong",
-  "style",
   "sub",
   "summary",
   "sup",
@@ -115,11 +114,75 @@ let htmlTags = ["a",
   "wbr",
 ]
 
+let svgTags = [
+  "$a",
+  "animate",
+  "animateMotion",
+  "animateTransform",
+  "circle",
+  "clipPath",
+  "defs",
+  "desc",
+  "ellipse",
+  "feBlend",
+  "feColorMatrix",
+  "feComponentTransfer",
+  "feComposite",
+  "feConvolveMatrix",
+  "feDiffuseLighting",
+  "feDisplacementMap",
+  "feDistantLight",
+  "feDropShadow",
+  "feFlood",
+  "feFuncA",
+  "feFuncB",
+  "feFuncG",
+  "feFuncR",
+  "feGaussianBlur",
+  "feImage",
+  "feMerge",
+  "feMergeNode",
+  "feMorphology",
+  "feOffset",
+  "fePointLight",
+  "feSpecularLighting",
+  "feSpotLight",
+  "feTile",
+  "feTurbulence",
+  "filter",
+  "foreignObject",
+  "g",
+  "image",
+  "line",
+  "linearGradient",
+  "marker",
+  "mask",
+  "metadata",
+  "mpath",
+  "path",
+  "pattern",
+  "polygon",
+  "polyline",
+  "radialGradient",
+  "rect",
+  "set",
+  "stop",
+  "svg",
+  "$switch",
+  "symbol",
+  "$text",
+  "textPath",
+  "$title",
+  "tspan",
+  "use",
+  "view"
+]
+
 function generateHSElementFucntion() {
   let __dirname = import.meta.dirname
   let filePath = join(__dirname, "elements.ts");
-  let fileBuffer = `import {HsHTMLElement, HsElement} from './element'\n`;
-  let template = (tag) => {
+  let fileBuffer = `import {HsHTMLElement, HsSVGElement, HsElement} from './element'\n`;
+  let htmlTemplate = (tag) => {
     return `
 export const ${tag} = (...children: HsElement[]):HsElement => {
 \tlet element = new HsHTMLElement("${tag == '$var' ? 'var' : tag}", children = children)
@@ -129,7 +192,21 @@ export const ${tag} = (...children: HsElement[]):HsElement => {
   }
   let htmlLength = htmlTags.length;
   for (let i = 0; i < htmlLength; i++) {
-    fileBuffer += template(htmlTags[i]);
+    fileBuffer += htmlTemplate(htmlTags[i]);
+  }
+
+  let svgTemplate = (tag) => {
+    return `
+export const ${tag} = (...children: HsElement[]):HsElement => {
+\tlet element = new HsSVGElement("${tag == '$a' ? 'a' : tag == '$title' ? 'title' : tag == '$text' ? 'text' : tag == '$switch' ? 'switch' : tag}", children = children)
+\treturn element;
+}
+`
+  }
+
+  let svgLength = svgTags.length
+  for (let i = 0; i < svgLength; i++) {
+    fileBuffer += svgTemplate(svgTags[i]);
   }
 
   writeFile(filePath, fileBuffer, (err) => {
