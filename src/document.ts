@@ -1,10 +1,10 @@
-import { FlexHTMLElement as FlexElement, FlexHTMLElement, FlexTextNode } from "../src/flex"
+import { FlHTMLElement as FlElement, FlHTMLElement, FlTextNode } from "./felin"
 
-export class FlexDocument {
+export class FlDocument {
   window: Window
   document: Document
   rootSelector: string;
-  rootElement: FlexElement;
+  rootElement: FlElement;
 
   constructor() {
     if (window) {
@@ -13,7 +13,7 @@ export class FlexDocument {
     }
   }
 
-  render(selector: string, element: FlexElement) {
+  render(selector: string, element: FlElement) {
     if (this.document instanceof Document) {
       let target = this.document.querySelector(selector)
       if (target instanceof HTMLElement || element instanceof Node) {
@@ -22,20 +22,20 @@ export class FlexDocument {
         this.rootSelector = selector;
         this.rootElement = element;
         let stateCalls = element.getStateCalls()
-        FLEX.registerFlexDocumentRoot(selector, this)
-        FLEX.registerStateCalls(selector, stateCalls)
-        FLEX.run()
+        Fl.registerFlDocumentRoot(selector, this)
+        Fl.registerStateCalls(selector, stateCalls)
+        Fl.run()
       } else
-        throw Error("FlexJsError: no element found with selector " + selector)
+        throw Error("FlJsError: no element found with selector " + selector)
     }
   }
 
-  selector(element: FlexElement) {
-    let elementPath: FlexHTMLElement[] = []
+  selector(element: FlElement) {
+    let elementPath: FlHTMLElement[] = []
     let currentElement = element
     let selector = `${this.rootSelector}>${this.rootElement.name}`
     while (currentElement.id != this.rootElement.id) {
-      if (currentElement instanceof FlexHTMLElement) {
+      if (currentElement instanceof FlHTMLElement) {
         elementPath.push(currentElement)
       }
       currentElement = currentElement.parentNode

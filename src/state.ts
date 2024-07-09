@@ -10,22 +10,22 @@ export class ExtensibleFunction extends Function {
   }
 }
 
-export interface FlexStateClass<T> {
+export interface FlStateClass<T> {
   id: string;
   value: T;
-  parent?: FlexState;
+  parent?: FlState;
   set(fnOrValue: T | StateTypeMutation<T>): void;
-  update?: (child: FlexState) => void
+  update?: (child: FlState) => void
 }
 
-export type FlexState<T = any> = Function & FlexStateClass<T>
+export type FlState<T = any> = Function & FlStateClass<T>
 
-export class FlexString extends ExtensibleFunction implements FlexState<string> {
+export class FlString extends ExtensibleFunction implements FlState<string> {
   id: string
   value: string
-  parent?: FlexState
+  parent?: FlState
 
-  constructor(value: string, parent?: FlexState) {
+  constructor(value: string, parent?: FlState) {
     super(() => { return this.value })
     this.id = crypto.randomUUID()
     this.value = value
@@ -42,17 +42,17 @@ export class FlexString extends ExtensibleFunction implements FlexState<string> 
     if (newValue != this.value) {
       this.value = newValue
       this.parent?.update(this)
-      FLEX.registerStateUpdate(this)
+      Fl.registerStateUpdate(this)
     }
   }
 }
 
-export class FlexNumber extends ExtensibleFunction implements FlexState<number> {
+export class FlNumber extends ExtensibleFunction implements FlState<number> {
   id: string
   value: number
-  parent?: FlexState
+  parent?: FlState
 
-  constructor(value: number, parent: FlexState) {
+  constructor(value: number, parent: FlState) {
     super(() => { return this.value })
     this.id = crypto.randomUUID()
     this.value = value
@@ -69,7 +69,7 @@ export class FlexNumber extends ExtensibleFunction implements FlexState<number> 
     if (newValue != this.value) {
       this.value = newValue
       this.parent?.update(this)
-      FLEX.registerStateUpdate(this)
+      Fl.registerStateUpdate(this)
     }
   }
 
@@ -77,12 +77,12 @@ export class FlexNumber extends ExtensibleFunction implements FlexState<number> 
 
 export type MappedObject = { [key: string]: any }
 
-export class FlexMappedObject extends ExtensibleFunction implements FlexState<MappedObject> {
+export class FlMappedObject extends ExtensibleFunction implements FlState<MappedObject> {
   id: string
   value: MappedObject
-  parent?: FlexState
+  parent?: FlState
 
-  constructor(value: MappedObject, parent?: FlexState) {
+  constructor(value: MappedObject, parent?: FlState) {
     super(() => { return this.value })
     this.id = crypto.randomUUID()
     this.value = value
@@ -102,11 +102,11 @@ export class FlexMappedObject extends ExtensibleFunction implements FlexState<Ma
     if (newValue != this.value) {
       this.value = newValue
       this.parent?.update(this)
-      FLEX.registerStateUpdate(this)
+      Fl.registerStateUpdate(this)
     }
   }
 
-  update(child: FlexState) {
+  update(child: FlState) {
     for (let key of Object.keys(this)) {
       if (Object.keys(this.value).includes(key) && this[key].id == child.id) {
         this.value[key] = child.value
@@ -118,12 +118,12 @@ export class FlexMappedObject extends ExtensibleFunction implements FlexState<Ma
   }
 }
 
-export class FlexArray extends ExtensibleFunction implements FlexState<any[]> {
+export class FlArray extends ExtensibleFunction implements FlState<any[]> {
   id: string
   value: any[]
-  parent?: FlexState
+  parent?: FlState
 
-  constructor(value: any[], parent?: FlexState) {
+  constructor(value: any[], parent?: FlState) {
     super(() => { return this.value })
     this.id = crypto.randomUUID()
     this.value = value
@@ -149,11 +149,11 @@ export class FlexArray extends ExtensibleFunction implements FlexState<any[]> {
     if (newValue != this.value) {
       this.value = newValue
       this.parent?.update(this)
-      FLEX.registerStateUpdate(this)
+      Fl.registerStateUpdate(this)
     }
   }
 
-  update(child: FlexState) {
+  update(child: FlState) {
     for (let key of Object.keys(this)) {
       if (Object.keys(this.value).includes(key) && this[key].id == child.id) {
         this.value[key] = child.value
@@ -170,15 +170,15 @@ export class FlexArray extends ExtensibleFunction implements FlexState<any[]> {
   }
 }
 
-export function createState(value: any, parent?: FlexState): FlexState {
+export function createState(value: any, parent?: FlState): FlState {
   let typeofValue = typeof value
   if (typeofValue == "string") {
-    return new FlexString(value as string, parent)
+    return new FlString(value as string, parent)
   } else if (typeofValue == "number") {
-    return new FlexNumber(value, parent)
+    return new FlNumber(value, parent)
   } else if (Array.isArray(value)) {
-    return new FlexArray(value, parent)
+    return new FlArray(value, parent)
   } else if (typeofValue == "object") {
-    return new FlexMappedObject(value, parent)
+    return new FlMappedObject(value, parent)
   }
 }

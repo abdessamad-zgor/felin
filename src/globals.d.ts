@@ -1,6 +1,6 @@
-import { FlexRegistry } from "./core"
+import { FlRegistry } from "./core"
 
 declare global {
-  var FLEX: FlexRegistry
+  var Fl: FlRegistry
 }
 

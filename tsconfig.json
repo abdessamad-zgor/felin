@@ -8,7 +8,8 @@
     "skipLibCheck": true, /* Skip type checking all .d.ts files. */
     "allowJs": true,
     "moduleResolution": "bundler",
-    "outDir": "./lib"
+    "outDir": "./lib",
+    "declaration": true,
   },
   "include": [
     "./src/**/*"

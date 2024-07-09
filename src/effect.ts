@@ -1,16 +1,16 @@
-import { ExtensibleFunction, FlexState } from "./state"
+import { ExtensibleFunction, FlState } from "./state"
 
-export class FlexEffect extends ExtensibleFunction {
+export class FlEffect extends ExtensibleFunction {
   id: string
-  effect: (...args: FlexState[])=>void
-  dependants: FlexState[]
+  effect: (...args: FlState[])=>void
+  dependants: FlState[]
 
-  constructor(fn: (...args: FlexState[])=>void){
-    super((...args: FlexState[])=>{
+  constructor(fn: (...args: FlState[])=>void){
+    super((...args: FlState[])=>{
       this.effect = fn
       this.dependants = args
       this.id = crypto.randomUUID()
-      FLEX.registerEffect(this)
+      Fl.registerEffect(this)
     })
     
   }

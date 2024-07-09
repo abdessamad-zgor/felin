@@ -1,11 +1,11 @@
-import { ExtensibleFunction, FlexState } from "./state";
+import { ExtensibleFunction, FlState } from "./state";
 
-export class FlexComputed extends ExtensibleFunction {
+export class FlComputed extends ExtensibleFunction {
   id: string
   value: any
-  fn:  (...args: FlexState[])=>any
-  states: FlexState[]
-  constructor(fn: (...args: FlexState[])=>any, ...states: FlexState[]) {
+  fn:  (...args: FlState[])=>any
+  states: FlState[]
+  constructor(fn: (...args: FlState[])=>any, ...states: FlState[]) {
     super(()=>{
       this.value = this.fn(...this.states)
       return this.value
@@ -14,6 +14,6 @@ export class FlexComputed extends ExtensibleFunction {
     this.states = states
     this.value = fn(...states)
     this.id = crypto.randomUUID()
-    FLEX.registerComputedState(this)
+    Fl.registerComputedState(this)
   }
 }

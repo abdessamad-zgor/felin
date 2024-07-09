@@ -1,856 +1,856 @@
-import {FlexHTMLElement, FlexSVGElement, FlexElement} from './element'
+import {FlHTMLElement, FlSVGElement, FlElement} from './element'
 
-export const a = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("a", children = children)
+export const a = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("a", children = children)
 	return element;
 }
 
-export const abbr = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("abbr", children = children)
+export const abbr = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("abbr", children = children)
 	return element;
 }
 
-export const address = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("address", children = children)
+export const address = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("address", children = children)
 	return element;
 }
 
-export const area = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("area", children = children)
+export const area = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("area", children = children)
 	return element;
 }
 
-export const article = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("article", children = children)
+export const article = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("article", children = children)
 	return element;
 }
 
-export const aside = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("aside", children = children)
+export const aside = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("aside", children = children)
 	return element;
 }
 
-export const audio = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("audio", children = children)
+export const audio = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("audio", children = children)
 	return element;
 }
 
-export const b = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("b", children = children)
+export const b = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("b", children = children)
 	return element;
 }
 
-export const base = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("base", children = children)
+export const base = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("base", children = children)
 	return element;
 }
 
-export const bdi = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("bdi", children = children)
+export const bdi = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("bdi", children = children)
 	return element;
 }
 
-export const bdo = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("bdo", children = children)
+export const bdo = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("bdo", children = children)
 	return element;
 }
 
-export const blockquote = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("blockquote", children = children)
+export const blockquote = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("blockquote", children = children)
 	return element;
 }
 
-export const body = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("body", children = children)
+export const body = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("body", children = children)
 	return element;
 }
 
-export const br = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("br", children = children)
+export const br = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("br", children = children)
 	return element;
 }
 
-export const button = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("button", children = children)
+export const button = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("button", children = children)
 	return element;
 }
 
-export const canvas = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("canvas", children = children)
+export const canvas = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("canvas", children = children)
 	return element;
 }
 
-export const caption = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("caption", children = children)
+export const caption = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("caption", children = children)
 	return element;
 }
 
-export const cite = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("cite", children = children)
+export const cite = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("cite", children = children)
 	return element;
 }
 
-export const code = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("code", children = children)
+export const code = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("code", children = children)
 	return element;
 }
 
-export const col = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("col", children = children)
+export const col = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("col", children = children)
 	return element;
 }
 
-export const colgroup = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("colgroup", children = children)
+export const colgroup = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("colgroup", children = children)
 	return element;
 }
 
-export const data = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("data", children = children)
+export const data = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("data", children = children)
 	return element;
 }
 
-export const datalist = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("datalist", children = children)
+export const datalist = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("datalist", children = children)
 	return element;
 }
 
-export const dd = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("dd", children = children)
+export const dd = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("dd", children = children)
 	return element;
 }
 
-export const del = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("del", children = children)
+export const del = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("del", children = children)
 	return element;
 }
 
-export const details = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("details", children = children)
+export const details = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("details", children = children)
 	return element;
 }
 
-export const dfn = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("dfn", children = children)
+export const dfn = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("dfn", children = children)
 	return element;
 }
 
-export const dialog = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("dialog", children = children)
+export const dialog = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("dialog", children = children)
 	return element;
 }
 
-export const div = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("div", children = children)
+export const div = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("div", children = children)
 	return element;
 }
 
-export const dl = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("dl", children = children)
+export const dl = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("dl", children = children)
 	return element;
 }
 
-export const dt = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("dt", children = children)
+export const dt = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("dt", children = children)
 	return element;
 }
 
-export const em = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("em", children = children)
+export const em = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("em", children = children)
 	return element;
 }
 
-export const embed = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("embed", children = children)
+export const embed = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("embed", children = children)
 	return element;
 }
 
-export const fieldset = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("fieldset", children = children)
+export const fieldset = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("fieldset", children = children)
 	return element;
 }
 
-export const figcaption = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("figcaption", children = children)
+export const figcaption = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("figcaption", children = children)
 	return element;
 }
 
-export const figure = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("figure", children = children)
+export const figure = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("figure", children = children)
 	return element;
 }
 
-export const footer = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("footer", children = children)
+export const footer = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("footer", children = children)
 	return element;
 }
 
-export const form = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("form", children = children)
+export const form = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("form", children = children)
 	return element;
 }
 
-export const h1 = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("h1", children = children)
+export const h1 = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("h1", children = children)
 	return element;
 }
 
-export const h2 = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("h2", children = children)
+export const h2 = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("h2", children = children)
 	return element;
 }
 
-export const h3 = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("h3", children = children)
+export const h3 = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("h3", children = children)
 	return element;
 }
 
-export const h4 = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("h4", children = children)
+export const h4 = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("h4", children = children)
 	return element;
 }
 
-export const h5 = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("h5", children = children)
+export const h5 = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("h5", children = children)
 	return element;
 }
 
-export const h6 = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("h6", children = children)
+export const h6 = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("h6", children = children)
 	return element;
 }
 
-export const head = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("head", children = children)
+export const head = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("head", children = children)
 	return element;
 }
 
-export const header = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("header", children = children)
+export const header = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("header", children = children)
 	return element;
 }
 
-export const hgroup = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("hgroup", children = children)
+export const hgroup = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("hgroup", children = children)
 	return element;
 }
 
-export const hr = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("hr", children = children)
+export const hr = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("hr", children = children)
 	return element;
 }
 
-export const html = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("html", children = children)
+export const html = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("html", children = children)
 	return element;
 }
 
-export const i = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("i", children = children)
+export const i = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("i", children = children)
 	return element;
 }
 
-export const iframe = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("iframe", children = children)
+export const iframe = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("iframe", children = children)
 	return element;
 }
 
-export const img = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("img", children = children)
+export const img = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("img", children = children)
 	return element;
 }
 
-export const input = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("input", children = children)
+export const input = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("input", children = children)
 	return element;
 }
 
-export const ins = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("ins", children = children)
+export const ins = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("ins", children = children)
 	return element;
 }
 
-export const kbd = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("kbd", children = children)
+export const kbd = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("kbd", children = children)
 	return element;
 }
 
-export const label = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("label", children = children)
+export const label = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("label", children = children)
 	return element;
 }
 
-export const legend = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("legend", children = children)
+export const legend = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("legend", children = children)
 	return element;
 }
 
-export const li = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("li", children = children)
+export const li = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("li", children = children)
 	return element;
 }
 
-export const link = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("link", children = children)
+export const link = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("link", children = children)
 	return element;
 }
 
-export const main = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("main", children = children)
+export const main = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("main", children = children)
 	return element;
 }
 
-export const map = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("map", children = children)
+export const map = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("map", children = children)
 	return element;
 }
 
-export const mark = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("mark", children = children)
+export const mark = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("mark", children = children)
 	return element;
 }
 
-export const menu = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("menu", children = children)
+export const menu = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("menu", children = children)
 	return element;
 }
 
-export const meta = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("meta", children = children)
+export const meta = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("meta", children = children)
 	return element;
 }
 
-export const meter = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("meter", children = children)
+export const meter = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("meter", children = children)
 	return element;
 }
 
-export const nav = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("nav", children = children)
+export const nav = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("nav", children = children)
 	return element;
 }
 
-export const noscript = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("noscript", children = children)
+export const noscript = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("noscript", children = children)
 	return element;
 }
 
-export const object = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("object", children = children)
+export const object = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("object", children = children)
 	return element;
 }
 
-export const ol = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("ol", children = children)
+export const ol = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("ol", children = children)
 	return element;
 }
 
-export const optgroup = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("optgroup", children = children)
+export const optgroup = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("optgroup", children = children)
 	return element;
 }
 
-export const option = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("option", children = children)
+export const option = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("option", children = children)
 	return element;
 }
 
-export const output = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("output", children = children)
+export const output = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("output", children = children)
 	return element;
 }
 
-export const p = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("p", children = children)
+export const p = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("p", children = children)
 	return element;
 }
 
-export const picture = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("picture", children = children)
+export const picture = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("picture", children = children)
 	return element;
 }
 
-export const pre = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("pre", children = children)
+export const pre = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("pre", children = children)
 	return element;
 }
 
-export const progress = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("progress", children = children)
+export const progress = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("progress", children = children)
 	return element;
 }
 
-export const q = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("q", children = children)
+export const q = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("q", children = children)
 	return element;
 }
 
-export const rp = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("rp", children = children)
+export const rp = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("rp", children = children)
 	return element;
 }
 
-export const rt = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("rt", children = children)
+export const rt = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("rt", children = children)
 	return element;
 }
 
-export const ruby = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("ruby", children = children)
+export const ruby = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("ruby", children = children)
 	return element;
 }
 
-export const s = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("s", children = children)
+export const s = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("s", children = children)
 	return element;
 }
 
-export const samp = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("samp", children = children)
+export const samp = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("samp", children = children)
 	return element;
 }
 
-export const search = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("search", children = children)
+export const search = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("search", children = children)
 	return element;
 }
 
-export const section = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("section", children = children)
+export const section = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("section", children = children)
 	return element;
 }
 
-export const select = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("select", children = children)
+export const select = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("select", children = children)
 	return element;
 }
 
-export const slot = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("slot", children = children)
+export const slot = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("slot", children = children)
 	return element;
 }
 
-export const small = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("small", children = children)
+export const small = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("small", children = children)
 	return element;
 }
 
-export const source = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("source", children = children)
+export const source = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("source", children = children)
 	return element;
 }
 
-export const span = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("span", children = children)
+export const span = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("span", children = children)
 	return element;
 }
 
-export const strong = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("strong", children = children)
+export const strong = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("strong", children = children)
 	return element;
 }
 
-export const sub = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("sub", children = children)
+export const sub = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("sub", children = children)
 	return element;
 }
 
-export const summary = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("summary", children = children)
+export const summary = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("summary", children = children)
 	return element;
 }
 
-export const sup = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("sup", children = children)
+export const sup = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("sup", children = children)
 	return element;
 }
 
-export const table = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("table", children = children)
+export const table = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("table", children = children)
 	return element;
 }
 
-export const tbody = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("tbody", children = children)
+export const tbody = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("tbody", children = children)
 	return element;
 }
 
-export const td = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("td", children = children)
+export const td = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("td", children = children)
 	return element;
 }
 
-export const template = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("template", children = children)
+export const template = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("template", children = children)
 	return element;
 }
 
-export const textarea = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("textarea", children = children)
+export const textarea = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("textarea", children = children)
 	return element;
 }
 
-export const tfoot = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("tfoot", children = children)
+export const tfoot = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("tfoot", children = children)
 	return element;
 }
 
-export const th = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("th", children = children)
+export const th = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("th", children = children)
 	return element;
 }
 
-export const thead = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("thead", children = children)
+export const thead = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("thead", children = children)
 	return element;
 }
 
-export const time = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("time", children = children)
+export const time = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("time", children = children)
 	return element;
 }
 
-export const title = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("title", children = children)
+export const title = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("title", children = children)
 	return element;
 }
 
-export const tr = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("tr", children = children)
+export const tr = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("tr", children = children)
 	return element;
 }
 
-export const track = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("track", children = children)
+export const track = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("track", children = children)
 	return element;
 }
 
-export const u = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("u", children = children)
+export const u = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("u", children = children)
 	return element;
 }
 
-export const ul = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("ul", children = children)
+export const ul = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("ul", children = children)
 	return element;
 }
 
-export const $var = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("var", children = children)
+export const $var = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("var", children = children)
 	return element;
 }
 
-export const video = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("video", children = children)
+export const video = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("video", children = children)
 	return element;
 }
 
-export const wbr = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexHTMLElement("wbr", children = children)
+export const wbr = (...children: FlElement[]):FlElement => {
+	let element = new FlHTMLElement("wbr", children = children)
 	return element;
 }
 
-export const $a = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("a", children = children)
+export const $a = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("a", children = children)
 	return element;
 }
 
-export const animate = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("animate", children = children)
+export const animate = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("animate", children = children)
 	return element;
 }
 
-export const animateMotion = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("animateMotion", children = children)
+export const animateMotion = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("animateMotion", children = children)
 	return element;
 }
 
-export const animateTransform = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("animateTransform", children = children)
+export const animateTransform = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("animateTransform", children = children)
 	return element;
 }
 
-export const circle = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("circle", children = children)
+export const circle = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("circle", children = children)
 	return element;
 }
 
-export const clipPath = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("clipPath", children = children)
+export const clipPath = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("clipPath", children = children)
 	return element;
 }
 
-export const defs = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("defs", children = children)
+export const defs = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("defs", children = children)
 	return element;
 }
 
-export const desc = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("desc", children = children)
+export const desc = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("desc", children = children)
 	return element;
 }
 
-export const ellipse = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("ellipse", children = children)
+export const ellipse = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("ellipse", children = children)
 	return element;
 }
 
-export const feBlend = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feBlend", children = children)
+export const feBlend = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feBlend", children = children)
 	return element;
 }
 
-export const feColorMatrix = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feColorMatrix", children = children)
+export const feColorMatrix = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feColorMatrix", children = children)
 	return element;
 }
 
-export const feComponentTransfer = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feComponentTransfer", children = children)
+export const feComponentTransfer = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feComponentTransfer", children = children)
 	return element;
 }
 
-export const feComposite = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feComposite", children = children)
+export const feComposite = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feComposite", children = children)
 	return element;
 }
 
-export const feConvolveMatrix = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feConvolveMatrix", children = children)
+export const feConvolveMatrix = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feConvolveMatrix", children = children)
 	return element;
 }
 
-export const feDiffuseLighting = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feDiffuseLighting", children = children)
+export const feDiffuseLighting = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feDiffuseLighting", children = children)
 	return element;
 }
 
-export const feDisplacementMap = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feDisplacementMap", children = children)
+export const feDisplacementMap = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feDisplacementMap", children = children)
 	return element;
 }
 
-export const feDistantLight = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feDistantLight", children = children)
+export const feDistantLight = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feDistantLight", children = children)
 	return element;
 }
 
-export const feDropShadow = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feDropShadow", children = children)
+export const feDropShadow = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feDropShadow", children = children)
 	return element;
 }
 
-export const feFlood = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feFlood", children = children)
+export const feFlood = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feFlood", children = children)
 	return element;
 }
 
-export const feFuncA = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feFuncA", children = children)
+export const feFuncA = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feFuncA", children = children)
 	return element;
 }
 
-export const feFuncB = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feFuncB", children = children)
+export const feFuncB = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feFuncB", children = children)
 	return element;
 }
 
-export const feFuncG = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feFuncG", children = children)
+export const feFuncG = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feFuncG", children = children)
 	return element;
 }
 
-export const feFuncR = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feFuncR", children = children)
+export const feFuncR = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feFuncR", children = children)
 	return element;
 }
 
-export const feGaussianBlur = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feGaussianBlur", children = children)
+export const feGaussianBlur = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feGaussianBlur", children = children)
 	return element;
 }
 
-export const feImage = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feImage", children = children)
+export const feImage = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feImage", children = children)
 	return element;
 }
 
-export const feMerge = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feMerge", children = children)
+export const feMerge = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feMerge", children = children)
 	return element;
 }
 
-export const feMergeNode = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feMergeNode", children = children)
+export const feMergeNode = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feMergeNode", children = children)
 	return element;
 }
 
-export const feMorphology = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feMorphology", children = children)
+export const feMorphology = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feMorphology", children = children)
 	return element;
 }
 
-export const feOffset = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feOffset", children = children)
+export const feOffset = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feOffset", children = children)
 	return element;
 }
 
-export const fePointLight = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("fePointLight", children = children)
+export const fePointLight = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("fePointLight", children = children)
 	return element;
 }
 
-export const feSpecularLighting = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feSpecularLighting", children = children)
+export const feSpecularLighting = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feSpecularLighting", children = children)
 	return element;
 }
 
-export const feSpotLight = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feSpotLight", children = children)
+export const feSpotLight = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feSpotLight", children = children)
 	return element;
 }
 
-export const feTile = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feTile", children = children)
+export const feTile = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feTile", children = children)
 	return element;
 }
 
-export const feTurbulence = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("feTurbulence", children = children)
+export const feTurbulence = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("feTurbulence", children = children)
 	return element;
 }
 
-export const filter = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("filter", children = children)
+export const filter = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("filter", children = children)
 	return element;
 }
 
-export const foreignObject = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("foreignObject", children = children)
+export const foreignObject = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("foreignObject", children = children)
 	return element;
 }
 
-export const g = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("g", children = children)
+export const g = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("g", children = children)
 	return element;
 }
 
-export const image = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("image", children = children)
+export const image = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("image", children = children)
 	return element;
 }
 
-export const line = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("line", children = children)
+export const line = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("line", children = children)
 	return element;
 }
 
-export const linearGradient = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("linearGradient", children = children)
+export const linearGradient = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("linearGradient", children = children)
 	return element;
 }
 
-export const marker = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("marker", children = children)
+export const marker = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("marker", children = children)
 	return element;
 }
 
-export const mask = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("mask", children = children)
+export const mask = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("mask", children = children)
 	return element;
 }
 
-export const metadata = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("metadata", children = children)
+export const metadata = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("metadata", children = children)
 	return element;
 }
 
-export const mpath = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("mpath", children = children)
+export const mpath = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("mpath", children = children)
 	return element;
 }
 
-export const path = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("path", children = children)
+export const path = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("path", children = children)
 	return element;
 }
 
-export const pattern = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("pattern", children = children)
+export const pattern = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("pattern", children = children)
 	return element;
 }
 
-export const polygon = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("polygon", children = children)
+export const polygon = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("polygon", children = children)
 	return element;
 }
 
-export const polyline = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("polyline", children = children)
+export const polyline = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("polyline", children = children)
 	return element;
 }
 
-export const radialGradient = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("radialGradient", children = children)
+export const radialGradient = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("radialGradient", children = children)
 	return element;
 }
 
-export const rect = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("rect", children = children)
+export const rect = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("rect", children = children)
 	return element;
 }
 
-export const set = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("set", children = children)
+export const set = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("set", children = children)
 	return element;
 }
 
-export const stop = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("stop", children = children)
+export const stop = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("stop", children = children)
 	return element;
 }
 
-export const svg = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("svg", children = children)
+export const svg = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("svg", children = children)
 	return element;
 }
 
-export const $switch = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("switch", children = children)
+export const $switch = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("switch", children = children)
 	return element;
 }
 
-export const symbol = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("symbol", children = children)
+export const symbol = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("symbol", children = children)
 	return element;
 }
 
-export const $text = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("text", children = children)
+export const $text = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("text", children = children)
 	return element;
 }
 
-export const textPath = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("textPath", children = children)
+export const textPath = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("textPath", children = children)
 	return element;
 }
 
-export const $title = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("title", children = children)
+export const $title = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("title", children = children)
 	return element;
 }
 
-export const tspan = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("tspan", children = children)
+export const tspan = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("tspan", children = children)
 	return element;
 }
 
-export const use = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("use", children = children)
+export const use = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("use", children = children)
 	return element;
 }
 
-export const view = (...children: FlexElement[]):FlexElement => {
-	let element = new FlexSVGElement("view", children = children)
+export const view = (...children: FlElement[]):FlElement => {
+	let element = new FlSVGElement("view", children = children)
 	return element;
 }

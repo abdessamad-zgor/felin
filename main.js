@@ -1,4 +1,4 @@
-import { main, div, p, button, FlexDocument, span, state, text, effect, computed } from "./dist/flex.js";
+import { main, div, p, button, FlDocument, span, state, text, effect, computed } from "./dist/felin.js";
 /*
  * import {div, p, button, main} from "flex"
  * 
@@ -53,6 +53,6 @@ let page = () => {
   )
 }
 
-let hsDocument = new FlexDocument();
-hsDocument.render('#page', page())
+let flDocument = new FlDocument();
+flDocument.render('#page', page())
 
