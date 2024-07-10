@@ -1,6 +1,6 @@
 {
   "name": "felin",
-  "version": "0.0.1",
+  "version": "${version}",
   "main": "lib/felin.js",
   "author": "Abdessamad Zgor <abdessamadzgor@gmail.com>",
   "license": "MIT",
@@ -16,6 +16,6 @@
     "build-dev": "tsc && esbuild ./src/felin.js --format=esm --platform=node --keep-names --bundle --minify --outfile=./dist/felin.js",
     "prestart": "yarn run build",
     "start": "python3 -m http.server 4444",
-    "publish": "npm publish"
+    "publish": "./scripts/publish.sh"
   }
 }

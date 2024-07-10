@@ -21,7 +21,6 @@ export class FlDOMUpdate implements FlTask<DOMUpdateArgs, void> {
 
   call(args: DOMUpdateArgs) {
     let newValue = (this.args.state as Function)()
-    console.log(newValue)
     let nodeSelector = this.args.hsDocument.selector(this.args.element as FlHTMLElement)
 
     let domElement = this.args.hsDocument.document.querySelector(nodeSelector)
@@ -174,11 +173,9 @@ export class FlRegistry {
     }
 
     let computed = this.computed.find(e=>e.states.some(s=>s.id==state.id))
-    console.log(computed)
     if(computed){
       let computedRefresh = new FlComputedRefresh(computed)
       this.runtime.pushTask(computedRefresh)
-      console.log(this.documentStates)
       let computedStateRoot = Object.keys(this.documentStates).find(r => this.documentStates[r].some(s => s.state.id == computed.id))
       if(computedStateRoot){
         let computedFlDocument = this.documentRootsMap[computedStateRoot]

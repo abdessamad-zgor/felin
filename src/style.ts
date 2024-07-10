@@ -11,6 +11,5 @@ export function toCssString(style: CssStyle) {
     });
     styleString += key.join('') + ": " + style[property] + ";"
   }
-  console.log(styleString)
   return styleString
 }
