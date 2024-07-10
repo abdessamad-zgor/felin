@@ -1,0 +1,21 @@
+{
+  "name": "felin",
+  "version": "0.0.2",
+  "main": "lib/felin.js",
+  "author": "Abdessamad Zgor <abdessamadzgor@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "csstype": "^3.1.3",
+    "esbuild": "^0.23.0",
+    "parcel": "^2.12.0",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "build-dev": "tsc && esbuild ./src/felin.js --format=esm --platform=node --keep-names --bundle --outfile=./dist/felin.js",
+    "build-cdn": "tsc && esbuild ./src/felin.js --format=esm --platform=node --keep-names --bundle --minify --outfile=./dist/felin.js",
+    "build": "tsc",
+    "prepublish": "yarn run build"
+  }
+}
