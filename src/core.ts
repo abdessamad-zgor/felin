@@ -1,5 +1,7 @@
 import { Properties as CssStyle } from "csstype"
-import { FlDocument, FlElement, FlHTMLElement, FlState, FlTextNode } from "./felin"
+import { FlState } from "./state"
+import { FlElement, FlTextNode, FlHTMLElement } from "./element"
+import { FlDocument } from "./document"
 import { FlEffect } from "./effect"
 import { FlComputed } from "./computed"
 

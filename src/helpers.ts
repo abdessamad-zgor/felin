@@ -1,6 +1,7 @@
 import { FlComputed } from "./computed";
 import { FlEffect } from "./effect";
-import { FlTextNode, createState, FlTask, FlState } from "./felin";
+import { createState, FlState } from "./state";
+import { FlTextNode } from "./element";
 
 export function text<T extends any[]>(text: string, ...args: T) {
   return new FlTextNode(text, ...args)

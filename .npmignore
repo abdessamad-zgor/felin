@@ -1,5 +1,6 @@
 src/
-lib/generate.js
+lib/
 main.js
 index.html
-
+tsconfig.json
+.parcel-cache

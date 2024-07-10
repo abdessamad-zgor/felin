@@ -1,4 +1,4 @@
-import { FlHTMLElement as FlElement, FlHTMLElement, FlTextNode } from "./felin"
+import { FlHTMLElement as FlElement, FlHTMLElement, FlTextNode } from "./element"
 
 export class FlDocument {
   window: Window
