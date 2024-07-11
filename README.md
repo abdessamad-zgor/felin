@@ -1,4 +1,5 @@
-# Felin - a flexible javascript library for making user interfaces
+# Felin 
+a flexible javascript library for making user interfaces
 
 Felin is a library which has no setup, build or migration costs, it's build to work seamlessly with vanilla javascript
 when using `felin` you don't think wether you should choose between simplicity or efficiency, you get both.
@@ -40,8 +41,4 @@ or you could start using derictly inside a script tag
 ```
 
 ## Documentation
-
-### HTML elements
-in `felin` HTML element are functions named correspondingly and accept other HTML elements as children, the same applies for SVG 
-elements, 
 
