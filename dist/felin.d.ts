@@ -2,140 +2,19 @@ import { Properties } from "csstype";
 type StateTypeMutation<StateType> = StateType extends {
     [key: string]: any;
 } | any[] ? <T>(state: StateType | Partial<StateType>) => StateType | Partial<StateType> | T : (state: StateType) => StateType;
-export class ExtensibleFunction extends Function {
+declare class ExtensibleFunction extends Function {
     constructor(f: any);
 }
-export interface FlStateClass<T> {
+interface FlStateClass<T> {
     id: string;
     value: T;
     parent?: FlState;
     set(fnOrValue: T | StateTypeMutation<T>): void;
     update?: (child: FlState) => void;
 }
-export type FlState<T = any> = Function & FlStateClass<T>;
-export class FlString extends ExtensibleFunction implements FlState<string> {
-    id: string;
-    value: string;
-    parent?: FlState;
-    constructor(value: string, parent?: FlState);
-    set(value: string | Partial<string> | StateTypeMutation<string>): void;
-}
-export class FlNumber extends ExtensibleFunction implements FlState<number> {
-    id: string;
-    value: number;
-    parent?: FlState;
-    constructor(value: number, parent: FlState);
-    set(value: number | Partial<number> | StateTypeMutation<number>): void;
-}
-export type MappedObject = {
-    [key: string]: any;
-};
-export class FlMappedObject extends ExtensibleFunction implements FlState<MappedObject> {
-    id: string;
-    value: MappedObject;
-    parent?: FlState;
-    constructor(value: MappedObject, parent?: FlState);
-    set(value: MappedObject | Partial<MappedObject> | StateTypeMutation<MappedObject>): void;
-    update(child: FlState): void;
-}
-export class FlArray extends ExtensibleFunction implements FlState<any[]> {
-    id: string;
-    value: any[];
-    parent?: FlState;
-    constructor(value: any[], parent?: FlState);
-    set(value: any[] | Partial<any[]> | StateTypeMutation<any[]>): void;
-    update(child: FlState): void;
-    get length(): number;
-}
-export function createState(value: any, parent?: FlState): FlState;
-declare class FlEffect extends ExtensibleFunction {
-    id: string;
-    effect: (...args: FlState[]) => void;
-    dependants: FlState[];
-    constructor(fn: (...args: FlState[]) => void);
-}
-declare class FlComputed extends ExtensibleFunction {
-    id: string;
-    value: any;
-    fn: (...args: FlState[]) => any;
-    states: FlState[];
-    constructor(fn: (...args: FlState[]) => any, ...states: FlState[]);
-}
-export interface FlTask<A = {
-    [key: string]: any;
-}, R = void> {
-    priority: number;
-    call(args: A): R;
-}
-type DOMUpdateArgs = {
-    state: FlState | FlComputed;
-    hsDocument: FlDocument;
-    element: FlElement;
-};
-export class FlDOMUpdate implements FlTask<DOMUpdateArgs, void> {
-    priority: number;
-    args: DOMUpdateArgs;
-    constructor(args: DOMUpdateArgs);
-    call(args: DOMUpdateArgs): void;
-}
-export class FlComputedRefresh implements FlTask {
-    priority: number;
-    args: FlComputed;
-    constructor(args: FlComputed);
-    call(args: any): void;
-}
-type FlEffectArgs = {
-    fn: (...args: FlState[]) => void;
-    dependents: FlState[];
-};
-export class FlEffectCall implements FlTask {
-    priority: number;
-    args: FlEffectArgs;
-    constructor(args: FlEffectArgs);
-    call(args: FlEffectArgs): void;
-}
-export class FlStack {
-    tasks: FlTask[];
-    constructor();
-    pop(): FlTask;
-    push(task: FlTask): void;
-    empty(): boolean;
-}
-export class FlRuntime {
-    stack: FlStack;
-    running: boolean;
-    constructor();
-    run(): void;
-    pushTask(task: FlTask): void;
-}
-export class FlRegistry {
-    runtime: FlRuntime;
-    documentStates: {
-        [key: string]: {
-            state: FlState;
-            element: FlElement;
-        }[];
-    };
-    documentRootsMap: {
-        [key: string]: FlDocument;
-    };
-    effects: FlEffect[];
-    computed: FlComputed[];
-    constructor();
-    register(task: FlTask): void;
-    registerStateCalls(root: string, stateCalls: {
-        state: FlState;
-        element: FlElement;
-    }[]): void;
-    registerStateUpdate(state: FlState): void;
-    registerFlDocumentRoot(root: string, document: FlDocument): void;
-    run(): void;
-    registerEffect(effect: FlEffect): void;
-    registerComputedState(state: FlComputed): void;
-}
-export const Fl: FlRegistry;
-export type FlEvent = Event | CustomEvent;
-export class FlTextNode<T extends any[]> {
+type FlState<T = any> = Function & FlStateClass<T>;
+type FlEvent = Event | CustomEvent;
+declare class FlTextNode<T extends any[]> {
     id: string;
     stateCalls: FlState[];
     parentNode: FlHTMLElement;
@@ -150,7 +29,7 @@ export class FlTextNode<T extends any[]> {
         element: FlElement;
     }[];
 }
-export class FlHTMLElement {
+declare class FlHTMLElement {
     id: string;
     name: keyof HTMLElementTagNameMap;
     parentNode: FlHTMLElement;
@@ -181,7 +60,7 @@ export class FlHTMLElement {
         [attr: string]: any;
     }): void;
 }
-export class FlSVGElement {
+declare class FlSVGElement {
     id: string;
     name: keyof SVGElementTagNameMap;
     parentNode: FlSVGElement;
@@ -212,7 +91,29 @@ export class FlSVGElement {
         [attr: string]: any;
     }): void;
 }
-export type FlElement = FlTextNode<any[]> | FlHTMLElement | FlSVGElement;
+type FlElement = FlTextNode<any[]> | FlHTMLElement | FlSVGElement;
+export class FlDocument {
+    window: Window;
+    document: Document;
+    rootSelector: string;
+    rootElement: FlHTMLElement;
+    constructor();
+    render(selector: string, element: FlHTMLElement): void;
+    selector(element: FlHTMLElement): string;
+}
+declare class FlEffect extends ExtensibleFunction {
+    id: string;
+    effect: (...args: FlState[]) => void;
+    dependants: FlState[];
+    constructor(fn: (...args: FlState[]) => void);
+}
+declare class FlComputed extends ExtensibleFunction {
+    id: string;
+    value: any;
+    fn: (...args: FlState[]) => any;
+    states: FlState[];
+    constructor(fn: (...args: FlState[]) => any, ...states: FlState[]);
+}
 export const a: (...children: FlElement[]) => FlElement;
 export const abbr: (...children: FlElement[]) => FlElement;
 export const address: (...children: FlElement[]) => FlElement;
@@ -384,15 +285,6 @@ export const $title: (...children: FlElement[]) => FlElement;
 export const tspan: (...children: FlElement[]) => FlElement;
 export const use: (...children: FlElement[]) => FlElement;
 export const view: (...children: FlElement[]) => FlElement;
-export class FlDocument {
-    window: Window;
-    document: Document;
-    rootSelector: string;
-    rootElement: FlHTMLElement;
-    constructor();
-    render(selector: string, element: FlHTMLElement): void;
-    selector(element: FlHTMLElement): string;
-}
 export function text<T extends any[]>(text: string, ...args: T): FlTextNode<T>;
 export function state<T>(value: T): FlState<any>;
 export function effect(fn: (...args: FlState[]) => void): FlEffect;
