@@ -221,5 +221,5 @@ export class FlRegistry {
   }
 }
 
-export const Fl = new FlRegistry()
+export const Felin = new FlRegistry()
 

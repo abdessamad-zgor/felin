@@ -1,184 +1,76 @@
+import { ExtensibleFunction } from "./utils"
 
 type StateTypeMutation<StateType> = StateType extends { [key: string]: any } | any[]
-  ? <T>(state: StateType | Partial<StateType>) => StateType | Partial<StateType> | T :
+  ? (state: StateType | Partial<StateType>) => StateType | Partial<StateType>  :
   (state: StateType) => StateType
 
-export class ExtensibleFunction extends Function {
-  constructor(f) {
-    super()
-    return Object.setPrototypeOf(f, new.target.prototype)
-  }
+interface FlStateType<T=any> {
+  value: T | Partial<T>,
+  id: string,
+  parent?: FlStateType,
+  set: (fnOrState: StateTypeMutation<T> | T) => void,
 }
 
-export interface FlStateClass<T> {
+export class FlState<T = any> extends ExtensibleFunction implements FlStateType<T> {
   id: string;
-  value: T;
-  parent?: FlState;
-  set(fnOrValue: T | StateTypeMutation<T>): void;
-  update?: (child: FlState) => void
-}
+  value: T| Partial<T>;
+  parent?: FlStateType<any>;
 
-export type FlState<T = any> = Function & FlStateClass<T>
-
-export class FlString extends ExtensibleFunction implements FlState<string> {
-  id: string
-  value: string
-  parent?: FlState
-
-  constructor(value: string, parent?: FlState) {
-    super(() => { return this.value })
-    this.id = crypto.randomUUID()
-    this.value = value
-    this.parent = parent
+  constructor(value: T| Partial<T>, parent?: FlStateType<any>) {
+    super(() => this.value)
+    this.value = value;
+    this.id = crypto.randomUUID();
+    if (parent) {
+      this.parent = parent;
+    }
+    if (typeof this.value == 'object') {
+      let handler: ProxyHandler<FlState<T>>= {
+        get: (target: FlState<T>, prop: string, reciever) => {
+          if (Object.keys(this.value).includes(prop)) {
+            let value = this.value[prop];
+            if (typeof value == 'object') {
+              return new Proxy(new FlState<typeof value>(value, this), handler);
+            } else {
+              return new FlState<typeof value>(value, this)
+            }
+          } else {
+            return Reflect.get(target, prop, reciever);
+          }
+        },
+        set: (target: FlState<T>, prop: string, value) => {
+          if (Object.keys(this.value).includes(prop)) {
+            target.set((s=>({...s, [prop]: value})) as StateTypeMutation<T>);
+          } else if(prop=="value"){
+            return Reflect.set(target, prop, value);
+          } 
+        }
+      }
+      return new Proxy(this, handler);
+    } 
   }
 
-  set(value: string | Partial<string> | StateTypeMutation<string>) {
-    let newValue: string | Partial<string>
-    if (typeof value === "function") {
-      newValue = (value as StateTypeMutation<string>)(this.value) as string
-    } else {
-      newValue = value;
-    }
-    if (newValue != this.value) {
-      this.value = newValue
-      this.parent?.update(this)
-      Fl.registerStateUpdate(this)
-    }
-  }
-}
-
-export class FlNumber extends ExtensibleFunction implements FlState<number> {
-  id: string
-  value: number
-  parent?: FlState
-
-  constructor(value: number, parent: FlState) {
-    super(() => { return this.value })
-    this.id = crypto.randomUUID()
-    this.value = value
-    this.parent = parent
-  }
-
-  set(value: number | Partial<number> | StateTypeMutation<number>) {
-    let newValue: number | Partial<number>
-    if (typeof value === "function") {
-      newValue = (value as StateTypeMutation<number>)(this.value) as number
-    } else {
-      newValue = value;
-    }
-    if (newValue != this.value) {
-      this.value = newValue
-      this.parent?.update(this)
-      Fl.registerStateUpdate(this)
-    }
-  }
-
-}
-
-export type MappedObject = { [key: string]: any }
-
-export class FlMappedObject extends ExtensibleFunction implements FlState<MappedObject> {
-  id: string
-  value: MappedObject
-  parent?: FlState
-
-  constructor(value: MappedObject, parent?: FlState) {
-    super(() => { return this.value })
-    this.id = crypto.randomUUID()
-    this.value = value
-    this.parent = parent
-    for (let key of Object.keys(value)) {
-      this[key] = createState(value[key], this)
-    }
-  }
-
-  set(value: MappedObject | Partial<MappedObject> | StateTypeMutation<MappedObject>) {
-    let newValue: MappedObject | Partial<MappedObject>
-    if (typeof value === "function") {
-      newValue = (value as StateTypeMutation<MappedObject>)(this.value) as MappedObject
-    } else {
-      newValue = value;
-    }
-    if (newValue != this.value) {
-      this.value = newValue
-      this.parent?.update(this)
-      Fl.registerStateUpdate(this)
-    }
-  }
-
-  update(child: FlState) {
-    for (let key of Object.keys(this)) {
-      if (Object.keys(this.value).includes(key) && this[key].id == child.id) {
-        this.value[key] = child.value
+  set(fnOrState?: StateTypeMutation<T> | T, child?: FlState<T>) {
+    if(child){
+      for(let key of Object.keys(this.value)){
+        if(this[key].id == child.id){
+          this.value[key] = child.value
+        }
       }
     }
-    if (this.parent) {
-      this.parent.update(this)
-    }
-  }
-}
-
-export class FlArray extends ExtensibleFunction implements FlState<any[]> {
-  id: string
-  value: any[]
-  parent?: FlState
-
-  constructor(value: any[], parent?: FlState) {
-    super(() => { return this.value })
-    this.id = crypto.randomUUID()
-    this.value = value
-    this.parent = parent
-    for (let key of Object.keys(value)) {
-      this[key] = createState(value[key], this)
-    }
-
-    Object.defineProperty(this, 'length', {
-      get(){
-        return this.value.length
-      }
-    })
-  }
-
-  set(value: any[] | Partial<any[]> | StateTypeMutation<any[]>) {
-    let newValue: any[] | Partial<any[]>
-    if (typeof value === "function") {
-      newValue = (value as StateTypeMutation<any[]>)(this.value) as any[]
+    let newValue: T | Partial<T>
+    if (typeof fnOrState=== "function") {
+      //@ts-ignore
+      newValue = (fnOrState as StateTypeMutation<T>)(this.value) as T
     } else {
-      newValue = value;
+      newValue = fnOrState;
     }
     if (newValue != this.value) {
       this.value = newValue
-      this.parent?.update(this)
-      Fl.registerStateUpdate(this)
-    }
-  }
-
-  update(child: FlState) {
-    for (let key of Object.keys(this)) {
-      if (Object.keys(this.value).includes(key) && this[key].id == child.id) {
-        this.value[key] = child.value
+      if(this.parent){
+        this.parent.set(child=child)
+      }else{
+        Felin.registerStateUpdate(this)
       }
     }
-    if (this.parent) {
-      this.parent.update(this)
-    }
-  }
-
-  get length(){
-    let length = this.value.length
-    return length
-  }
-}
-
-export function createState(value: any, parent?: FlState): FlState {
-  let typeofValue = typeof value
-  if (typeofValue == "string") {
-    return new FlString(value as string, parent)
-  } else if (typeofValue == "number") {
-    return new FlNumber(value, parent)
-  } else if (Array.isArray(value)) {
-    return new FlArray(value, parent)
-  } else if (typeofValue == "object") {
-    return new FlMappedObject(value, parent)
   }
 }
