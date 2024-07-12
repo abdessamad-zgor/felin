@@ -1,4 +1,4 @@
-import { main, div, p, button, FlDocument, span, state, text, effect, computed } from "./dist/felin.js";
+import { main, div, p, button, FlDocument, span, state, text, effect, computed } from "felin";
 /*
  * import {div, p, button, main} from "flex"
  * 

@@ -1,18 +1,23 @@
 import { Properties } from "csstype";
-type StateTypeMutation<StateType> = StateType extends {
-    [key: string]: any;
-} | any[] ? <T>(state: StateType | Partial<StateType>) => StateType | Partial<StateType> | T : (state: StateType) => StateType;
 declare class ExtensibleFunction extends Function {
     constructor(f: any);
 }
-interface FlStateClass<T> {
+type StateTypeMutation<StateType> = StateType extends {
+    [key: string]: any;
+} | any[] ? (state: StateType | Partial<StateType>) => StateType | Partial<StateType> : (state: StateType) => StateType;
+interface FlStateType<T = any> {
+    value: T | Partial<T>;
     id: string;
-    value: T;
-    parent?: FlState;
-    set(fnOrValue: T | StateTypeMutation<T>): void;
-    update?: (child: FlState) => void;
+    parent?: FlStateType;
+    set: (fnOrState: StateTypeMutation<T> | T) => void;
 }
-type FlState<T = any> = Function & FlStateClass<T>;
+declare class FlState<T = any> extends ExtensibleFunction implements FlStateType<T> {
+    id: string;
+    value: T | Partial<T>;
+    parent?: FlStateType<any>;
+    constructor(value: T | Partial<T>, parent?: FlStateType<any>);
+    set(fnOrState?: StateTypeMutation<T> | T, child?: FlState<T>): void;
+}
 type FlEvent = Event | CustomEvent;
 declare class FlTextNode<T extends any[]> {
     id: string;
@@ -103,7 +108,7 @@ export class FlDocument {
 }
 declare class FlEffect extends ExtensibleFunction {
     id: string;
-    effect: (...args: FlState[]) => void;
+    effect: (...args: FlState<any>[]) => void;
     dependants: FlState[];
     constructor(fn: (...args: FlState[]) => void);
 }
@@ -286,7 +291,7 @@ export const tspan: (...children: FlElement[]) => FlElement;
 export const use: (...children: FlElement[]) => FlElement;
 export const view: (...children: FlElement[]) => FlElement;
 export function text<T extends any[]>(text: string, ...args: T): FlTextNode<T>;
-export function state<T>(value: T): FlState<any>;
+export function state<T>(value: T): FlState<T>;
 export function effect(fn: (...args: FlState[]) => void): FlEffect;
 export function computed(fn: (...args: FlState[]) => void, ...states: FlState[]): FlComputed;
 
