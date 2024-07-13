@@ -74,6 +74,7 @@ export class FlHTMLElement {
     }
     this.$style = style || null
     this.$listeners = new Map()
+    this.$attributes = {}
   }
 
   style(style: CssStyle) {
@@ -191,6 +192,7 @@ export class FlSVGElement {
     }
     this.$style = style || null
     this.$listeners = new Map()
+    this.$attributes = {}
   }
 
   style(style: CssStyle) {

@@ -2,7 +2,7 @@ import { ExtensibleFunction } from "./utils"
 import { FlState } from "./state"
 
 export class FlEffect extends ExtensibleFunction {
-  id: string
+  _id: string
   effect: (...args: FlState<any>[])=>void
   dependants: FlState[]
 
@@ -10,7 +10,7 @@ export class FlEffect extends ExtensibleFunction {
     super((...args: FlState[])=>{
       this.effect = fn
       this.dependants = args
-      this.id = crypto.randomUUID()
+      this._id = crypto.randomUUID()
       Felin.registerEffect(this)
     })
     

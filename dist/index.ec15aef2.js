@@ -608,17 +608,18 @@ var _felin = require("felin");
  * hsDocument.render('query', page)
  */ let page = ()=>{
     let counter = (0, _felin.state)({
-        count: 0
+        count: {
+            a: 1
+        }
     });
     let msg = (0, _felin.computed)((count)=>{
-        return `the count is ${count()}`;
-    }, counter.count);
-    console.log(msg);
+        return `the count is ${count.count.a()}`;
+    }, counter);
     (0, _felin.effect)((counter)=>{
         console.log("msg is: ", msg());
-    })(counter.count);
+    })(counter);
     return (0, _felin.main)((0, _felin.div)((0, _felin.p)("hello world"), (0, _felin.div)((0, _felin.div)((0, _felin.p)("I am also here"), msg, (0, _felin.button)("Click me").listen("click", ()=>{
-        counter.count.set((s)=>++s);
+        counter.count.a.set((s)=>s + 1);
         console.log(counter.value);
     })))));
 };
@@ -744,10 +745,10 @@ class FlRegistry {
         this.documentStates[root] = stateCalls;
     }
     registerStateUpdate(state) {
-        let root = Object.keys(this.documentStates).find((r)=>this.documentStates[r].some((s)=>s.state.id == state.id));
+        let root = Object.keys(this.documentStates).find((r)=>this.documentStates[r].some((s)=>s.state._id == state._id));
         if (root) {
             let hsDocument = this.documentRootsMap[root];
-            let stateCalls = this.documentStates[root].filter((s)=>s.state.id == state.id);
+            let stateCalls = this.documentStates[root].filter((s)=>s.state._id == state._id);
             for (let stateCall of stateCalls){
                 let targetElement = stateCall.element;
                 if (stateCall.element instanceof (0, _element.FlTextNode)) targetElement = stateCall.element.parentNode;
@@ -759,14 +760,14 @@ class FlRegistry {
                 this.runtime.pushTask(domUpdate);
             }
         }
-        let computed = this.computed.find((e)=>e.states.some((s)=>s.id == state.id));
+        let computed = this.computed.find((e)=>e.states.some((s)=>s._id == state._id));
         if (computed) {
             let computedRefresh = new FlComputedRefresh(computed);
             this.runtime.pushTask(computedRefresh);
-            let computedStateRoot = Object.keys(this.documentStates).find((r)=>this.documentStates[r].some((s)=>s.state.id == computed.id));
+            let computedStateRoot = Object.keys(this.documentStates).find((r)=>this.documentStates[r].some((s)=>s.state._id == computed._id));
             if (computedStateRoot) {
                 let computedFlDocument = this.documentRootsMap[computedStateRoot];
-                let computedStateCalls = this.documentStates[computedStateRoot].filter((s)=>s.state.id == computed.id);
+                let computedStateCalls = this.documentStates[computedStateRoot].filter((s)=>s.state._id == computed._id);
                 for (let computedStateCall of computedStateCalls){
                     let computedTargetElement = computedStateCall.element;
                     if (computedStateCall.element instanceof (0, _element.FlTextNode)) computedTargetElement = computedStateCall.element.parentNode;
@@ -779,7 +780,7 @@ class FlRegistry {
                 }
             }
         }
-        let effect = this.effects.find((e)=>e.dependants.some((s)=>s.id == state.id));
+        let effect = this.effects.find((e)=>e.dependants.some((s)=>s._id == state._id));
         if (effect) {
             let effectCall = new FlEffectCall({
                 fn: effect.effect,
@@ -795,10 +796,10 @@ class FlRegistry {
         this.runtime.run();
     }
     registerEffect(effect) {
-        if (!this.effects.some((e)=>e.id == effect.id)) this.effects.push(effect);
+        if (!this.effects.some((e)=>e._id == effect._id)) this.effects.push(effect);
     }
     registerComputedState(state) {
-        if (!this.computed.some((c)=>c.id == state.id)) this.computed.push(state);
+        if (!this.computed.some((c)=>c._id == state._id)) this.computed.push(state);
     }
 }
 const Felin = new FlRegistry();
@@ -853,6 +854,7 @@ class FlHTMLElement {
         } else this.$children = [];
         this.$style = style || null;
         this.$listeners = new Map();
+        this.$attributes = {};
     }
     style(style) {
         this.$style = style;
@@ -925,6 +927,7 @@ class FlSVGElement {
         } else this.$children.push(typeof child == "string" ? new FlTextNode(child) : child);
         this.$style = style || null;
         this.$listeners = new Map();
+        this.$attributes = {};
     }
     style(style) {
         this.$style = style;
@@ -1969,7 +1972,7 @@ class FlComputed extends (0, _utils.ExtensibleFunction) {
         this.fn = fn;
         this.states = states;
         this.value = fn(...states);
-        this.id = crypto.randomUUID();
+        this._id = crypto.randomUUID();
         Felin.registerComputedState(this);
     }
 }
@@ -1995,7 +1998,7 @@ class FlEffect extends (0, _utils.ExtensibleFunction) {
         super((...args)=>{
             this.effect = fn;
             this.dependants = args;
-            this.id = crypto.randomUUID();
+            this._id = crypto.randomUUID();
             Felin.registerEffect(this);
         });
     }
@@ -2010,40 +2013,42 @@ class FlState extends (0, _utils.ExtensibleFunction) {
     constructor(value, parent){
         super(()=>this.value);
         this.value = value;
-        this.id = crypto.randomUUID();
+        this._id = crypto.randomUUID();
         if (parent) this.parent = parent;
-        if (typeof this.value == "object") {
+        if (typeof this.value == "object" && this.value != undefined && this.value != null) {
             let handler = {
                 get: (target, prop, reciever)=>{
-                    if (Object.keys(this.value).includes(prop)) {
-                        let value = this.value[prop];
-                        if (typeof value == "object") return new Proxy(new FlState(value, this), handler);
-                        else return new FlState(value, this);
-                    } else return Reflect.get(target, prop, reciever);
-                },
-                set: (target, prop, value)=>{
-                    if (Object.keys(this.value).includes(prop)) target.set((s)=>({
-                            ...s,
-                            [prop]: value
-                        }));
-                    else if (prop == "value") return Reflect.set(target, prop, value);
+                    if (!Object.keys(target.value).includes(prop)) return Reflect.get(target, prop, reciever);
+                    else {
+                        let value = target.value[prop];
+                        let childState = new FlState(value, {
+                            state: this,
+                            key: prop
+                        });
+                        return childState;
+                    }
                 }
             };
             return new Proxy(this, handler);
         }
     }
     set(fnOrState, child) {
+        let newValue = this.value;
         if (child) {
-            for (let key of Object.keys(this.value))if (this[key].id == child.id) this.value[key] = child.value;
+            for (let key of Object.keys(this.value))if (key == child.parent.key) newValue[key] = child.value;
         }
-        let newValue;
-        if (typeof fnOrState === "function") //@ts-ignore
-        newValue = fnOrState(this.value);
-        else newValue = fnOrState;
-        if (newValue != this.value) {
+        if (fnOrState) {
+            if (typeof fnOrState === "function") //@ts-ignore
+            newValue = fnOrState(this.value);
+            else newValue = fnOrState;
             this.value = newValue;
-            if (this.parent) this.parent.set(child);
-            else Felin.registerStateUpdate(this);
+        }
+        if (this.parent) {
+            this.value = newValue;
+            this.parent.state.set(undefined, this);
+        } else {
+            this.value = newValue;
+            Felin.registerStateUpdate(this);
         }
     }
 }

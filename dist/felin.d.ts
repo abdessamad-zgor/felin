@@ -7,16 +7,20 @@ type StateTypeMutation<StateType> = StateType extends {
 } | any[] ? (state: StateType | Partial<StateType>) => StateType | Partial<StateType> : (state: StateType) => StateType;
 interface FlStateType<T = any> {
     value: T | Partial<T>;
-    id: string;
-    parent?: FlStateType;
-    set: (fnOrState: StateTypeMutation<T> | T) => void;
+    _id: string;
+    parent?: ParentState;
+    set: (fnOrState: StateTypeMutation<T> | T, child?: FlState<T>) => void;
 }
+type ParentState = {
+    state: FlStateType;
+    key: string;
+};
 declare class FlState<T = any> extends ExtensibleFunction implements FlStateType<T> {
-    id: string;
+    _id: string;
     value: T | Partial<T>;
-    parent?: FlStateType<any>;
-    constructor(value: T | Partial<T>, parent?: FlStateType<any>);
-    set(fnOrState?: StateTypeMutation<T> | T, child?: FlState<T>): void;
+    parent?: ParentState;
+    constructor(value: T | Partial<T>, parent?: ParentState);
+    set(fnOrState: StateTypeMutation<T> | T, child?: FlState<T>): void;
 }
 type FlEvent = Event | CustomEvent;
 declare class FlTextNode<T extends any[]> {
@@ -107,13 +111,13 @@ export class FlDocument {
     selector(element: FlHTMLElement): string;
 }
 declare class FlEffect extends ExtensibleFunction {
-    id: string;
+    _id: string;
     effect: (...args: FlState<any>[]) => void;
     dependants: FlState[];
     constructor(fn: (...args: FlState[]) => void);
 }
 declare class FlComputed extends ExtensibleFunction {
-    id: string;
+    _id: string;
     value: any;
     fn: (...args: FlState[]) => any;
     states: FlState[];

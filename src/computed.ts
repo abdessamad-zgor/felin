@@ -2,7 +2,7 @@ import { ExtensibleFunction } from "./utils"
 import { FlState } from "./state";
 
 export class FlComputed extends ExtensibleFunction {
-  id: string
+  _id: string
   value: any
   fn: (...args: FlState[]) => any
   states: FlState[]
@@ -14,7 +14,7 @@ export class FlComputed extends ExtensibleFunction {
     this.fn = fn
     this.states = states
     this.value = fn(...states)
-    this.id = crypto.randomUUID()
+    this._id = crypto.randomUUID()
     Felin.registerComputedState(this)
   }
 }

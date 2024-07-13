@@ -57,6 +57,7 @@ class $1053edf64ed8e6a3$export$5c862657cac5310e {
         } else this.$children = [];
         this.$style = style || null;
         this.$listeners = new Map();
+        this.$attributes = {};
     }
     style(style) {
         this.$style = style;
@@ -129,6 +130,7 @@ class $1053edf64ed8e6a3$export$7b5dc3cb1a09720a {
         } else this.$children.push(typeof child == "string" ? new $1053edf64ed8e6a3$export$391d51f7f06558d(child) : child);
         this.$style = style || null;
         this.$listeners = new Map();
+        this.$attributes = {};
     }
     style(style) {
         this.$style = style;
@@ -286,10 +288,10 @@ class $8a29e9b0d3dc349c$export$eee6c302d5b11391 {
         this.documentStates[root] = stateCalls;
     }
     registerStateUpdate(state) {
-        let root = Object.keys(this.documentStates).find((r)=>this.documentStates[r].some((s)=>s.state.id == state.id));
+        let root = Object.keys(this.documentStates).find((r)=>this.documentStates[r].some((s)=>s.state._id == state._id));
         if (root) {
             let hsDocument = this.documentRootsMap[root];
-            let stateCalls = this.documentStates[root].filter((s)=>s.state.id == state.id);
+            let stateCalls = this.documentStates[root].filter((s)=>s.state._id == state._id);
             for (let stateCall of stateCalls){
                 let targetElement = stateCall.element;
                 if (stateCall.element instanceof (0, $1053edf64ed8e6a3$export$391d51f7f06558d)) targetElement = stateCall.element.parentNode;
@@ -301,14 +303,14 @@ class $8a29e9b0d3dc349c$export$eee6c302d5b11391 {
                 this.runtime.pushTask(domUpdate);
             }
         }
-        let computed = this.computed.find((e)=>e.states.some((s)=>s.id == state.id));
+        let computed = this.computed.find((e)=>e.states.some((s)=>s._id == state._id));
         if (computed) {
             let computedRefresh = new $8a29e9b0d3dc349c$export$c5a6b68548974cf2(computed);
             this.runtime.pushTask(computedRefresh);
-            let computedStateRoot = Object.keys(this.documentStates).find((r)=>this.documentStates[r].some((s)=>s.state.id == computed.id));
+            let computedStateRoot = Object.keys(this.documentStates).find((r)=>this.documentStates[r].some((s)=>s.state._id == computed._id));
             if (computedStateRoot) {
                 let computedFlDocument = this.documentRootsMap[computedStateRoot];
-                let computedStateCalls = this.documentStates[computedStateRoot].filter((s)=>s.state.id == computed.id);
+                let computedStateCalls = this.documentStates[computedStateRoot].filter((s)=>s.state._id == computed._id);
                 for (let computedStateCall of computedStateCalls){
                     let computedTargetElement = computedStateCall.element;
                     if (computedStateCall.element instanceof (0, $1053edf64ed8e6a3$export$391d51f7f06558d)) computedTargetElement = computedStateCall.element.parentNode;
@@ -321,7 +323,7 @@ class $8a29e9b0d3dc349c$export$eee6c302d5b11391 {
                 }
             }
         }
-        let effect = this.effects.find((e)=>e.dependants.some((s)=>s.id == state.id));
+        let effect = this.effects.find((e)=>e.dependants.some((s)=>s._id == state._id));
         if (effect) {
             let effectCall = new $8a29e9b0d3dc349c$export$7237afb2b5ef80bd({
                 fn: effect.effect,
@@ -337,10 +339,10 @@ class $8a29e9b0d3dc349c$export$eee6c302d5b11391 {
         this.runtime.run();
     }
     registerEffect(effect) {
-        if (!this.effects.some((e)=>e.id == effect.id)) this.effects.push(effect);
+        if (!this.effects.some((e)=>e._id == effect._id)) this.effects.push(effect);
     }
     registerComputedState(state) {
-        if (!this.computed.some((c)=>c.id == state.id)) this.computed.push(state);
+        if (!this.computed.some((c)=>c._id == state._id)) this.computed.push(state);
     }
 }
 const $8a29e9b0d3dc349c$export$76fb3b11e24d7138 = new $8a29e9b0d3dc349c$export$eee6c302d5b11391();
@@ -1269,7 +1271,7 @@ class $6766d2e336270b01$export$ff154421c5494dff extends (0, $fab42eb3dee39b5b$ex
         this.fn = fn;
         this.states = states;
         this.value = fn(...states);
-        this.id = crypto.randomUUID();
+        this._id = crypto.randomUUID();
         Felin.registerComputedState(this);
     }
 }
@@ -1281,7 +1283,7 @@ class $4704b076393e4b49$export$20cf6ede9b7e40c5 extends (0, $fab42eb3dee39b5b$ex
         super((...args)=>{
             this.effect = fn;
             this.dependants = args;
-            this.id = crypto.randomUUID();
+            this._id = crypto.randomUUID();
             Felin.registerEffect(this);
         });
     }
@@ -1293,40 +1295,42 @@ class $94cfa2cfccc8cc22$export$693b3a618571100f extends (0, $fab42eb3dee39b5b$ex
     constructor(value, parent){
         super(()=>this.value);
         this.value = value;
-        this.id = crypto.randomUUID();
+        this._id = crypto.randomUUID();
         if (parent) this.parent = parent;
-        if (typeof this.value == "object") {
+        if (typeof this.value == "object" && this.value != undefined && this.value != null) {
             let handler = {
                 get: (target, prop, reciever)=>{
-                    if (Object.keys(this.value).includes(prop)) {
-                        let value = this.value[prop];
-                        if (typeof value == "object") return new Proxy(new $94cfa2cfccc8cc22$export$693b3a618571100f(value, this), handler);
-                        else return new $94cfa2cfccc8cc22$export$693b3a618571100f(value, this);
-                    } else return Reflect.get(target, prop, reciever);
-                },
-                set: (target, prop, value)=>{
-                    if (Object.keys(this.value).includes(prop)) target.set((s)=>({
-                            ...s,
-                            [prop]: value
-                        }));
-                    else if (prop == "value") return Reflect.set(target, prop, value);
+                    if (!Object.keys(target.value).includes(prop)) return Reflect.get(target, prop, reciever);
+                    else {
+                        let value = target.value[prop];
+                        let childState = new $94cfa2cfccc8cc22$export$693b3a618571100f(value, {
+                            state: this,
+                            key: prop
+                        });
+                        return childState;
+                    }
                 }
             };
             return new Proxy(this, handler);
         }
     }
     set(fnOrState, child) {
+        let newValue = this.value;
         if (child) {
-            for (let key of Object.keys(this.value))if (this[key].id == child.id) this.value[key] = child.value;
+            for (let key of Object.keys(this.value))if (key == child.parent.key) newValue[key] = child.value;
         }
-        let newValue;
-        if (typeof fnOrState === "function") //@ts-ignore
-        newValue = fnOrState(this.value);
-        else newValue = fnOrState;
-        if (newValue != this.value) {
+        if (fnOrState) {
+            if (typeof fnOrState === "function") //@ts-ignore
+            newValue = fnOrState(this.value);
+            else newValue = fnOrState;
             this.value = newValue;
-            if (this.parent) this.parent.set(child);
-            else Felin.registerStateUpdate(this);
+        }
+        if (this.parent) {
+            this.value = newValue;
+            this.parent.state.set(undefined, this);
+        } else {
+            this.value = newValue;
+            Felin.registerStateUpdate(this);
         }
     }
 }
