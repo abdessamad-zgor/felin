@@ -11,7 +11,7 @@ $ npm install felin
 ```
 or include our cdn inside your html:
 ```
-<script src="https://cdn.cloudflare.com/felin.js" type="module"></script>
+<script src="https://cdn.jsdelivr.net/npm/felin@latest/dist/felin.js" type="module"></script>
 ```
 
 create an `app.js` file and start using felin:
