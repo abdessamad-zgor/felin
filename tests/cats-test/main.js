@@ -1,4 +1,4 @@
-import { main, div, p, button, FlDocument, span, state, text, effect, computed } from "./dist/felin.js";
+import { main, div, p, button, FlDocument, span, state, text, effect, computed } from "felin";
 /*
  * import {div, p, button, main} from "flex"
  * 
@@ -24,17 +24,16 @@ import { main, div, p, button, FlDocument, span, state, text, effect, computed }
 
 
 let page = () => {
-  let counter = state({ count: 0 })
+  let counter = state({ count: {a: 1} })
 
   let msg = computed((count) => {
-    return `the count is ${count()}`
-  }, counter.count)
+    return `the count is ${count.count.a()}`
+  }, counter)
 
-  console.log(msg)
 
   effect((counter) => {
     console.log("msg is: ", msg())
-  })(counter.count)
+  })(counter)
 
   return main(
     div(
@@ -44,7 +43,7 @@ let page = () => {
           p("I am also here"),
           msg,
           button("Click me").listen('click', () => {
-            counter.count.set(s => ++s)
+            counter.count.a.set(s=>s+1)
             console.log(counter.value)
           })
         )

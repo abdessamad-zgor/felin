@@ -22,8 +22,8 @@
     "build": "parcel build",
     "build-tsc": "tsc",
     "prepublish": "yarn run build",
-    "pretest": "npm link",
-    "test": "jest && parcel tests/cats-test/index.html"
+    "pretest": "npm run build && npm link && npm link felin",
+    "test": "jest; parcel tests/cats-test/index.html"
   },
   "repository": {
     "type": "git",

@@ -1,5 +1,5 @@
-import { Fl } from "./core";
-window.Fl = Fl
+import { Felin } from "./core";
+window.Felin = Felin
 
 export * from "./elements";
 export * from "./document";

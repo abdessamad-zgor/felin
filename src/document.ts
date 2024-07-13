@@ -22,9 +22,9 @@ export class FlDocument {
         this.rootSelector = selector;
         this.rootElement = element;
         let stateCalls = element.getStateCalls()
-        Fl.registerFlDocumentRoot(selector, this)
-        Fl.registerStateCalls(selector, stateCalls)
-        Fl.run()
+        Felin.registerFlDocumentRoot(selector, this)
+        Felin.registerStateCalls(selector, stateCalls)
+        Felin.run()
       } else
         throw Error("FlJsError: no element found with selector " + selector)
     }
