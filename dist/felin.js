@@ -57,6 +57,7 @@ class $1053edf64ed8e6a3$export$5c862657cac5310e {
         } else this.$children = [];
         this.$style = style || null;
         this.$listeners = new Map();
+        this.$attributes = {};
     }
     style(style) {
         this.$style = style;
@@ -129,6 +130,7 @@ class $1053edf64ed8e6a3$export$7b5dc3cb1a09720a {
         } else this.$children.push(typeof child == "string" ? new $1053edf64ed8e6a3$export$391d51f7f06558d(child) : child);
         this.$style = style || null;
         this.$listeners = new Map();
+        this.$attributes = {};
     }
     style(style) {
         this.$style = style;
@@ -286,10 +288,10 @@ class $8a29e9b0d3dc349c$export$eee6c302d5b11391 {
         this.documentStates[root] = stateCalls;
     }
     registerStateUpdate(state) {
-        let root = Object.keys(this.documentStates).find((r)=>this.documentStates[r].some((s)=>s.state.id == state.id));
+        let root = Object.keys(this.documentStates).find((r)=>this.documentStates[r].some((s)=>s.state._id == state._id));
         if (root) {
             let hsDocument = this.documentRootsMap[root];
-            let stateCalls = this.documentStates[root].filter((s)=>s.state.id == state.id);
+            let stateCalls = this.documentStates[root].filter((s)=>s.state._id == state._id);
             for (let stateCall of stateCalls){
                 let targetElement = stateCall.element;
                 if (stateCall.element instanceof (0, $1053edf64ed8e6a3$export$391d51f7f06558d)) targetElement = stateCall.element.parentNode;
@@ -301,14 +303,14 @@ class $8a29e9b0d3dc349c$export$eee6c302d5b11391 {
                 this.runtime.pushTask(domUpdate);
             }
         }
-        let computed = this.computed.find((e)=>e.states.some((s)=>s.id == state.id));
+        let computed = this.computed.find((e)=>e.states.some((s)=>s._id == state._id));
         if (computed) {
             let computedRefresh = new $8a29e9b0d3dc349c$export$c5a6b68548974cf2(computed);
             this.runtime.pushTask(computedRefresh);
-            let computedStateRoot = Object.keys(this.documentStates).find((r)=>this.documentStates[r].some((s)=>s.state.id == computed.id));
+            let computedStateRoot = Object.keys(this.documentStates).find((r)=>this.documentStates[r].some((s)=>s.state._id == computed._id));
             if (computedStateRoot) {
                 let computedFlDocument = this.documentRootsMap[computedStateRoot];
-                let computedStateCalls = this.documentStates[computedStateRoot].filter((s)=>s.state.id == computed.id);
+                let computedStateCalls = this.documentStates[computedStateRoot].filter((s)=>s.state._id == computed._id);
                 for (let computedStateCall of computedStateCalls){
                     let computedTargetElement = computedStateCall.element;
                     if (computedStateCall.element instanceof (0, $1053edf64ed8e6a3$export$391d51f7f06558d)) computedTargetElement = computedStateCall.element.parentNode;
@@ -321,7 +323,7 @@ class $8a29e9b0d3dc349c$export$eee6c302d5b11391 {
                 }
             }
         }
-        let effect = this.effects.find((e)=>e.dependants.some((s)=>s.id == state.id));
+        let effect = this.effects.find((e)=>e.dependants.some((s)=>s._id == state._id));
         if (effect) {
             let effectCall = new $8a29e9b0d3dc349c$export$7237afb2b5ef80bd({
                 fn: effect.effect,
@@ -337,13 +339,13 @@ class $8a29e9b0d3dc349c$export$eee6c302d5b11391 {
         this.runtime.run();
     }
     registerEffect(effect) {
-        if (!this.effects.some((e)=>e.id == effect.id)) this.effects.push(effect);
+        if (!this.effects.some((e)=>e._id == effect._id)) this.effects.push(effect);
     }
     registerComputedState(state) {
-        if (!this.computed.some((c)=>c.id == state.id)) this.computed.push(state);
+        if (!this.computed.some((c)=>c._id == state._id)) this.computed.push(state);
     }
 }
-const $8a29e9b0d3dc349c$export$d81afc18e5c90bdd = new $8a29e9b0d3dc349c$export$eee6c302d5b11391();
+const $8a29e9b0d3dc349c$export$76fb3b11e24d7138 = new $8a29e9b0d3dc349c$export$eee6c302d5b11391();
 
 
 var $9e0c0b8784c80412$exports = {};
@@ -1226,9 +1228,9 @@ class $9a2175d49af6cdeb$export$6e6230adb118a96e {
                 this.rootSelector = selector;
                 this.rootElement = element;
                 let stateCalls = element.getStateCalls();
-                Fl.registerFlDocumentRoot(selector, this);
-                Fl.registerStateCalls(selector, stateCalls);
-                Fl.run();
+                Felin.registerFlDocumentRoot(selector, this);
+                Felin.registerStateCalls(selector, stateCalls);
+                Felin.run();
             } else throw Error("FlJsError: no element found with selector " + selector);
         }
     }
@@ -1252,121 +1254,15 @@ $parcel$export($e2e1ea6dd3b7d2e1$exports, "text", () => $e2e1ea6dd3b7d2e1$export
 $parcel$export($e2e1ea6dd3b7d2e1$exports, "state", () => $e2e1ea6dd3b7d2e1$export$ca000e230c0caa3e);
 $parcel$export($e2e1ea6dd3b7d2e1$exports, "effect", () => $e2e1ea6dd3b7d2e1$export$dc573d8a6576cdb3);
 $parcel$export($e2e1ea6dd3b7d2e1$exports, "computed", () => $e2e1ea6dd3b7d2e1$export$2983e091f1a1e8e2);
-class $94cfa2cfccc8cc22$export$f38f450dbc1e989 extends Function {
+class $fab42eb3dee39b5b$export$f38f450dbc1e989 extends Function {
     constructor(f){
         super();
         return Object.setPrototypeOf(f, new.target.prototype);
     }
 }
-class $94cfa2cfccc8cc22$export$3047a3b426cdfba extends $94cfa2cfccc8cc22$export$f38f450dbc1e989 {
-    constructor(value, parent){
-        super(()=>{
-            return this.value;
-        });
-        this.id = crypto.randomUUID();
-        this.value = value;
-        this.parent = parent;
-    }
-    set(value) {
-        let newValue;
-        if (typeof value === "function") newValue = value(this.value);
-        else newValue = value;
-        if (newValue != this.value) {
-            this.value = newValue;
-            this.parent?.update(this);
-            Fl.registerStateUpdate(this);
-        }
-    }
-}
-class $94cfa2cfccc8cc22$export$85394f47fef48cf7 extends $94cfa2cfccc8cc22$export$f38f450dbc1e989 {
-    constructor(value, parent){
-        super(()=>{
-            return this.value;
-        });
-        this.id = crypto.randomUUID();
-        this.value = value;
-        this.parent = parent;
-    }
-    set(value) {
-        let newValue;
-        if (typeof value === "function") newValue = value(this.value);
-        else newValue = value;
-        if (newValue != this.value) {
-            this.value = newValue;
-            this.parent?.update(this);
-            Fl.registerStateUpdate(this);
-        }
-    }
-}
-class $94cfa2cfccc8cc22$export$2fc0b960d886d56e extends $94cfa2cfccc8cc22$export$f38f450dbc1e989 {
-    constructor(value, parent){
-        super(()=>{
-            return this.value;
-        });
-        this.id = crypto.randomUUID();
-        this.value = value;
-        this.parent = parent;
-        for (let key of Object.keys(value))this[key] = $94cfa2cfccc8cc22$export$e6a0daad8304de(value[key], this);
-    }
-    set(value) {
-        let newValue;
-        if (typeof value === "function") newValue = value(this.value);
-        else newValue = value;
-        if (newValue != this.value) {
-            this.value = newValue;
-            this.parent?.update(this);
-            Fl.registerStateUpdate(this);
-        }
-    }
-    update(child) {
-        for (let key of Object.keys(this))if (Object.keys(this.value).includes(key) && this[key].id == child.id) this.value[key] = child.value;
-        if (this.parent) this.parent.update(this);
-    }
-}
-class $94cfa2cfccc8cc22$export$e8579d33fc6e03a8 extends $94cfa2cfccc8cc22$export$f38f450dbc1e989 {
-    constructor(value, parent){
-        super(()=>{
-            return this.value;
-        });
-        this.id = crypto.randomUUID();
-        this.value = value;
-        this.parent = parent;
-        for (let key of Object.keys(value))this[key] = $94cfa2cfccc8cc22$export$e6a0daad8304de(value[key], this);
-        Object.defineProperty(this, "length", {
-            get () {
-                return this.value.length;
-            }
-        });
-    }
-    set(value) {
-        let newValue;
-        if (typeof value === "function") newValue = value(this.value);
-        else newValue = value;
-        if (newValue != this.value) {
-            this.value = newValue;
-            this.parent?.update(this);
-            Fl.registerStateUpdate(this);
-        }
-    }
-    update(child) {
-        for (let key of Object.keys(this))if (Object.keys(this.value).includes(key) && this[key].id == child.id) this.value[key] = child.value;
-        if (this.parent) this.parent.update(this);
-    }
-    get length() {
-        let length = this.value.length;
-        return length;
-    }
-}
-function $94cfa2cfccc8cc22$export$e6a0daad8304de(value, parent) {
-    let typeofValue = typeof value;
-    if (typeofValue == "string") return new $94cfa2cfccc8cc22$export$3047a3b426cdfba(value, parent);
-    else if (typeofValue == "number") return new $94cfa2cfccc8cc22$export$85394f47fef48cf7(value, parent);
-    else if (Array.isArray(value)) return new $94cfa2cfccc8cc22$export$e8579d33fc6e03a8(value, parent);
-    else if (typeofValue == "object") return new $94cfa2cfccc8cc22$export$2fc0b960d886d56e(value, parent);
-}
 
 
-class $6766d2e336270b01$export$ff154421c5494dff extends (0, $94cfa2cfccc8cc22$export$f38f450dbc1e989) {
+class $6766d2e336270b01$export$ff154421c5494dff extends (0, $fab42eb3dee39b5b$export$f38f450dbc1e989) {
     constructor(fn, ...states){
         super(()=>{
             this.value = this.fn(...this.states);
@@ -1375,24 +1271,69 @@ class $6766d2e336270b01$export$ff154421c5494dff extends (0, $94cfa2cfccc8cc22$ex
         this.fn = fn;
         this.states = states;
         this.value = fn(...states);
-        this.id = crypto.randomUUID();
-        Fl.registerComputedState(this);
+        this._id = crypto.randomUUID();
+        Felin.registerComputedState(this);
     }
 }
 
 
 
-class $4704b076393e4b49$export$20cf6ede9b7e40c5 extends (0, $94cfa2cfccc8cc22$export$f38f450dbc1e989) {
+class $4704b076393e4b49$export$20cf6ede9b7e40c5 extends (0, $fab42eb3dee39b5b$export$f38f450dbc1e989) {
     constructor(fn){
         super((...args)=>{
             this.effect = fn;
             this.dependants = args;
-            this.id = crypto.randomUUID();
-            Fl.registerEffect(this);
+            this._id = crypto.randomUUID();
+            Felin.registerEffect(this);
         });
     }
 }
 
+
+
+class $94cfa2cfccc8cc22$export$693b3a618571100f extends (0, $fab42eb3dee39b5b$export$f38f450dbc1e989) {
+    constructor(value, parent){
+        super(()=>this.value);
+        this.value = value;
+        this._id = crypto.randomUUID();
+        if (parent) this.parent = parent;
+        if (typeof this.value == "object" && this.value != undefined && this.value != null) {
+            let handler = {
+                get: (target, prop, reciever)=>{
+                    if (!Object.keys(target.value).includes(prop)) return Reflect.get(target, prop, reciever);
+                    else {
+                        let value = target.value[prop];
+                        let childState = new $94cfa2cfccc8cc22$export$693b3a618571100f(value, {
+                            state: this,
+                            key: prop
+                        });
+                        return childState;
+                    }
+                }
+            };
+            return new Proxy(this, handler);
+        }
+    }
+    set(fnOrState, child) {
+        let newValue = this.value;
+        if (child) {
+            for (let key of Object.keys(this.value))if (key == child.parent.key) newValue[key] = child.value;
+        }
+        if (fnOrState) {
+            if (typeof fnOrState === "function") //@ts-ignore
+            newValue = fnOrState(this.value);
+            else newValue = fnOrState;
+            this.value = newValue;
+        }
+        if (this.parent) {
+            this.value = newValue;
+            this.parent.state.set(undefined, this);
+        } else {
+            this.value = newValue;
+            Felin.registerStateUpdate(this);
+        }
+    }
+}
 
 
 
@@ -1400,7 +1341,7 @@ function $e2e1ea6dd3b7d2e1$export$6f093cfa640b7166(text1, ...args) {
     return new (0, $1053edf64ed8e6a3$export$391d51f7f06558d)(text1, ...args);
 }
 function $e2e1ea6dd3b7d2e1$export$ca000e230c0caa3e(value) {
-    return (0, $94cfa2cfccc8cc22$export$e6a0daad8304de)(value);
+    return new (0, $94cfa2cfccc8cc22$export$693b3a618571100f)(value);
 }
 function $e2e1ea6dd3b7d2e1$export$dc573d8a6576cdb3(fn) {
     return new (0, $4704b076393e4b49$export$20cf6ede9b7e40c5)(fn);
@@ -1410,7 +1351,7 @@ function $e2e1ea6dd3b7d2e1$export$2983e091f1a1e8e2(fn, ...states) {
 }
 
 
-window.Fl = (0, $8a29e9b0d3dc349c$export$d81afc18e5c90bdd);
+window.Felin = (0, $8a29e9b0d3dc349c$export$76fb3b11e24d7138);
 
 
 export {$9e0c0b8784c80412$export$407448d2b89b1813 as a, $9e0c0b8784c80412$export$2bcb785951133fe5 as abbr, $9e0c0b8784c80412$export$f7d3c097ceca6c15 as address, $9e0c0b8784c80412$export$bb3edc44842b5f2e as area, $9e0c0b8784c80412$export$bba2aacf8566461b as article, $9e0c0b8784c80412$export$64a02cd6422b91be as aside, $9e0c0b8784c80412$export$592b77e6034db746 as audio, $9e0c0b8784c80412$export$8b22cf2602fb60ce as b, $9e0c0b8784c80412$export$e2253033e6e1df16 as base, $9e0c0b8784c80412$export$2d20a4e9df674436 as bdi, $9e0c0b8784c80412$export$fae0db89ef70aab2 as bdo, $9e0c0b8784c80412$export$67dc04e652a298ca as blockquote, $9e0c0b8784c80412$export$32180ef41b15b513 as body, $9e0c0b8784c80412$export$479ac0420f53ed26 as br, $9e0c0b8784c80412$export$2ba01fb71ed41cb6 as button, $9e0c0b8784c80412$export$67ea982130081db as canvas, $9e0c0b8784c80412$export$8e3c2dfdc4f0453d as caption, $9e0c0b8784c80412$export$3035df57df42c31a as cite, $9e0c0b8784c80412$export$6565f9f03506010b as code, $9e0c0b8784c80412$export$aba86695643891f5 as col, $9e0c0b8784c80412$export$3db318dd257cd653 as colgroup, $9e0c0b8784c80412$export$4051a07651545597 as data, $9e0c0b8784c80412$export$d6956b5f6d5ee87d as datalist, $9e0c0b8784c80412$export$eaaeafa904fe3ddf as dd, $9e0c0b8784c80412$export$1d2f21e549771e67 as del, $9e0c0b8784c80412$export$41ee12f6f6f05843 as details, $9e0c0b8784c80412$export$771f54d1a902afc9 as dfn, $9e0c0b8784c80412$export$518824cf31321346 as dialog, $9e0c0b8784c80412$export$159d9494db57879b as div, $9e0c0b8784c80412$export$53d26b7a9a23d594 as dl, $9e0c0b8784c80412$export$9198f9466fc833e as dt, $9e0c0b8784c80412$export$c63c6f932822f543 as em, $9e0c0b8784c80412$export$2be46bb7e96db87f as embed, $9e0c0b8784c80412$export$a38812d1aa1302d9 as fieldset, $9e0c0b8784c80412$export$b75acb72a9c69c26 as figcaption, $9e0c0b8784c80412$export$991dc94f816a1d48 as figure, $9e0c0b8784c80412$export$adb608be33961c98 as footer, $9e0c0b8784c80412$export$6210fa4921d2a466 as form, $9e0c0b8784c80412$export$448e4850cad7c7b0 as h1, $9e0c0b8784c80412$export$a943aa9a0fca3f0b as h2, $9e0c0b8784c80412$export$7edd4a21fac8ce55 as h3, $9e0c0b8784c80412$export$51a85cc1b68f452c as h4, $9e0c0b8784c80412$export$f44841a11990acb2 as h5, $9e0c0b8784c80412$export$c9ccd321d64f47e3 as h6, $9e0c0b8784c80412$export$5fd5031fecdacec3 as head, $9e0c0b8784c80412$export$38e42c68cf43b5d4 as header, $9e0c0b8784c80412$export$e7c17d6cef8bd1c as hgroup, $9e0c0b8784c80412$export$b4adb3f464574dcf as hr, $9e0c0b8784c80412$export$c0bb0b647f701bb5 as html, $9e0c0b8784c80412$export$23f2a1d2818174ef as i, $9e0c0b8784c80412$export$8cde213409fd6377 as iframe, $9e0c0b8784c80412$export$463b44d9bf3628be as img, $9e0c0b8784c80412$export$b7e3ae3d7c15e42e as input, $9e0c0b8784c80412$export$27a48efc044c200a as ins, $9e0c0b8784c80412$export$1ed45b69d23c052b as kbd, $9e0c0b8784c80412$export$1237798dc640739a as label, $9e0c0b8784c80412$export$9a9b59e08de24cef as legend, $9e0c0b8784c80412$export$19caeaf7d9d84644 as li, $9e0c0b8784c80412$export$9c30223ca0a664fb as link, $9e0c0b8784c80412$export$f22da7240b7add18 as main, $9e0c0b8784c80412$export$871de8747c9eaa88 as map, $9e0c0b8784c80412$export$bf7f2fce5c1cf636 as mark, $9e0c0b8784c80412$export$b1e5508a851be14d as menu, $9e0c0b8784c80412$export$6990040ee07315 as meta, $9e0c0b8784c80412$export$82334bbdfcebb57 as meter, $9e0c0b8784c80412$export$80e4b313e5e6b30d as nav, $9e0c0b8784c80412$export$528ba0e6da49e146 as noscript, $9e0c0b8784c80412$export$be5493f9613cbbe as object, $9e0c0b8784c80412$export$b2235297ee22a6fe as ol, $9e0c0b8784c80412$export$b9d336f245a516e8 as optgroup, $9e0c0b8784c80412$export$a75d1723e6bda2ec as option, $9e0c0b8784c80412$export$c789db2c85949867 as output, $9e0c0b8784c80412$export$ffb5f4729a158638 as p, $9e0c0b8784c80412$export$1188214e9d38144e as picture, $9e0c0b8784c80412$export$2af2ac64526e2aa9 as pre, $9e0c0b8784c80412$export$504d7abb21fa8c9 as progress, $9e0c0b8784c80412$export$9e5f44173e64f162 as q, $9e0c0b8784c80412$export$6d4c73e3ddf8818b as rp, $9e0c0b8784c80412$export$f08282231bb71285 as rt, $9e0c0b8784c80412$export$f2b283820b448b35 as ruby, $9e0c0b8784c80412$export$2408f22a0fab9ae5 as s, $9e0c0b8784c80412$export$8c1cb8fb6818c292 as samp, $9e0c0b8784c80412$export$d76128d007d19019 as search, $9e0c0b8784c80412$export$fe2e36411d703b3d as section, $9e0c0b8784c80412$export$2e6c959c16ff56b8 as select, $9e0c0b8784c80412$export$103b78750979eead as slot, $9e0c0b8784c80412$export$3c17b0e969a90510 as small, $9e0c0b8784c80412$export$b4d5da5f34fb77ad as source, $9e0c0b8784c80412$export$afc1bfabebaf28a2 as span, $9e0c0b8784c80412$export$59ae2c325a998f89 as strong, $9e0c0b8784c80412$export$f93b5905241a7cca as sub, $9e0c0b8784c80412$export$9a2dbef7a17e2e58 as summary, $9e0c0b8784c80412$export$abe1cd54efe9b9cd as sup, $9e0c0b8784c80412$export$9852986a3ec5f6a0 as table, $9e0c0b8784c80412$export$7cdd536eaa8f163c as tbody, $9e0c0b8784c80412$export$2beef8af2014e5c6 as td, $9e0c0b8784c80412$export$ce69bd05624d0c48 as template, $9e0c0b8784c80412$export$a3574df893ffa88d as textarea, $9e0c0b8784c80412$export$9396b2f97a03ad14 as tfoot, $9e0c0b8784c80412$export$d657bc098992a431 as th, $9e0c0b8784c80412$export$e3f32a5920890b82 as thead, $9e0c0b8784c80412$export$2da9be4cfdb689b1 as time, $9e0c0b8784c80412$export$fb184b623420d9be as title, $9e0c0b8784c80412$export$72451b88a72ad9c2 as tr, $9e0c0b8784c80412$export$6b2a7d5132615086 as track, $9e0c0b8784c80412$export$3b14a55fb2447963 as u, $9e0c0b8784c80412$export$b5023c870cb34848 as ul, $9e0c0b8784c80412$export$fb1263f5e78aa11b as $var, $9e0c0b8784c80412$export$5f8d3589eb8441ca as video, $9e0c0b8784c80412$export$ee8f8f9447a35bdc as wbr, $9e0c0b8784c80412$export$308c0c85ad47ce2a as $a, $9e0c0b8784c80412$export$e3607ec2d7a891c4 as animate, $9e0c0b8784c80412$export$5e588c605a4a78b2 as animateMotion, $9e0c0b8784c80412$export$729fc4eb9847864b as animateTransform, $9e0c0b8784c80412$export$e1d786d2f707b414 as circle, $9e0c0b8784c80412$export$a93a2fac2519a03d as clipPath, $9e0c0b8784c80412$export$868461b1c6870d10 as defs, $9e0c0b8784c80412$export$51987bb50e1f6752 as desc, $9e0c0b8784c80412$export$35eec893e28a8a34 as ellipse, $9e0c0b8784c80412$export$ba172c53ad3949dd as feBlend, $9e0c0b8784c80412$export$5eb95cb0e6566912 as feColorMatrix, $9e0c0b8784c80412$export$32d87166552d46e4 as feComponentTransfer, $9e0c0b8784c80412$export$a9c456e7f59a922e as feComposite, $9e0c0b8784c80412$export$80857957c253f74c as feConvolveMatrix, $9e0c0b8784c80412$export$15897bb48f363dc5 as feDiffuseLighting, $9e0c0b8784c80412$export$29d24d9a033d4415 as feDisplacementMap, $9e0c0b8784c80412$export$189ae3b23835546d as feDistantLight, $9e0c0b8784c80412$export$a2a7ecf3147a8160 as feDropShadow, $9e0c0b8784c80412$export$d4a3c574e219ec41 as feFlood, $9e0c0b8784c80412$export$ff335e1896a0d6ac as feFuncA, $9e0c0b8784c80412$export$b413ed7ce780ab62 as feFuncB, $9e0c0b8784c80412$export$acd966dff92826df as feFuncG, $9e0c0b8784c80412$export$1c8b9a56b85655d7 as feFuncR, $9e0c0b8784c80412$export$fab9ed97c28f4d5 as feGaussianBlur, $9e0c0b8784c80412$export$5c615a36cad27f2a as feImage, $9e0c0b8784c80412$export$f72866be216dad64 as feMerge, $9e0c0b8784c80412$export$80304804ee4b74ee as feMergeNode, $9e0c0b8784c80412$export$97b2331bbf087a92 as feMorphology, $9e0c0b8784c80412$export$c5df7b6020d120a4 as feOffset, $9e0c0b8784c80412$export$d886bd6a8560a99b as fePointLight, $9e0c0b8784c80412$export$99967a5441a64397 as feSpecularLighting, $9e0c0b8784c80412$export$40aa73cef2a57617 as feSpotLight, $9e0c0b8784c80412$export$ec9928c0fd729eba as feTile, $9e0c0b8784c80412$export$ac27df26d1bb1c75 as feTurbulence, $9e0c0b8784c80412$export$3dea766d36a8935f as filter, $9e0c0b8784c80412$export$25ef286fa535664a as foreignObject, $9e0c0b8784c80412$export$39b482c5e57630a8 as g, $9e0c0b8784c80412$export$5c452ff88e35e47d as image, $9e0c0b8784c80412$export$53f1d5ea8de3d7c as line, $9e0c0b8784c80412$export$46def8197cf4dd4c as linearGradient, $9e0c0b8784c80412$export$ffc4d0086f1a4c9 as marker, $9e0c0b8784c80412$export$d99f0801a68bbcf1 as mask, $9e0c0b8784c80412$export$dbb5e893e736e4ee as metadata, $9e0c0b8784c80412$export$d455c2d7dc3122e5 as mpath, $9e0c0b8784c80412$export$bb654e07daaf8c3a as path, $9e0c0b8784c80412$export$24f82734ea047e6f as pattern, $9e0c0b8784c80412$export$b7b19aa0ee06c73 as polygon, $9e0c0b8784c80412$export$8d69707c7074d5c0 as polyline, $9e0c0b8784c80412$export$3922d1ccb8631cd8 as radialGradient, $9e0c0b8784c80412$export$4b409e53cf4df6e6 as rect, $9e0c0b8784c80412$export$adaa4cf7ef1b65be as set, $9e0c0b8784c80412$export$fa6813432f753b0d as stop, $9e0c0b8784c80412$export$7ed1367e7fa1ad68 as svg, $9e0c0b8784c80412$export$d1ef279f66c8e43 as $switch, $9e0c0b8784c80412$export$8f701197936bc2a6 as symbol, $9e0c0b8784c80412$export$68028ad1cb93a754 as $text, $9e0c0b8784c80412$export$5fc665c586745ec9 as textPath, $9e0c0b8784c80412$export$41720239e4ed5ea6 as $title, $9e0c0b8784c80412$export$79063f2f83f17896 as tspan, $9e0c0b8784c80412$export$1f96ae73734a86cc as use, $9e0c0b8784c80412$export$c4ddc81c7b2c8d7a as view, $9a2175d49af6cdeb$export$6e6230adb118a96e as FlDocument, $e2e1ea6dd3b7d2e1$export$6f093cfa640b7166 as text, $e2e1ea6dd3b7d2e1$export$ca000e230c0caa3e as state, $e2e1ea6dd3b7d2e1$export$dc573d8a6576cdb3 as effect, $e2e1ea6dd3b7d2e1$export$2983e091f1a1e8e2 as computed};

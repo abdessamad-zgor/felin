@@ -160,10 +160,10 @@ export class FlRegistry {
   }
 
   registerStateUpdate(state: FlState) {
-    let root = Object.keys(this.documentStates).find(r => this.documentStates[r].some(s => s.state.id == state.id))
+    let root = Object.keys(this.documentStates).find(r => this.documentStates[r].some(s => s.state._id == state._id))
     if (root) {
       let hsDocument = this.documentRootsMap[root]
-      let stateCalls = this.documentStates[root].filter(s => s.state.id == state.id);
+      let stateCalls = this.documentStates[root].filter(s => s.state._id == state._id);
       for (let stateCall of stateCalls) {
         let targetElement: FlHTMLElement = stateCall.element as FlHTMLElement
         if (stateCall.element instanceof FlTextNode) {
@@ -174,14 +174,14 @@ export class FlRegistry {
       }
     }
 
-    let computed = this.computed.find(e=>e.states.some(s=>s.id==state.id))
+    let computed = this.computed.find(e=>e.states.some(s=>s._id==state._id))
     if(computed){
       let computedRefresh = new FlComputedRefresh(computed)
       this.runtime.pushTask(computedRefresh)
-      let computedStateRoot = Object.keys(this.documentStates).find(r => this.documentStates[r].some(s => s.state.id == computed.id))
+      let computedStateRoot = Object.keys(this.documentStates).find(r => this.documentStates[r].some(s => s.state._id == computed._id))
       if(computedStateRoot){
         let computedFlDocument = this.documentRootsMap[computedStateRoot]
-        let computedStateCalls = this.documentStates[computedStateRoot].filter(s=>s.state.id == computed.id);
+        let computedStateCalls = this.documentStates[computedStateRoot].filter(s=>s.state._id == computed._id);
         for (let computedStateCall of computedStateCalls){
           let computedTargetElement: FlHTMLElement = computedStateCall.element as FlHTMLElement
           if(computedStateCall.element instanceof FlTextNode){
@@ -193,7 +193,7 @@ export class FlRegistry {
       }
     }
 
-    let effect = this.effects.find(e => e.dependants.some(s => s.id == state.id))
+    let effect = this.effects.find(e => e.dependants.some(s => s._id == state._id))
     if(effect){
       let effectCall = new FlEffectCall({ fn: effect.effect, dependents: effect.dependants })
       this.runtime.pushTask(effectCall)
@@ -211,15 +211,15 @@ export class FlRegistry {
   }
 
   registerEffect(effect: FlEffect) {
-    if(!this.effects.some(e=>e.id==effect.id))
+    if(!this.effects.some(e=>e._id==effect._id))
       this.effects.push(effect)
   }
 
   registerComputedState(state: FlComputed){
-    if(!this.computed.some(c=>c.id == state.id))
+    if(!this.computed.some(c=>c._id == state._id))
       this.computed.push(state)
   }
 }
 
-export const Fl = new FlRegistry()
+export const Felin = new FlRegistry()
 

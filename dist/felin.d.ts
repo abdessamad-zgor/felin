@@ -1,18 +1,27 @@
 import { Properties } from "csstype";
-type StateTypeMutation<StateType> = StateType extends {
-    [key: string]: any;
-} | any[] ? <T>(state: StateType | Partial<StateType>) => StateType | Partial<StateType> | T : (state: StateType) => StateType;
 declare class ExtensibleFunction extends Function {
     constructor(f: any);
 }
-interface FlStateClass<T> {
-    id: string;
-    value: T;
-    parent?: FlState;
-    set(fnOrValue: T | StateTypeMutation<T>): void;
-    update?: (child: FlState) => void;
+type StateTypeMutation<StateType> = StateType extends {
+    [key: string]: any;
+} | any[] ? (state: StateType | Partial<StateType>) => StateType | Partial<StateType> : (state: StateType) => StateType;
+interface FlStateType<T = any> {
+    value: T | Partial<T>;
+    _id: string;
+    parent?: ParentState;
+    set: (fnOrState: StateTypeMutation<T> | T, child?: FlState<T>) => void;
 }
-type FlState<T = any> = Function & FlStateClass<T>;
+type ParentState = {
+    state: FlStateType;
+    key: string;
+};
+declare class FlState<T = any> extends ExtensibleFunction implements FlStateType<T> {
+    _id: string;
+    value: T | Partial<T>;
+    parent?: ParentState;
+    constructor(value: T | Partial<T>, parent?: ParentState);
+    set(fnOrState: StateTypeMutation<T> | T, child?: FlState<T>): void;
+}
 type FlEvent = Event | CustomEvent;
 declare class FlTextNode<T extends any[]> {
     id: string;
@@ -102,13 +111,13 @@ export class FlDocument {
     selector(element: FlHTMLElement): string;
 }
 declare class FlEffect extends ExtensibleFunction {
-    id: string;
-    effect: (...args: FlState[]) => void;
+    _id: string;
+    effect: (...args: FlState<any>[]) => void;
     dependants: FlState[];
     constructor(fn: (...args: FlState[]) => void);
 }
 declare class FlComputed extends ExtensibleFunction {
-    id: string;
+    _id: string;
     value: any;
     fn: (...args: FlState[]) => any;
     states: FlState[];
@@ -286,7 +295,7 @@ export const tspan: (...children: FlElement[]) => FlElement;
 export const use: (...children: FlElement[]) => FlElement;
 export const view: (...children: FlElement[]) => FlElement;
 export function text<T extends any[]>(text: string, ...args: T): FlTextNode<T>;
-export function state<T>(value: T): FlState<any>;
+export function state<T>(value: T): FlState<T>;
 export function effect(fn: (...args: FlState[]) => void): FlEffect;
 export function computed(fn: (...args: FlState[]) => void, ...states: FlState[]): FlComputed;
 
