@@ -19,4 +19,4 @@ ___
 
 ## Donate
 ___
-I hope you this project helps in your work or you find it helpful, If you can help I would happy to accept your [donation](paypal.me/abdessamadzgor).  
+I hope you this project helps in your work or you find it helpful, If you can help I would happy to accept your [donation](https://paypal.me/abdessamadzgor).  
