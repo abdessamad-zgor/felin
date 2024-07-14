@@ -4,12 +4,12 @@ ___
 ___
 ## what is it ?
 
-Felin is a library for making user interfaces, it's focused on being flexible, with zero-dependencies.
+Felin is a library for making user interfaces, it's focused on being flexible, with zero dependencies.
 
 ## Getting started
 install the package with your prefered package manager:
 ```
-$ npm install felin
+npm install felin
 ```
 or include our cdn inside your html:
 ```

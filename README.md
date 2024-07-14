@@ -1,44 +1,22 @@
 # Felin 
-a flexible javascript library for making user interfaces
+___
+> a flexible javascript library for making user interfaces
+___
+## what is it ?
+Felin is a library for making user interfaces, it's focused on being flexible, with zero dependencies, you can start using
+`felin` right away, checkout our [Getting started](https://abdessamad-zgor.gihub.io/felin/#/id=felin) guide.
+___
 
-Felin is a library which has no setup, build or migration costs, it's build to work seamlessly with vanilla javascript
-when using `felin` you don't think wether you should choose between simplicity or efficiency, you get both.
+Felin is a library for making user interfaces, it's focused on being flexible, with zero dependencies.
+## Features
+___
 
-## Getting started
-install the package with your prefered package manager:
-```
-$ npm install felin
-```
-or include our cdn inside your html:
-```
-<script src="https://cdn.jsdelivr.net/npm/felin@latest/dist/felin.js" type="module"></script>
-```
+- simple syntax and flexible usage
+- simple reactive primitives
+- zero dependecies
+- Typescript support
+- integrated router
 
-create an `app.js` file and start using felin:
-```
-import {h1, FlDocument} from "felin"
-
-let hello = h1("hello world");
-
-let flDocument = new FlDocument();
-flDocument.render("#root", hello);
-```
-then include you file in your html:
-```
-<script src="app.js" type="module"></script>
-```
-
-or you could start using derictly inside a script tag
-```
-<script type="module">
-    import {h1, FlDocument} from "felin"
-
-    let hello = h1("hello world");
-
-    let flDocument = new FlDocument();
-    flDocument.render("#root", hello);
-</script>
-```
-
-## Documentation
-
+## Donate
+___
+I hope you this project helps in your work or you find it helpful, If you can help I would happy to accept your [donation](paypal.me/abdessamadzgor).  
