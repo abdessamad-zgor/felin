@@ -1,13 +1,10 @@
 # Felin 
 ___
 > a flexible javascript library for making user interfaces
+## What is it ?
 ___
-## what is it ?
 Felin is a library for making user interfaces, it's focused on being flexible, with zero dependencies, you can start using
 `felin` right away, checkout our [Getting started](https://abdessamad-zgor.gihub.io/felin/#/id=felin) guide.
-___
-
-Felin is a library for making user interfaces, it's focused on being flexible, with zero dependencies.
 ## Features
 ___
 
