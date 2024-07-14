@@ -9,4 +9,4 @@
 - zero dependencies
 
 [GitHub](https://github.com/abdessamad-zgor/felin)
-[Getting Started](#felin)
+[Getting Started](#getting-started)

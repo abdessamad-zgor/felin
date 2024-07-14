@@ -1,12 +1,4 @@
-# Felin 
-___
->a flexible javascript library for making user interfaces
-___
-## what is it ?
-
-Felin is a library for making user interfaces, it's focused on being flexible, with zero dependencies.
-
-## Getting started
+# Getting started
 install the package with your prefered package manager:
 ```
 npm install felin
@@ -41,6 +33,3 @@ or you could start using derictly inside a script tag
     flDocument.render("#root", hello);
 </script>
 ```
-
-## Documentation
-
