@@ -1,10 +1,12 @@
 import { FlHTMLElement as FlElement, FlHTMLElement, FlTextNode } from "./element"
+import { FlRouter } from "./router";
 
 export class FlDocument {
   window: Window
   document: Document
   rootSelector: string;
   rootElement: FlElement;
+  router?: FlRouter
 
   constructor() {
     if (window) {
@@ -17,6 +19,11 @@ export class FlDocument {
     if (this.document instanceof Document) {
       let target = this.document.querySelector(selector)
       if (target instanceof HTMLElement || element instanceof Node) {
+        element.buildElementTree();
+        let router = element.buildRouterTree()
+        if(router){
+          Felin.registerActiveRouter(this.rootSelector, routerLocation)
+        }
         let domElementRoot = element.element()
         target.appendChild(domElementRoot)
         this.rootSelector = selector;

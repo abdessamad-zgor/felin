@@ -4,6 +4,7 @@ import { FlElement, FlTextNode, FlHTMLElement } from "./element"
 import { FlDocument } from "./document"
 import { FlEffect } from "./effect"
 import { FlComputed } from "./computed"
+import { FlRouter } from "./router"
 
 export interface FlTask<A = { [key: string]: any }, R = void> {
   priority: number
@@ -62,6 +63,21 @@ export class FlEffectCall implements FlTask {
 
   call(args: FlEffectArgs) {
     args.fn(...args.dependents)
+  }
+}
+
+type FlRouteChangeArgs = {}
+
+export class FlRouteChange implements FlTask {
+  priority: number
+  args: FlRouteChangeArgs
+
+  constructor(args: FlRouteChangeArgs) {
+    this.args = args
+    this.priority = 4
+  }
+
+  call(args: FlRouteChangeArgs) {
   }
 }
 
@@ -126,6 +142,8 @@ export class FlRuntime {
         task.call(task.args)
       } else if (task instanceof FlEffectCall) {
         task.call(task.args)
+      } else if (task instanceof FlRouteChange) {
+        task.call(task.args)
       }
     }
   }
@@ -142,6 +160,7 @@ export class FlRegistry {
   documentRootsMap: { [key: string]: FlDocument }
   effects: FlEffect[]
   computed: FlComputed[]
+  router?: {[key: string]: FlRouter}
 
   constructor() {
     this.runtime = new FlRuntime();
@@ -218,6 +237,15 @@ export class FlRegistry {
   registerComputedState(state: FlComputed){
     if(!this.computed.some(c=>c._id == state._id))
       this.computed.push(state)
+  }
+
+  registerActiveRouter(rootSelector: string, router: FlRouter){
+    if(!Object.keys(this.router).includes(rootSelector))
+      this.router[rootSelector] = router
+  }
+
+  registerRouterChange(path: string, rootSelector: string){
+
   }
 }
 

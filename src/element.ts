@@ -2,6 +2,7 @@ import { Properties as CssStyle } from "csstype";
 import { FlEvent } from "./event";
 import { FlState } from "./state";
 import { toCssString } from "./style";
+import { FlRoute, FlRouter, FlRouterTreeLocation } from "./router";
 
 export class FlTextNode<T extends any[]> {
   id: string
@@ -52,6 +53,8 @@ export class FlHTMLElement {
   $listeners: Map<keyof HTMLElementEventMap, (event: FlEvent) => void>
   $classname: string
   $attributes: { [attr: string]: any }
+  router: FlRouter | null = null
+  routes: FlRoute[] | null = null;
 
   constructor(name: keyof HTMLElementTagNameMap, children?: (FlElement | string)[] | string, style?: CssStyle) {
     this.id = crypto.randomUUID()
@@ -65,6 +68,18 @@ export class FlHTMLElement {
           this.$children.push(new FlTextNode("{}", child))
           //@ts-ignore
           this.stateCalls.push(child as FlState)
+        } else if(child instanceof FlRouter) {
+          if(this.router){
+            throw Error("Cannot have multiple routers in the same element tree.")
+          } else {
+            child.parentNode = this
+            this.router = child
+          }
+        } else if (child instanceof FlRoute) {
+          child.parentNode = this
+          if(!Array.isArray(this.routes))
+            this.routes = []
+          this.routes.push(child)
         } else {
           this.$children.push(typeof child == "string" ? new FlTextNode(child) : child)
         }
@@ -120,10 +135,7 @@ export class FlHTMLElement {
     return this
   }
 
-  element(parent?: FlHTMLElement): HTMLElement {
-    if (parent) {
-      this.parentNode = parent
-    }
+  element(): HTMLElement {
     let element = document.createElement(this.name)
     //element.style.cssText = toCssString(this.$style)
     for (let entry of this.$listeners.entries()) {
@@ -146,10 +158,52 @@ export class FlHTMLElement {
     } else {
       for (let child of elementChildren) {
         //@ts-ignore
-        element.appendChild(child.element(this))
+        element.appendChild(child.element())
       }
       return element
     }
+  }
+
+  buildElementTree(parent?: FlHTMLElement){
+    if(parent){
+      this.parentNode = parent
+    }
+    this.buildElementTree(this)
+  }
+
+  buildRouterTree(router?: FlRouter): FlRouter | null {
+    if(router){
+      if(router.routes.length>0){
+        for(let route of router.routes){
+          let element = route.component({})
+          if(element instanceof FlHTMLElement){
+            if(element.routes){
+              for(let childRoute of element.routes){
+                route.children.push(childRoute)
+              }
+
+            } else {
+
+            }
+          } else if (element){
+
+          }
+        }
+      }else {
+        return null
+      }
+    } else if(this.$children.length>0){
+      for (let child of this.$children){
+        if(child instanceof FlHTMLElement){
+          if(child.hasRouter()){
+            return child.buildRouterTree(child.router)
+          } else {
+            return child.buildRouterTree()
+          }
+        }
+      }
+    } 
+    return null
   }
 
   class(classname: string) {
@@ -162,6 +216,10 @@ export class FlHTMLElement {
 
   attrs(attrs: { [attr: string]: any }) {
     this.$attributes = { ...this.$attributes, ...attrs }
+  }
+
+  hasRouter(): boolean{
+    return this.router ? true : false;
   }
 }
 
