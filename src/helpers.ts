@@ -1,9 +1,10 @@
 import { FlComputed } from "./computed";
 import { FlEffect } from "./effect";
 import { FlState } from "./state";
-import { FlElement, FlTextNode } from "./element";
+import { FlElement, FlHTMLElement, FlTextNode } from "./element";
 import { FlRoute, FlRouter } from "./router";
 import { FlConditional, FlLoop } from "./control-flow";
+import {a} from "./elements"
 
 export function $text<T extends any[]>(text: string, ...args: T) {
   return new FlTextNode(text, ...args)
@@ -26,7 +27,13 @@ export function $router(...routes: FlRoute[]){
 }
 
 export function $link(path: string, element: FlElement|string){
-
+  let linkElement = (new FlHTMLElement("a", typeof element == "string"? element: [element] ))
+  return linkElement.listen("click", (e)=>{
+    e.preventDefault()
+    let rootSelector = Felin.getElementRootSelector(linkElement)
+    if(typeof rootSelector == 'string')
+      Felin.registerRouteChange(path, rootSelector)
+  })
 }
 
 export function $if(condition: ()=>boolean, trueBranch: FlElement, falseBranch: FlElement){

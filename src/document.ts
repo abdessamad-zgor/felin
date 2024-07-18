@@ -20,9 +20,10 @@ export class FlDocument {
       let target = this.document.querySelector(selector)
       if (target instanceof HTMLElement || element instanceof Node) {
         element.buildElementTree();
-        let router = element.buildRouterTree()
+        let router = element.hasRouter()
         if(router){
-          Felin.registerActiveRouter(this.rootSelector, routerLocation)
+          router.buildRouterTree()
+          Felin.registerActiveRouter(this.rootSelector, router)
         }
         let domElementRoot = element.element()
         target.appendChild(domElementRoot)
@@ -52,4 +53,5 @@ export class FlDocument {
     }
     return selector
   }
+
 }

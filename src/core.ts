@@ -244,8 +244,41 @@ export class FlRegistry {
       this.router[rootSelector] = router
   }
 
-  registerRouterChange(path: string, rootSelector: string){
+  registerRouteChange(path: string, rootSelector: string){
 
+  }
+
+  getElementRootSelector(element: FlElement, parent?: FlHTMLElement): string|boolean{
+    let rootSelector: string
+    let doesHaveChild: boolean = false
+    if(parent){
+      for(let child of parent.$children){
+        if(child.id == element.id){
+          doesHaveChild = true
+        } else {
+          if(child instanceof FlHTMLElement){
+            doesHaveChild = this.getElementRootSelector(element, child) as boolean
+          }
+        }
+      }
+      return doesHaveChild
+    } else {
+      for(let selector of Object.keys(this.documentRootsMap)){
+        let selectedDocument = this.documentRootsMap[selector];
+        for(let child of selectedDocument.rootElement.$children){
+          if(child.id == element.id){
+            rootSelector = selector
+          } else {
+            if(child instanceof FlHTMLElement){
+              if(this.getElementRootSelector(element, child) == true){
+                rootSelector = selector
+              }
+            }
+          }
+        }
+      }
+      return rootSelector
+    }
   }
 }
 

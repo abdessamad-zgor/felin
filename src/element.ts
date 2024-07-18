@@ -2,7 +2,7 @@ import { Properties as CssStyle } from "csstype";
 import { FlEvent } from "./event";
 import { FlState } from "./state";
 import { toCssString } from "./style";
-import { FlRoute, FlRouter, FlRouterTreeLocation } from "./router";
+import { FlRoute, FlRouter } from "./router";
 
 export class FlTextNode<T extends any[]> {
   id: string
@@ -171,41 +171,6 @@ export class FlHTMLElement {
     this.buildElementTree(this)
   }
 
-  buildRouterTree(router?: FlRouter): FlRouter | null {
-    if(router){
-      if(router.routes.length>0){
-        for(let route of router.routes){
-          let element = route.component({})
-          if(element instanceof FlHTMLElement){
-            if(element.routes){
-              for(let childRoute of element.routes){
-                route.children.push(childRoute)
-              }
-
-            } else {
-
-            }
-          } else if (element){
-
-          }
-        }
-      }else {
-        return null
-      }
-    } else if(this.$children.length>0){
-      for (let child of this.$children){
-        if(child instanceof FlHTMLElement){
-          if(child.hasRouter()){
-            return child.buildRouterTree(child.router)
-          } else {
-            return child.buildRouterTree()
-          }
-        }
-      }
-    } 
-    return null
-  }
-
   class(classname: string) {
     this.$classname = classname
   }
@@ -218,8 +183,21 @@ export class FlHTMLElement {
     this.$attributes = { ...this.$attributes, ...attrs }
   }
 
-  hasRouter(): boolean{
-    return this.router ? true : false;
+  hasRouter(): FlRouter|undefined{
+    if(this.router){
+      return this.router;
+    } else {
+      if(this.$children.length>0){
+        let router: FlRouter
+        for (let child of this.$children){
+          if(child instanceof FlHTMLElement){
+            if(child.hasRouter())
+              router = child.hasRouter()
+          }
+        }
+        return router
+      }
+    }
   }
 }
 
