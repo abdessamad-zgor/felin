@@ -63,7 +63,8 @@ export class FlHTMLElement {
       this.$children = [new FlTextNode(children)]
     } else if (Array.isArray(children)) {
       this.$children = []
-      for (let child of children) {
+      for (let i =0; i< children.length; i++) {
+        let child = children[i]
         if (child instanceof Function) {
           this.$children.push(new FlTextNode("{}", child))
           //@ts-ignore
@@ -73,10 +74,12 @@ export class FlHTMLElement {
             throw Error("Cannot have multiple routers in the same element tree.")
           } else {
             child.parentNode = this
+            child.index = i
             this.router = child
           }
         } else if (child instanceof FlRoute) {
           child.parentNode = this
+          child.index = i
           if(!Array.isArray(this.routes))
             this.routes = []
           this.routes.push(child)

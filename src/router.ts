@@ -6,22 +6,69 @@ export type FlRouterTreeLocation = {router: FlRouter, location: FlHTMLElement}
 
 export class FlRouter {
   routes:  FlRoute[]
-  active: FlRoute
+  index?: number
+  active: FlRoute[]
+  previous: FlRoute[]
   history: FlRoute[]
-  parentNode?: FlHTMLElement
+  parentNode?: FlHTMLElement;
+  params: {[key: string]: string|number}
 
   constructor(...routes: FlRoute[]){
     this.routes = routes
-    this.determineActiveRoute(window.location.href)
+    this.params = {}
+    this.previous = []
+    this.active = []
+    this.matchRoute(window.location.href.slice(window.location.hostname.length+window.location.protocol.length+2))
   }
 
-  determineActiveRoute(path: string){
-    let activeRoute = this.routes.find(r=>r.path == path)
-    if(activeRoute){
-      this.active = activeRoute 
-    } else {
-      let catchAll = this.routes.find(r=>r.path == "*")
-      this.active = catchAll
+  matchRoute(path: string){
+    if(this.active.length>0){
+      this.previous = [...this.active]
+      this.active = []
+    }
+    if(path=='/'){
+      let homeRoute = this.routes.find(r=>r.path=="/")
+      if(homeRoute){
+        this.active = [homeRoute]
+        return;
+      }
+      return;
+    }
+    let pathSegments = path.split('/').filter(s=>s!='')
+    let foundMatch: FlRoute|undefined
+    for(let i=0; i<pathSegments.length; i++){
+      if(!foundMatch){
+        for(let route of this.routes){
+          let routeSegments = route.path.split('/')
+          if(pathSegments[i]==routeSegments[i]){
+            foundMatch = route
+            break;
+          }
+        }
+      } else {
+        foundMatch = undefined
+        for(let matchChildRoute of foundMatch.children){
+          let routeSegments = matchChildRoute.path.split('/')
+          if(routeSegments[i].startsWith(":")){
+            this.params = {[routeSegments[i].slice(1)]: Number.isNaN((+pathSegments[i]) as number) ? +pathSegments[i]: pathSegments[i]}
+            foundMatch = matchChildRoute
+            break;
+          }else if(routeSegments[i] == pathSegments[i]){
+            foundMatch = matchChildRoute;
+            break;
+          }
+        }
+      }
+      if(foundMatch){
+        this.active.push(foundMatch)
+        continue;
+      }else if(i==0){
+        let catchAll = this.routes.find(r=>r.path == "*")
+        this.active = [catchAll]
+        break;
+      } else if (this.active.length<i+1){
+        break;
+      }
     }
   }
 
@@ -43,14 +90,11 @@ export class FlRouter {
     }
     return this
   }
-
-  element(){
-    return this.active.component({}).element()
-  }
 }
 
 export class FlRoute {
   path: string
+  index?: number
   component: FlComponent
   parentRoute?: FlRoute
   parentNode?: FlHTMLElement

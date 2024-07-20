@@ -34,7 +34,7 @@ export class FlDocument {
         Felin.registerStateCalls(selector, stateCalls)
         Felin.run()
       } else
-        throw Error("FlJsError: no element found with selector " + selector)
+        throw Error("FelinError: no element found with selector " + selector)
     }
   }
 
@@ -54,4 +54,9 @@ export class FlDocument {
     return selector
   }
 
+  rerenderElement(element: FlElement){
+    let selector = this.selector(element)
+    let targetNode = this.document.querySelector(selector)
+    targetNode.replaceWith(element.element())
+  }
 }

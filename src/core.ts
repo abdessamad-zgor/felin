@@ -4,14 +4,14 @@ import { FlElement, FlTextNode, FlHTMLElement } from "./element"
 import { FlDocument } from "./document"
 import { FlEffect } from "./effect"
 import { FlComputed } from "./computed"
-import { FlRouter } from "./router"
+import { FlRoute, FlRouter } from "./router"
 
 export interface FlTask<A = { [key: string]: any }, R = void> {
   priority: number
   call(args: A): R
 }
 
-type DOMUpdateArgs = { state: FlState|FlComputed, hsDocument: FlDocument, element: FlElement }
+type DOMUpdateArgs = { state: FlState|FlComputed, flDocument: FlDocument, element: FlElement }
 
 export class FlDOMUpdate implements FlTask<DOMUpdateArgs, void> {
   priority: number
@@ -24,9 +24,9 @@ export class FlDOMUpdate implements FlTask<DOMUpdateArgs, void> {
 
   call(args: DOMUpdateArgs) {
     let newValue = (this.args.state as Function)()
-    let nodeSelector = this.args.hsDocument.selector(this.args.element as FlHTMLElement)
+    let nodeSelector = this.args.flDocument.selector(this.args.element as FlHTMLElement)
 
-    let domElement = this.args.hsDocument.document.querySelector(nodeSelector)
+    let domElement = this.args.flDocument.document.querySelector(nodeSelector)
     if (domElement) {
       domElement.replaceWith(this.args.element.element())
     }
@@ -66,7 +66,7 @@ export class FlEffectCall implements FlTask {
   }
 }
 
-type FlRouteChangeArgs = {}
+type FlRouteChangeArgs = {document: FlDocument, router: FlRouter, path: string}
 
 export class FlRouteChange implements FlTask {
   priority: number
@@ -78,6 +78,23 @@ export class FlRouteChange implements FlTask {
   }
 
   call(args: FlRouteChangeArgs) {
+    args.router.matchRoute(args.path)
+    let activeRoutes = args.router.active
+    let previousRoutes = args.router.previous
+    if(previousRoutes.length>0){
+      for(let previousRoute of previousRoutes){
+        let routeParent = previousRoute.parentNode
+        routeParent.$children = routeParent.$children.filter(child=>child.id != previousRoute.component({}).id)
+      }
+    }
+    for(let activeRoute of activeRoutes){
+      let routeParent = activeRoute.parentNode
+      routeParent.$children.splice(activeRoute.index, 0, activeRoute.component({}))
+    }
+    let routesParentNodes = activeRoutes.map(route=>route.parentNode)
+    for(let targetNode of routesParentNodes){
+      args.document.rerenderElement(targetNode)
+    }
   }
 }
 
@@ -181,14 +198,14 @@ export class FlRegistry {
   registerStateUpdate(state: FlState) {
     let root = Object.keys(this.documentStates).find(r => this.documentStates[r].some(s => s.state._id == state._id))
     if (root) {
-      let hsDocument = this.documentRootsMap[root]
+      let flDocument = this.documentRootsMap[root]
       let stateCalls = this.documentStates[root].filter(s => s.state._id == state._id);
       for (let stateCall of stateCalls) {
         let targetElement: FlHTMLElement = stateCall.element as FlHTMLElement
         if (stateCall.element instanceof FlTextNode) {
           targetElement = stateCall.element.parentNode
         }
-        let domUpdate = new FlDOMUpdate({ hsDocument, state: stateCall.state, element: targetElement })
+        let domUpdate = new FlDOMUpdate({ flDocument, state: stateCall.state, element: targetElement })
         this.runtime.pushTask(domUpdate);
       }
     }
@@ -206,7 +223,7 @@ export class FlRegistry {
           if(computedStateCall.element instanceof FlTextNode){
             computedTargetElement = computedStateCall.element.parentNode
           }
-          let computedDomUpdate = new FlDOMUpdate({hsDocument: computedFlDocument, state: computedStateCall.state, element: computedTargetElement})
+          let computedDomUpdate = new FlDOMUpdate({flDocument: computedFlDocument, state: computedStateCall.state, element: computedTargetElement})
           this.runtime.pushTask(computedDomUpdate)
         }
       }
@@ -245,7 +262,8 @@ export class FlRegistry {
   }
 
   registerRouteChange(path: string, rootSelector: string){
-
+    let routeChangeTask = new FlRouteChange({path, router: this.router[rootSelector], document: this.documentRootsMap[rootSelector]})
+    this.runtime.pushTask(routeChangeTask)
   }
 
   getElementRootSelector(element: FlElement, parent?: FlHTMLElement): string|boolean{
