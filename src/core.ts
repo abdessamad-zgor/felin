@@ -95,6 +95,7 @@ export class FlRouteChange implements FlTask {
     for(let targetNode of routesParentNodes){
       args.document.rerenderElement(targetNode)
     }
+    args.document.window.history.pushState("", "", args.document.window.location.protocol+args.document.window.location.hostname+args.path)
   }
 }
 

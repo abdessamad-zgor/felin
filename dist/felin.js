@@ -430,6 +430,7 @@ class $8a29e9b0d3dc349c$export$eee6c302d5b11391 {
         this.documentStates = {};
         this.effects = [];
         this.computed = [];
+        this.router = {};
     }
     register(task) {
         this.runtime.pushTask(task);
@@ -1411,6 +1412,8 @@ class $9a2175d49af6cdeb$export$6e6230adb118a96e {
     render(selector, element) {
         if (this.document instanceof Document) {
             let target = this.document.querySelector(selector);
+            this.rootSelector = selector;
+            this.rootElement = element;
             if (target instanceof HTMLElement || element instanceof Node) {
                 element.buildElementTree();
                 let router = element.hasRouter();
@@ -1419,10 +1422,8 @@ class $9a2175d49af6cdeb$export$6e6230adb118a96e {
                     Felin.registerActiveRouter(this.rootSelector, router);
                 }
                 let domElementRoot = element.element();
-                target.appendChild(domElementRoot);
-                this.rootSelector = selector;
-                this.rootElement = element;
                 let stateCalls = element.getStateCalls();
+                target.appendChild(domElementRoot);
                 Felin.registerFlDocumentRoot(selector, this);
                 Felin.registerStateCalls(selector, stateCalls);
                 Felin.run();
@@ -1435,6 +1436,7 @@ class $9a2175d49af6cdeb$export$6e6230adb118a96e {
         let selector = `${this.rootSelector}>${this.rootElement.name}`;
         while(currentElement.id != this.rootElement.id){
             if (currentElement instanceof (0, $1053edf64ed8e6a3$export$5c862657cac5310e)) elementPath.push(currentElement);
+            //@ts-ignore
             currentElement = currentElement.parentNode;
         }
         for (let pathElement of elementPath)selector += `>${pathElement.name}`;

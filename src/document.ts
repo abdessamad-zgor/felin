@@ -1,11 +1,11 @@
-import { FlHTMLElement as FlElement, FlHTMLElement, FlTextNode } from "./element"
+import { FlHTMLElement, FlTextNode } from "./element"
 import { FlRouter } from "./router";
 
 export class FlDocument {
   window: Window
   document: Document
   rootSelector: string;
-  rootElement: FlElement;
+  rootElement: FlHTMLElement;
   router?: FlRouter
 
   constructor() {
@@ -15,9 +15,11 @@ export class FlDocument {
     }
   }
 
-  render(selector: string, element: FlElement) {
+  render(selector: string, element: FlHTMLElement) {
     if (this.document instanceof Document) {
       let target = this.document.querySelector(selector)
+      this.rootSelector = selector;
+      this.rootElement = element;
       if (target instanceof HTMLElement || element instanceof Node) {
         element.buildElementTree();
         let router = element.hasRouter()
@@ -26,10 +28,8 @@ export class FlDocument {
           Felin.registerActiveRouter(this.rootSelector, router)
         }
         let domElementRoot = element.element()
-        target.appendChild(domElementRoot)
-        this.rootSelector = selector;
-        this.rootElement = element;
         let stateCalls = element.getStateCalls()
+        target.appendChild(domElementRoot)
         Felin.registerFlDocumentRoot(selector, this)
         Felin.registerStateCalls(selector, stateCalls)
         Felin.run()
@@ -38,7 +38,7 @@ export class FlDocument {
     }
   }
 
-  selector(element: FlElement) {
+  selector(element: FlHTMLElement) {
     let elementPath: FlHTMLElement[] = []
     let currentElement = element
     let selector = `${this.rootSelector}>${this.rootElement.name}`
@@ -46,6 +46,7 @@ export class FlDocument {
       if (currentElement instanceof FlHTMLElement) {
         elementPath.push(currentElement)
       }
+      //@ts-ignore
       currentElement = currentElement.parentNode
     }
     for (let pathElement of elementPath) {
@@ -54,7 +55,7 @@ export class FlDocument {
     return selector
   }
 
-  rerenderElement(element: FlElement){
+  rerenderElement(element: FlHTMLElement){
     let selector = this.selector(element)
     let targetNode = this.document.querySelector(selector)
     targetNode.replaceWith(element.element())
