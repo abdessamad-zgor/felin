@@ -83,13 +83,15 @@ export class FlRouteChange implements FlTask {
     let previousRoutes = args.router.previous
     if(previousRoutes.length>0){
       for(let previousRoute of previousRoutes){
+        console.log(previousRoute)
+        console.log(previousRoutes)
         let routeParent = previousRoute.parentNode
-        routeParent.$children = routeParent.$children.filter(child=>child.id != previousRoute.component({}).id)
+        routeParent.$children = routeParent.$children.filter(child=>child.id != previousRoute.element.id)
       }
     }
     for(let activeRoute of activeRoutes){
       let routeParent = activeRoute.parentNode
-      routeParent.$children.splice(activeRoute.index, 0, activeRoute.component({}))
+      routeParent.$children.splice(activeRoute.index, 0, activeRoute.element)
     }
     let routesParentNodes = activeRoutes.map(route=>route.parentNode)
     for(let targetNode of routesParentNodes){

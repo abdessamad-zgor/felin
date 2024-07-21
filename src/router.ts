@@ -22,6 +22,7 @@ export class FlRouter {
   }
 
   matchRoute(path: string){
+    console.log(this.routes)
     if(this.active.length>0){
       this.previous = [...this.active]
       this.active = []
@@ -35,7 +36,7 @@ export class FlRouter {
       return;
     }
     let pathSegments = path.split('/').filter(s=>s!='')
-    let foundMatch: FlRoute|undefined
+    let foundMatch: FlRoute|undefined = undefined
     for(let i=0; i<pathSegments.length; i++){
       if(!foundMatch){
         for(let route of this.routes){
@@ -59,7 +60,7 @@ export class FlRouter {
           }
         }
       }
-      if(foundMatch){
+      if(foundMatch!=undefined){
         this.active.push(foundMatch)
         continue;
       }else if(i==0){
@@ -70,11 +71,12 @@ export class FlRouter {
         break;
       }
     }
+    console.log(this.active)
   }
 
   buildRouterTree(): FlRouter {
     for(let route of this.routes){
-      let element = route.component({})
+      let element = route.element
       if(element instanceof FlHTMLElement){
         if(element.router){
           throw Error("Cannot have nested routers inside the same element tree");
@@ -95,14 +97,14 @@ export class FlRouter {
 export class FlRoute {
   path: string
   index?: number
-  component: FlComponent
+  element: FlElement
   parentRoute?: FlRoute
   parentNode?: FlHTMLElement
   children?: FlRoute[]
 
-  constructor(path: string, component: FlComponent, parent?: FlRoute){
+  constructor(path: string, element: FlElement, parent?: FlRoute){
     this.path = path
-    this.component = component
+    this.element = element
     if(parent){
       this.parentRoute = parent
     }

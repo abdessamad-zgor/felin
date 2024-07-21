@@ -68,9 +68,9 @@ let page = () => {
   return main(
     nav($link("/", "Home"), $link("/blogs", "Blog")),
     $router(
-      $route("/", home),
-      $route("/blog", blogs),
-      $route("/blogs/:slug", blog_post)
+      $route("/", home()),
+      $route("/blog", blogs()),
+      $route("/blogs/:slug", blog_post())
     )
   )
 }
