@@ -18,11 +18,11 @@ export class FlRouter {
     this.params = {}
     this.previous = []
     this.active = []
-    this.matchRoute(window.location.href.slice(window.location.hostname.length+window.location.protocol.length+2))
   }
 
   matchRoute(path: string){
     console.log(this.routes)
+    console.log(path)
     if(this.active.length>0){
       this.previous = [...this.active]
       this.active = []
@@ -65,7 +65,9 @@ export class FlRouter {
         continue;
       }else if(i==0){
         let catchAll = this.routes.find(r=>r.path == "*")
-        this.active = [catchAll]
+        if(catchAll!=undefined){
+          this.active = [catchAll]
+        }
         break;
       } else if (this.active.length<i+1){
         break;

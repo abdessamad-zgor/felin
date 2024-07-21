@@ -82,6 +82,10 @@ export class FlHTMLElement {
             child.parentNode = this
             child.index = i
             this.router = child
+            for(let route of this.router.routes){
+              route.parentNode = this
+              route.index = i
+            }
           }
         } else if (child instanceof FlRoute) {
           child.parentNode = this

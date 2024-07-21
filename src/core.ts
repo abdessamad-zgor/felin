@@ -261,8 +261,10 @@ export class FlRegistry {
   }
 
   registerActiveRouter(rootSelector: string, router: FlRouter){
-    if(!Object.keys(this.router).includes(rootSelector))
+    if(!Object.keys(this.router).includes(rootSelector)){
       this.router[rootSelector] = router
+      this.registerRouteChange(window.location.href.slice(window.location.host.length+window.location.protocol.length+2), rootSelector)
+    }
   }
 
   registerRouteChange(path: string, rootSelector: string){
