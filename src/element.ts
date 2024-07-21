@@ -7,7 +7,7 @@ import { FlRoute, FlRouter } from "./router";
 export class FlTextNode<T extends any[]> {
   id: string
   stateCalls: FlState[] = [];
-  parentNode: FlHTMLElement;
+  parentNode?: FlHTMLElement|FlSVGElement;
   text: string
 
   constructor(text: string, ...args: T) {
@@ -40,13 +40,19 @@ export class FlTextNode<T extends any[]> {
     acc = acc.concat(...stateCalls)
     return acc
   }
+
+  buildElementTree(parent?: FlHTMLElement|FlSVGElement){
+    if(parent){
+      this.parentNode = parent
+    }
+  }
 }
 
 // TODO: MAKE `element()` ACCEPT AN `FlDocument`
 export class FlHTMLElement {
   id: string;
   name: keyof HTMLElementTagNameMap;
-  parentNode: FlHTMLElement;
+  parentNode: FlHTMLElement|FlSVGElement;
   stateCalls: FlState[] = [];
   $children: FlElement[];
   $style: CssStyle | null;
@@ -167,11 +173,15 @@ export class FlHTMLElement {
     }
   }
 
-  buildElementTree(parent?: FlHTMLElement){
+  buildElementTree(parent?: FlHTMLElement|FlSVGElement){
     if(parent){
       this.parentNode = parent
     }
-    this.buildElementTree(this)
+    if(this.$children.length > 0){
+      for(let child of this.$children){
+        child.buildElementTree(this)
+      }
+    }
   }
 
   class(classname: string) {
@@ -207,7 +217,7 @@ export class FlHTMLElement {
 export class FlSVGElement {
   id: string;
   name: keyof SVGElementTagNameMap;
-  parentNode: FlSVGElement;
+  parentNode: FlSVGElement|FlHTMLElement;
   stateCalls: FlState[] = [];
   $children: FlElement[];
   $style: CssStyle | null;
@@ -319,6 +329,17 @@ export class FlSVGElement {
 
   attrs(attrs: { [attr: string]: any }) {
     this.$attributes = { ...this.$attributes, ...attrs }
+  }
+
+  buildElementTree(parent?: FlHTMLElement | FlSVGElement){
+    if(parent){
+      this.parentNode = parent
+    }
+    if(this.$children.length > 0){
+      for(let child of this.$children){
+        child.buildElementTree(this)
+      }
+    }
   }
 }
 

@@ -2,9 +2,8 @@ import { FlComputed } from "./computed";
 import { FlEffect } from "./effect";
 import { FlState } from "./state";
 import { FlElement, FlHTMLElement, FlTextNode } from "./element";
-import { FlRoute, FlRouter } from "./router";
+import { FlComponent, FlRoute, FlRouter } from "./router";
 import { FlConditional, FlLoop } from "./control-flow";
-import {a} from "./elements"
 
 export function $text<T extends any[]>(text: string, ...args: T) {
   return new FlTextNode(text, ...args)
@@ -24,6 +23,14 @@ export function $computed(fn: (...args: FlState[])=>void, ...states: FlState[]){
 
 export function $router(...routes: FlRoute[]){
   return new FlRouter(...routes)
+}
+
+export function $route(path: string, element: FlComponent<{}>){
+  return new FlRoute(path, element)
+}
+
+export function $params(){
+  return Felin.getRouterParams()
 }
 
 export function $link(path: string, element: FlElement|string){

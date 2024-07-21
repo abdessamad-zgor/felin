@@ -109,13 +109,13 @@ let htmlTags = [
   "track",
   "u",
   "ul",
-  "$var",
+  "_var",
   "video",
   "wbr",
 ]
 
 let svgTags = [
-  "$a",
+  "_a",
   "animate",
   "animateMotion",
   "animateTransform",
@@ -168,11 +168,11 @@ let svgTags = [
   "set",
   "stop",
   "svg",
-  "$switch",
+  "_switch",
   "symbol",
-  "$text",
+  "_text",
   "textPath",
-  "$title",
+  "_title",
   "tspan",
   "use",
   "view"
@@ -185,7 +185,7 @@ function generateHSElementFucntion() {
   let htmlTemplate = (tag) => {
     return `
 export const ${tag} = (...children: FlElement[]):FlElement => {
-\tlet element = new FlHTMLElement("${tag == '$var' ? 'var' : tag}", children = children)
+\tlet element = new FlHTMLElement("${tag == '_var' ? 'var' : tag}", children = children)
 \treturn element;
 }
 `;
@@ -198,7 +198,7 @@ export const ${tag} = (...children: FlElement[]):FlElement => {
   let svgTemplate = (tag) => {
     return `
 export const ${tag} = (...children: FlElement[]):FlElement => {
-\tlet element = new FlSVGElement("${tag == '$a' ? 'a' : tag == '$title' ? 'title' : tag == '$text' ? 'text' : tag == '$switch' ? 'switch' : tag}", children = children)
+\tlet element = new FlSVGElement("${tag == '_a' ? 'a' : tag == '_title' ? 'title' : tag == '_text' ? 'text' : tag == '_switch' ? 'switch' : tag}", children = children)
 \treturn element;
 }
 `

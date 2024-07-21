@@ -23,10 +23,34 @@ declare class FlState<T = any> extends ExtensibleFunction implements FlStateType
     set(fnOrState: StateTypeMutation<T> | T, child?: FlState<T>): void;
 }
 type FlEvent = Event | CustomEvent;
+type FlComponent<T = {}> = (props: T) => FlElement;
+declare class FlRouter {
+    routes: FlRoute[];
+    index?: number;
+    active: FlRoute[];
+    previous: FlRoute[];
+    history: FlRoute[];
+    parentNode?: FlHTMLElement;
+    params: {
+        [key: string]: string | number;
+    };
+    constructor(...routes: FlRoute[]);
+    matchRoute(path: string): void;
+    buildRouterTree(): FlRouter;
+}
+declare class FlRoute {
+    path: string;
+    index?: number;
+    component: FlComponent;
+    parentRoute?: FlRoute;
+    parentNode?: FlHTMLElement;
+    children?: FlRoute[];
+    constructor(path: string, component: FlComponent, parent?: FlRoute);
+}
 declare class FlTextNode<T extends any[]> {
     id: string;
     stateCalls: FlState[];
-    parentNode: FlHTMLElement;
+    parentNode?: FlHTMLElement | FlSVGElement;
     text: string;
     constructor(text: string, ...args: T);
     element(parent?: FlHTMLElement): Text;
@@ -37,11 +61,12 @@ declare class FlTextNode<T extends any[]> {
         state: FlState;
         element: FlElement;
     }[];
+    buildElementTree(parent?: FlHTMLElement | FlSVGElement): void;
 }
 declare class FlHTMLElement {
     id: string;
     name: keyof HTMLElementTagNameMap;
-    parentNode: FlHTMLElement;
+    parentNode: FlHTMLElement | FlSVGElement;
     stateCalls: FlState[];
     $children: FlElement[];
     $style: Properties | null;
@@ -50,6 +75,8 @@ declare class FlHTMLElement {
     $attributes: {
         [attr: string]: any;
     };
+    router: FlRouter | null;
+    routes: FlRoute[] | null;
     constructor(name: keyof HTMLElementTagNameMap, children?: (FlElement | string)[] | string, style?: Properties);
     style(style: Properties): this;
     children(children?: FlElement[]): this | FlElement[];
@@ -62,17 +89,19 @@ declare class FlHTMLElement {
     }[];
     child(): this;
     listen(eventname: keyof HTMLElementEventMap, callback: (event: FlEvent) => void): this;
-    element(parent?: FlHTMLElement): HTMLElement;
+    element(): HTMLElement;
+    buildElementTree(parent?: FlHTMLElement | FlSVGElement): void;
     class(classname: string): void;
     attr(name: string, value: any): void;
     attrs(attrs: {
         [attr: string]: any;
     }): void;
+    hasRouter(): FlRouter | undefined;
 }
 declare class FlSVGElement {
     id: string;
     name: keyof SVGElementTagNameMap;
-    parentNode: FlSVGElement;
+    parentNode: FlSVGElement | FlHTMLElement;
     stateCalls: FlState[];
     $children: FlElement[];
     $style: Properties | null;
@@ -99,6 +128,7 @@ declare class FlSVGElement {
     attrs(attrs: {
         [attr: string]: any;
     }): void;
+    buildElementTree(parent?: FlHTMLElement | FlSVGElement): void;
 }
 type FlElement = FlTextNode<any[]> | FlHTMLElement | FlSVGElement;
 export class FlDocument {
@@ -106,9 +136,11 @@ export class FlDocument {
     document: Document;
     rootSelector: string;
     rootElement: FlHTMLElement;
+    router?: FlRouter;
     constructor();
     render(selector: string, element: FlHTMLElement): void;
     selector(element: FlHTMLElement): string;
+    rerenderElement(element: FlHTMLElement): void;
 }
 declare class FlEffect extends ExtensibleFunction {
     _id: string;
@@ -230,10 +262,10 @@ export const tr: (...children: FlElement[]) => FlElement;
 export const track: (...children: FlElement[]) => FlElement;
 export const u: (...children: FlElement[]) => FlElement;
 export const ul: (...children: FlElement[]) => FlElement;
-export const $var: (...children: FlElement[]) => FlElement;
+export const _var: (...children: FlElement[]) => FlElement;
 export const video: (...children: FlElement[]) => FlElement;
 export const wbr: (...children: FlElement[]) => FlElement;
-export const $a: (...children: FlElement[]) => FlElement;
+export const _a: (...children: FlElement[]) => FlElement;
 export const animate: (...children: FlElement[]) => FlElement;
 export const animateMotion: (...children: FlElement[]) => FlElement;
 export const animateTransform: (...children: FlElement[]) => FlElement;
@@ -286,17 +318,36 @@ export const rect: (...children: FlElement[]) => FlElement;
 export const set: (...children: FlElement[]) => FlElement;
 export const stop: (...children: FlElement[]) => FlElement;
 export const svg: (...children: FlElement[]) => FlElement;
-export const $switch: (...children: FlElement[]) => FlElement;
+export const _switch: (...children: FlElement[]) => FlElement;
 export const symbol: (...children: FlElement[]) => FlElement;
-export const $text: (...children: FlElement[]) => FlElement;
+export const _text: (...children: FlElement[]) => FlElement;
 export const textPath: (...children: FlElement[]) => FlElement;
-export const $title: (...children: FlElement[]) => FlElement;
+export const _title: (...children: FlElement[]) => FlElement;
 export const tspan: (...children: FlElement[]) => FlElement;
 export const use: (...children: FlElement[]) => FlElement;
 export const view: (...children: FlElement[]) => FlElement;
-export function text<T extends any[]>(text: string, ...args: T): FlTextNode<T>;
-export function state<T>(value: T): FlState<T>;
-export function effect(fn: (...args: FlState[]) => void): FlEffect;
-export function computed(fn: (...args: FlState[]) => void, ...states: FlState[]): FlComputed;
+declare class FlConditional {
+    condition: () => boolean;
+    trueBranch: FlElement;
+    falseBranch: FlElement;
+    parent?: FlElement;
+    constructor(condition: () => boolean, trueBranch: FlElement, falseBranch: FlElement);
+    element(parent?: FlElement): Text | HTMLElement | SVGElement;
+}
+declare class FlLoop<T = any> {
+    state: FlState<Array<T>>;
+    iteration: (element: T) => FlElement;
+    constructor(state: FlState, iteration: (element: T) => FlElement);
+}
+export function $text<T extends any[]>(text: string, ...args: T): FlTextNode<T>;
+export function $state<T>(value: T): FlState<T>;
+export function $effect(fn: (...args: FlState[]) => void): FlEffect;
+export function $computed(fn: (...args: FlState[]) => void, ...states: FlState[]): FlComputed;
+export function $router(...routes: FlRoute[]): FlRouter;
+export function $route(path: string, element: FlComponent<{}>): FlRoute;
+export function $params(): any;
+export function $link(path: string, element: FlElement | string): FlHTMLElement;
+export function $if(condition: () => boolean, trueBranch: FlElement, falseBranch: FlElement): FlConditional;
+export function $for<T>(state: FlState<Array<T>>, iteration: (element: T) => FlElement): FlLoop<T>;
 
 //# sourceMappingURL=felin.d.ts.map

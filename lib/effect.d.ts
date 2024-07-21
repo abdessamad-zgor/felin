@@ -1,7 +1,8 @@
-import { ExtensibleFunction, FlState } from "./state";
+import { ExtensibleFunction } from "./utils";
+import { FlState } from "./state";
 export declare class FlEffect extends ExtensibleFunction {
-    id: string;
-    effect: (...args: FlState[]) => void;
+    _id: string;
+    effect: (...args: FlState<any>[]) => void;
     dependants: FlState[];
     constructor(fn: (...args: FlState[]) => void);
 }

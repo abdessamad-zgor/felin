@@ -1,6 +1,7 @@
 import { Properties as CssStyle } from "csstype";
 import { FlEvent } from "./event";
 import { FlState } from "./state";
+import { FlRoute, FlRouter } from "./router";
 export declare class FlTextNode<T extends any[]> {
     id: string;
     stateCalls: FlState[];
@@ -28,6 +29,8 @@ export declare class FlHTMLElement {
     $attributes: {
         [attr: string]: any;
     };
+    router: FlRouter | null;
+    routes: FlRoute[] | null;
     constructor(name: keyof HTMLElementTagNameMap, children?: (FlElement | string)[] | string, style?: CssStyle);
     style(style: CssStyle): this;
     children(children?: FlElement[]): this | FlElement[];
@@ -40,12 +43,14 @@ export declare class FlHTMLElement {
     }[];
     child(): this;
     listen(eventname: keyof HTMLElementEventMap, callback: (event: FlEvent) => void): this;
-    element(parent?: FlHTMLElement): HTMLElement;
+    element(): HTMLElement;
+    buildElementTree(parent?: FlHTMLElement): void;
     class(classname: string): void;
     attr(name: string, value: any): void;
     attrs(attrs: {
         [attr: string]: any;
     }): void;
+    hasRouter(): FlRouter | undefined;
 }
 export declare class FlSVGElement {
     id: string;

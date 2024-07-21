@@ -1,6 +1,9 @@
-import { FlDocument, FlElement, FlState } from "./felin";
+import { FlState } from "./state";
+import { FlElement, FlHTMLElement } from "./element";
+import { FlDocument } from "./document";
 import { FlEffect } from "./effect";
 import { FlComputed } from "./computed";
+import { FlRouter } from "./router";
 export interface FlTask<A = {
     [key: string]: any;
 }, R = void> {
@@ -9,7 +12,7 @@ export interface FlTask<A = {
 }
 type DOMUpdateArgs = {
     state: FlState | FlComputed;
-    hsDocument: FlDocument;
+    flDocument: FlDocument;
     element: FlElement;
 };
 export declare class FlDOMUpdate implements FlTask<DOMUpdateArgs, void> {
@@ -33,6 +36,17 @@ export declare class FlEffectCall implements FlTask {
     args: FlEffectArgs;
     constructor(args: FlEffectArgs);
     call(args: FlEffectArgs): void;
+}
+type FlRouteChangeArgs = {
+    document: FlDocument;
+    router: FlRouter;
+    path: string;
+};
+export declare class FlRouteChange implements FlTask {
+    priority: number;
+    args: FlRouteChangeArgs;
+    constructor(args: FlRouteChangeArgs);
+    call(args: FlRouteChangeArgs): void;
 }
 export declare class FlStack {
     tasks: FlTask[];
@@ -61,6 +75,9 @@ export declare class FlRegistry {
     };
     effects: FlEffect[];
     computed: FlComputed[];
+    router?: {
+        [key: string]: FlRouter;
+    };
     constructor();
     register(task: FlTask): void;
     registerStateCalls(root: string, stateCalls: {
@@ -72,6 +89,9 @@ export declare class FlRegistry {
     run(): void;
     registerEffect(effect: FlEffect): void;
     registerComputedState(state: FlComputed): void;
+    registerActiveRouter(rootSelector: string, router: FlRouter): void;
+    registerRouteChange(path: string, rootSelector: string): void;
+    getElementRootSelector(element: FlElement, parent?: FlHTMLElement): string | boolean;
 }
-export declare const Fl: FlRegistry;
+export declare const Felin: FlRegistry;
 export {};

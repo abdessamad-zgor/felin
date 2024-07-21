@@ -1,6 +1,7 @@
-import { ExtensibleFunction, FlState } from "./state";
+import { ExtensibleFunction } from "./utils";
+import { FlState } from "./state";
 export declare class FlComputed extends ExtensibleFunction {
-    id: string;
+    _id: string;
     value: any;
     fn: (...args: FlState[]) => any;
     states: FlState[];

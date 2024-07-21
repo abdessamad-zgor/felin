@@ -535,7 +535,7 @@ export const ul = (...children: FlElement[]):FlElement => {
 	return element;
 }
 
-export const $var = (...children: FlElement[]):FlElement => {
+export const _var = (...children: FlElement[]):FlElement => {
 	let element = new FlHTMLElement("var", children = children)
 	return element;
 }
@@ -550,7 +550,7 @@ export const wbr = (...children: FlElement[]):FlElement => {
 	return element;
 }
 
-export const $a = (...children: FlElement[]):FlElement => {
+export const _a = (...children: FlElement[]):FlElement => {
 	let element = new FlSVGElement("a", children = children)
 	return element;
 }
@@ -815,7 +815,7 @@ export const svg = (...children: FlElement[]):FlElement => {
 	return element;
 }
 
-export const $switch = (...children: FlElement[]):FlElement => {
+export const _switch = (...children: FlElement[]):FlElement => {
 	let element = new FlSVGElement("switch", children = children)
 	return element;
 }
@@ -825,7 +825,7 @@ export const symbol = (...children: FlElement[]):FlElement => {
 	return element;
 }
 
-export const $text = (...children: FlElement[]):FlElement => {
+export const _text = (...children: FlElement[]):FlElement => {
 	let element = new FlSVGElement("text", children = children)
 	return element;
 }
@@ -835,7 +835,7 @@ export const textPath = (...children: FlElement[]):FlElement => {
 	return element;
 }
 
-export const $title = (...children: FlElement[]):FlElement => {
+export const _title = (...children: FlElement[]):FlElement => {
 	let element = new FlSVGElement("title", children = children)
 	return element;
 }

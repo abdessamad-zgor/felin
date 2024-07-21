@@ -1,26 +1,23 @@
-import { main, div, p, button, FlDocument, span, state, text, effect, computed } from "felin";
-/*
- * import {div, p, button, main} from "flex"
- * 
- *
- * let state = $state(0)
- *
- * let effect = state.effect(()=>{
- *
- * })
- *
- * let page = main([
- *  div([
- *    p("hello world"+state()),
- *    button("Click")
- *      .style({backgroundColor: 'blue'})
- *      .listener('click', (e)=>state.set(s=>s++))
- *  ]).style({width: '100%', display: 'flex'}).class("hello"),
- * ])
- *
- * let hsDocument = new HSDocument()
- * hsDocument.render('query', page)
- */
+import { 
+  main,
+  div,
+  p,
+  h1,
+  button,
+  FlDocument,
+  span,
+  $state,
+  $text, 
+  $effect,
+  $computed,
+  nav,
+  $if,
+  $for,
+  $link,
+  $router,
+  $route,
+  $params
+} from "felin";
 
 let home = ()=>{
   let counter = $state({ count: { a: 1 } })
@@ -38,7 +35,7 @@ let home = ()=>{
      msg,
      button("increase")
        .style({backgroundColor: 'blue'})
-       .listener('click', (e)=>counter.count.a.set(s=>++s))
+       .listen('click', (e)=>counter.count.a.set(s=>++s))
    )
 }
 
@@ -58,7 +55,6 @@ let blogs = ()=>{
 }
 
 let blog_post = ()=>{
-  let {id} = $params()
   let post = $state(fetch("http://jsonfakery.com/blogs/random").then(res=>res.json()))
 
   return div(

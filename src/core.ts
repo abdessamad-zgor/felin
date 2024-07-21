@@ -185,6 +185,7 @@ export class FlRegistry {
     this.documentStates = {}
     this.effects = []
     this.computed = []
+    this.router = {}
   }
 
   register(task: FlTask) {
@@ -203,7 +204,7 @@ export class FlRegistry {
       for (let stateCall of stateCalls) {
         let targetElement: FlHTMLElement = stateCall.element as FlHTMLElement
         if (stateCall.element instanceof FlTextNode) {
-          targetElement = stateCall.element.parentNode
+          targetElement = stateCall.element.parentNode as FlHTMLElement
         }
         let domUpdate = new FlDOMUpdate({ flDocument, state: stateCall.state, element: targetElement })
         this.runtime.pushTask(domUpdate);
@@ -221,7 +222,7 @@ export class FlRegistry {
         for (let computedStateCall of computedStateCalls){
           let computedTargetElement: FlHTMLElement = computedStateCall.element as FlHTMLElement
           if(computedStateCall.element instanceof FlTextNode){
-            computedTargetElement = computedStateCall.element.parentNode
+            computedTargetElement = computedStateCall.element.parentNode as FlHTMLElement
           }
           let computedDomUpdate = new FlDOMUpdate({flDocument: computedFlDocument, state: computedStateCall.state, element: computedTargetElement})
           this.runtime.pushTask(computedDomUpdate)
@@ -253,7 +254,7 @@ export class FlRegistry {
 
   registerComputedState(state: FlComputed){
     if(!this.computed.some(c=>c._id == state._id))
-      this.computed.push(state)
+      this.computed.push(state);
   }
 
   registerActiveRouter(rootSelector: string, router: FlRouter){
@@ -297,6 +298,17 @@ export class FlRegistry {
       }
       return rootSelector
     }
+  }
+
+  getRouterParams(): {[key: string]: string | number}{
+    let routers = Object.keys(this.router).map(selector=>this.router[selector])
+    let params = {}
+    for(let router of routers){
+      if(router.active.length>0){
+        params = router.params
+      }
+    }
+    return params
   }
 }
 

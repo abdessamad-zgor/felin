@@ -23,7 +23,7 @@
     "build-tsc": "tsc",
     "prepublish": "yarn run build",
     "pretest": "npm run build && npm link && npm link felin",
-    "test": "jest; parcel tests/cats-test/index.html"
+    "test": "jest; parcel examples/cats-blog/index.html"
   },
   "repository": {
     "type": "git",
