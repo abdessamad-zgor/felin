@@ -1,4 +1,6 @@
-function quickSortByPriority(array: FlTask[]) {
+import { ComputedRefresh, DOMUpdate, EffectCall, RouteChange, Task } from "./tasks";
+
+function quickSortByPriority(array: Task[]) {
   if (array.length <= 1) {
     return array;
   }
@@ -13,12 +15,13 @@ function quickSortByPriority(array: FlTask[]) {
   return quickSortByPriority(left).concat(pivot, quickSortByPriority(right));
 };
 
-export class FlStack {
-  tasks: FlTask[] = []
+export class Stack {
+  tasks: Task[] = []
+  running: boolean = false
   constructor() {
   }
 
-  pop(): FlTask {
+  pop(): Task {
     if (this.tasks.length > 0) {
       let highestPriorityTask = this.tasks[0]
       this.tasks = this.tasks.slice(1)
@@ -26,47 +29,33 @@ export class FlStack {
     }
   }
 
-  push(task: FlTask) {
+  push(task: Task) {
     this.tasks.push(task)
     this.tasks = quickSortByPriority(this.tasks)
+    if (!this.running) this.run()
   }
 
   empty() {
     return this.tasks.length == 0
   }
-}
-
-export class FlRuntime {
-  stack: FlStack
-  running: boolean
-
-  constructor() {
-    this.stack = new FlStack()
-    this.running = true
-  }
 
   run() {
     if (!this.running) this.running = true
     while (this.running) {
-      if (this.stack.empty()) {
+      if (this.empty()) {
         this.running = false
         break;
       }
-      let task = this.stack.pop()
-      if (task instanceof FlDOMUpdate) {
+      let task = this.pop()
+      if (task instanceof DOMUpdate) {
         task.call(task.args)
-      } else if (task instanceof FlComputedRefresh) {
+      } else if (task instanceof ComputedRefresh) {
         task.call(task.args)
-      } else if (task instanceof FlEffectCall) {
+      } else if (task instanceof EffectCall) {
         task.call(task.args)
-      } else if (task instanceof FlRouteChange) {
+      } else if (task instanceof RouteChange) {
         task.call(task.args)
       }
     }
-  }
-
-  pushTask(task: FlTask) {
-    this.stack.push(task)
-    if (!this.running) this.run()
   }
 }

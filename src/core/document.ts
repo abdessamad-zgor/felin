@@ -1,12 +1,12 @@
-import { FlHTMLElement, FlTextNode } from "./element"
-import { FlRouter } from "./router";
+import { FHTMLElement, FTextNode } from "../elements/element"
+import { Router } from "../router";
 
-export class FlDocument {
+export class FDocument {
   window: Window
   document: Document
   rootSelector: string;
-  rootElement: FlHTMLElement;
-  router?: FlRouter
+  rootElement: FHTMLElement;
+  router?: Router
 
   constructor() {
     if (window) {
@@ -15,7 +15,7 @@ export class FlDocument {
     }
   }
 
-  render(selector: string, element: FlHTMLElement) {
+  render(selector: string, element: FHTMLElement) {
     if (this.document instanceof Document) {
       let target = this.document.querySelector(selector)
       this.rootSelector = selector;
@@ -38,12 +38,12 @@ export class FlDocument {
     }
   }
 
-  selector(element: FlHTMLElement) {
-    let elementPath: FlHTMLElement[] = []
+  selector(element: FHTMLElement) {
+    let elementPath: FHTMLElement[] = []
     let currentElement = element
     let selector = `${this.rootSelector}>${this.rootElement.name}`
     while (currentElement.id != this.rootElement.id) {
-      if (currentElement instanceof FlHTMLElement) {
+      if (currentElement instanceof FHTMLElement) {
         elementPath.push(currentElement)
       }
       //@ts-ignore
@@ -55,7 +55,7 @@ export class FlDocument {
     return selector
   }
 
-  rerenderElement(element: FlHTMLElement){
+  rerenderElement(element: FHTMLElement){
     let selector = this.selector(element)
     let targetNode = this.document.querySelector(selector)
     targetNode.replaceWith(element.element())

@@ -1,13 +1,13 @@
 import { Properties as CssStyle } from "csstype";
-import { FlEvent } from "./event";
-import { FlState } from "./state";
-import { toCssString } from "./style";
-import { FlRoute, FlRouter } from "./router";
+import { FEvent } from "./event";
+import { State } from "../primitives/state";
+import { toCssString } from "../utils";
+import { Route, Router } from "../router";
 
-export class FlTextNode<T extends any[]> {
+export class FTextNode<T extends any[]> {
   id: string
-  stateCalls: FlState[] = [];
-  parentNode?: FlHTMLElement|FlSVGElement;
+  stateCalls: State[] = [];
+  parentNode?: FHTMLElement|FSVGElement;
   text: string
 
   constructor(text: string, ...args: T) {
@@ -23,7 +23,7 @@ export class FlTextNode<T extends any[]> {
     this.text = text
   }
 
-  element(parent?: FlHTMLElement) {
+  element(parent?: FHTMLElement) {
     if (parent) {
       this.parentNode = parent
     }
@@ -34,14 +34,14 @@ export class FlTextNode<T extends any[]> {
     return document.createTextNode(textContent)
   }
 
-  getStateCalls(accumulator?: { state: FlState, element: FlElement }[]) {
+  getStateCalls(accumulator?: { state: State, element: FElement }[]) {
     let acc = accumulator || []
     let stateCalls = this.stateCalls.map(sc => ({ state: sc, element: this }))
     acc = acc.concat(...stateCalls)
     return acc
   }
 
-  buildElementTree(parent?: FlHTMLElement|FlSVGElement){
+  buildElementTree(parent?: FHTMLElement|FSVGElement){
     if(parent){
       this.parentNode = parent
     }
@@ -49,33 +49,33 @@ export class FlTextNode<T extends any[]> {
 }
 
 // TODO: MAKE `element()` ACCEPT AN `FlDocument`
-export class FlHTMLElement {
+export class FHTMLElement {
   id: string;
   name: keyof HTMLElementTagNameMap;
-  parentNode: FlHTMLElement|FlSVGElement;
-  stateCalls: FlState[] = [];
-  $children: FlElement[];
+  parentNode: FHTMLElement|FSVGElement;
+  stateCalls: State[] = [];
+  $children: FElement[];
   $style: CssStyle | null;
-  $listeners: Map<keyof HTMLElementEventMap, (event: FlEvent) => void>
+  $listeners: Map<keyof HTMLElementEventMap, (event: FEvent) => void>
   $classname: string
   $attributes: { [attr: string]: any }
-  router: FlRouter | null = null
-  routes: FlRoute[] | null = null;
+  router: Router | null = null
+  routes: Route[] | null = null;
 
-  constructor(name: keyof HTMLElementTagNameMap, children?: (FlElement | string)[] | string, style?: CssStyle) {
+  constructor(name: keyof HTMLElementTagNameMap, children?: (FElement | string)[] | string, style?: CssStyle) {
     this.id = crypto.randomUUID()
     this.name = name
     if (typeof children == "string") {
-      this.$children = [new FlTextNode(children)]
+      this.$children = [new FTextNode(children)]
     } else if (Array.isArray(children)) {
       this.$children = []
       for (let i =0; i< children.length; i++) {
         let child = children[i]
         if (child instanceof Function) {
-          this.$children.push(new FlTextNode("{}", child))
+          this.$children.push(new FTextNode("{}", child))
           //@ts-ignore
-          this.stateCalls.push(child as FlState)
-        } else if(child instanceof FlRouter) {
+          this.stateCalls.push(child as State)
+        } else if(child instanceof Router) {
           if(this.router){
             throw Error("Cannot have multiple routers in the same element tree.")
           } else {
@@ -87,14 +87,14 @@ export class FlHTMLElement {
               route.index = i
             }
           }
-        } else if (child instanceof FlRoute) {
+        } else if (child instanceof Route) {
           child.parentNode = this
           child.index = i
           if(!Array.isArray(this.routes))
             this.routes = []
           this.routes.push(child)
         } else {
-          this.$children.push(typeof child == "string" ? new FlTextNode(child) : child)
+          this.$children.push(typeof child == "string" ? new FTextNode(child) : child)
         }
       }
     } else {
@@ -110,13 +110,13 @@ export class FlHTMLElement {
     return this
   }
 
-  children(children?: FlElement[]) {
+  children(children?: FElement[]) {
     if (!children)
       return this.$children
     else {
       for (let child of children) {
         if (child instanceof Function) {
-          this.$children.push(new FlTextNode("{}", child))
+          this.$children.push(new FTextNode("{}", child))
         } else {
           this.$children.push(child)
         }
@@ -125,7 +125,7 @@ export class FlHTMLElement {
     }
   }
 
-  getStateCalls(accumulator?: { state: FlState, element: FlElement }[]) {
+  getStateCalls(accumulator?: { state: State, element: FElement }[]) {
     let acc = accumulator || []
     let stateCalls = this.stateCalls.map(sc => ({ state: sc, element: this }))
     acc = acc.concat(...stateCalls)
@@ -141,7 +141,7 @@ export class FlHTMLElement {
     return this
   }
 
-  listen(eventname: keyof HTMLElementEventMap, callback: (event: FlEvent) => void) {
+  listen(eventname: keyof HTMLElementEventMap, callback: (event: FEvent) => void) {
     if (!this.$listeners.has(eventname)) {
       this.$listeners.set(eventname, callback)
     }
@@ -165,7 +165,7 @@ export class FlHTMLElement {
       element.setAttribute(key, this.$attributes[key] as string)
     }
 
-    let elementChildren = this.children() as FlElement[]
+    let elementChildren = this.children() as FElement[]
     if (elementChildren.length == 0) {
       return element
     } else {
@@ -177,7 +177,7 @@ export class FlHTMLElement {
     }
   }
 
-  buildElementTree(parent?: FlHTMLElement|FlSVGElement){
+  buildElementTree(parent?: FHTMLElement|FSVGElement){
     if(parent){
       this.parentNode = parent
     }
@@ -200,14 +200,14 @@ export class FlHTMLElement {
     this.$attributes = { ...this.$attributes, ...attrs }
   }
 
-  hasRouter(): FlRouter|undefined{
+  hasRouter(): Router|undefined{
     if(this.router){
       return this.router;
     } else {
       if(this.$children.length>0){
-        let router: FlRouter
+        let router: Router
         for (let child of this.$children){
-          if(child instanceof FlHTMLElement){
+          if(child instanceof FHTMLElement){
             if(child.hasRouter())
               router = child.hasRouter()
           }
@@ -218,29 +218,29 @@ export class FlHTMLElement {
   }
 }
 
-export class FlSVGElement {
+export class FSVGElement {
   id: string;
   name: keyof SVGElementTagNameMap;
-  parentNode: FlSVGElement|FlHTMLElement;
-  stateCalls: FlState[] = [];
-  $children: FlElement[];
+  parentNode: FSVGElement|FHTMLElement;
+  stateCalls: State[] = [];
+  $children: FElement[];
   $style: CssStyle | null;
-  $listeners: Map<keyof SVGElementEventMap, (event: FlEvent) => void>
+  $listeners: Map<keyof SVGElementEventMap, (event: FEvent) => void>
   $classname: string
   $attributes: { [attr: string]: any }
 
-  constructor(name: keyof SVGElementTagNameMap, children?: FlElement[], style?: CssStyle) {
+  constructor(name: keyof SVGElementTagNameMap, children?: FElement[], style?: CssStyle) {
     this.id = crypto.randomUUID();
     this.name = name;
 
     this.$children = []
     for (let child of children) {
       if (child instanceof Function) {
-        this.$children.push(new FlTextNode("{}", child))
+        this.$children.push(new FTextNode("{}", child))
         //@ts-ignore
-        this.stateCalls.push(child as FlState)
+        this.stateCalls.push(child as State)
       } else {
-        this.$children.push(typeof child == "string" ? new FlTextNode(child) : child)
+        this.$children.push(typeof child == "string" ? new FTextNode(child) : child)
       }
     }
     this.$style = style || null
@@ -253,13 +253,13 @@ export class FlSVGElement {
     return this
   }
 
-  children(children?: FlElement[]) {
+  children(children?: FElement[]) {
     if (!children)
       return this.$children
     else {
       for (let child of children) {
         if (child instanceof Function) {
-          this.$children.push(new FlTextNode("{}", child))
+          this.$children.push(new FTextNode("{}", child))
         } else {
           this.$children.push(child)
         }
@@ -268,7 +268,7 @@ export class FlSVGElement {
     }
   }
 
-  getStateCalls(accumulator?: { state: FlState, element: FlElement }[]) {
+  getStateCalls(accumulator?: { state: State, element: FElement }[]) {
     let acc = accumulator || []
     let stateCalls = this.stateCalls.map(sc => ({ state: sc, element: this }))
     acc = acc.concat(...stateCalls)
@@ -284,14 +284,14 @@ export class FlSVGElement {
     return this
   }
 
-  listen(eventname: keyof SVGElementEventMap, callback: (event: FlEvent) => void) {
+  listen(eventname: keyof SVGElementEventMap, callback: (event: FEvent) => void) {
     if (!this.$listeners.has(eventname)) {
       this.$listeners.set(eventname, callback)
     }
     return this
   }
 
-  element(parent?: FlSVGElement): SVGElement {
+  element(parent?: FSVGElement): SVGElement {
     if (parent) {
       this.parentNode = parent
     }
@@ -311,7 +311,7 @@ export class FlSVGElement {
       element.setAttribute(key, this.$attributes[key] as string)
     }
 
-    let elementChildren = this.children() as FlElement[]
+    let elementChildren = this.children() as FElement[]
     if (elementChildren.length == 0) {
       return element
     } else {
@@ -335,7 +335,7 @@ export class FlSVGElement {
     this.$attributes = { ...this.$attributes, ...attrs }
   }
 
-  buildElementTree(parent?: FlHTMLElement | FlSVGElement){
+  buildElementTree(parent?: FHTMLElement | FSVGElement){
     if(parent){
       this.parentNode = parent
     }
@@ -347,4 +347,4 @@ export class FlSVGElement {
   }
 }
 
-export type FlElement = FlTextNode<any[]> | FlHTMLElement | FlSVGElement
+export type FElement = FTextNode<any[]> | FHTMLElement | FSVGElement

@@ -1,19 +1,19 @@
-import { FlElement, FlHTMLElement } from "./element"
+import { FElement, FHTMLElement } from "../elements/element"
 
-export type FlComponent<T={}> = (props: T)=> FlElement
+export type Component<T={}> = (props: T)=> FElement
 
-export type FlRouterTreeLocation = {router: FlRouter, location: FlHTMLElement}
+export type RouterTreeLocation = {router: Router, location: FHTMLElement}
 
-export class FlRouter {
-  routes:  FlRoute[]
+export class Router {
+  routes:  Route[]
   index?: number
-  active: FlRoute[]
-  previous: FlRoute[]
-  history: FlRoute[]
-  parentNode?: FlHTMLElement;
+  active: Route[]
+  previous: Route[]
+  history: Route[]
+  parentNode?: FHTMLElement;
   params: {[key: string]: string|number}
 
-  constructor(...routes: FlRoute[]){
+  constructor(...routes: Route[]){
     this.routes = routes
     this.params = {}
     this.previous = []
@@ -36,7 +36,7 @@ export class FlRouter {
       return;
     }
     let pathSegments = path.split('/').filter(s=>s!='')
-    let foundMatch: FlRoute|undefined = undefined
+    let foundMatch: Route|undefined = undefined
     for(let i=0; i<pathSegments.length; i++){
       if(!foundMatch){
         for(let route of this.routes){
@@ -76,10 +76,10 @@ export class FlRouter {
     console.log(this.active)
   }
 
-  buildRouterTree(): FlRouter {
+  buildRouterTree(): Router {
     for(let route of this.routes){
       let element = route.element
-      if(element instanceof FlHTMLElement){
+      if(element instanceof FHTMLElement){
         if(element.router){
           throw Error("Cannot have nested routers inside the same element tree");
         } else {
@@ -96,15 +96,15 @@ export class FlRouter {
   }
 }
 
-export class FlRoute {
+export class Route {
   path: string
   index?: number
-  element: FlElement
-  parentRoute?: FlRoute
-  parentNode?: FlHTMLElement
-  children?: FlRoute[]
+  element: FElement
+  parentRoute?: Route
+  parentNode?: FHTMLElement
+  children?: Route[]
 
-  constructor(path: string, element: FlElement, parent?: FlRoute){
+  constructor(path: string, element: FElement, parent?: Route){
     this.path = path
     this.element = element
     if(parent){

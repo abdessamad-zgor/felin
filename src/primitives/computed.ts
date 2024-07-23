@@ -1,12 +1,12 @@
-import { ExtensibleFunction } from "./utils"
-import { FlState } from "./state";
+import { ExtensibleFunction } from "../utils"
+import { State } from "./state";
 
-export class FlComputed extends ExtensibleFunction {
+export class Computed extends ExtensibleFunction {
   _id: string
   value: any
-  fn: (...args: FlState[]) => any
-  states: FlState[]
-  constructor(fn: (...args: FlState[]) => any, ...states: FlState[]) {
+  fn: (...args: State[]) => any
+  states: State[]
+  constructor(fn: (...args: State[]) => any, ...states: State[]) {
     super(() => {
       this.value = this.fn(...this.states)
       return this.value

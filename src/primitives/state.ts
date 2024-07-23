@@ -1,22 +1,22 @@
-import { ExtensibleFunction } from "./utils"
+import { ExtensibleFunction } from "../utils"
 
 type StateTypeMutation<StateType> = StateType extends { [key: string]: any } | any[]
   ? (state: StateType | Partial<StateType>) => StateType | Partial<StateType> :
   (state: StateType) => StateType
 
-interface FlStateType<T = any> {
+interface StateType<T = any> {
   value: T | Partial<T>,
   _id: string,
   parent?: ParentState,
-  set: (fnOrState: StateTypeMutation<T> | T, child?: FlState<T>) => void,
+  set: (fnOrState: StateTypeMutation<T> | T, child?: State<T>) => void,
 }
 
 type ParentState = {
-  state: FlStateType,
+  state: StateType,
   key: string
 }
 
-export class FlState<T = any> extends ExtensibleFunction implements FlStateType<T> {
+export class State<T = any> extends ExtensibleFunction implements StateType<T> {
   _id: string;
   value: T | Partial<T>;
   parent?: ParentState;
@@ -29,13 +29,13 @@ export class FlState<T = any> extends ExtensibleFunction implements FlStateType<
       this.parent = parent;
     }
     if (typeof this.value == 'object' && this.value != undefined && this.value != null) {
-      let handler: ProxyHandler<FlState<T>> = {
-        get: (target: FlState<T>, prop: string, reciever) => {
+      let handler: ProxyHandler<State<T>> = {
+        get: (target: State<T>, prop: string, reciever) => {
           if (!Object.keys(target.value).includes(prop)) {
             return Reflect.get(target, prop, reciever);
           } else {
             let value = target.value[prop];
-            let childState = new FlState<typeof value>(value, {state: this, key: prop});
+            let childState = new State<typeof value>(value, {state: this, key: prop});
             return childState;
           }
         }
@@ -44,7 +44,7 @@ export class FlState<T = any> extends ExtensibleFunction implements FlStateType<
     }
   }
 
-  set(fnOrState: StateTypeMutation<T> | T, child?: FlState<T>) {
+  set(fnOrState: StateTypeMutation<T> | T, child?: State<T>) {
     let newValue: T | Partial<T> = this.value
     if (child) {
       for (let key of Object.keys(this.value)) {

@@ -1,19 +1,19 @@
-import { FlElement } from "./element"
-import { FlState } from "./state"
+import { FElement } from "../elements/element"
+import { State } from "./state"
 
 export class FlConditional {
   condition: ()=>boolean
-  trueBranch: FlElement
-  falseBranch: FlElement
-  parent?: FlElement
+  trueBranch: FElement
+  falseBranch: FElement
+  parent?: FElement
 
-  constructor(condition: ()=>boolean, trueBranch: FlElement, falseBranch: FlElement){
+  constructor(condition: ()=>boolean, trueBranch: FElement, falseBranch: FElement){
     this.condition = condition
     this.trueBranch = trueBranch
     this.falseBranch = falseBranch
   }
 
-  element(parent?: FlElement){
+  element(parent?: FElement){
     if(parent){
       this.parent = parent
     }
@@ -27,10 +27,10 @@ export class FlConditional {
 }
 
 export class FlLoop<T = any> {
-  state: FlState<Array<T>>
-  iteration: (element: T)=>FlElement
+  state: State<Array<T>>
+  iteration: (element: T)=>FElement
 
-  constructor(state: FlState, iteration: (element: T)=>FlElement){
+  constructor(state: State, iteration: (element: T)=>FElement){
     this.state = state
     this.iteration = iteration
   }

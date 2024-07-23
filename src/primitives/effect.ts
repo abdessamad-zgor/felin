@@ -1,13 +1,13 @@
-import { ExtensibleFunction } from "./utils"
-import { FlState } from "./state"
+import { ExtensibleFunction } from "../utils"
+import { State } from "./state"
 
-export class FlEffect extends ExtensibleFunction {
+export class Effect extends ExtensibleFunction {
   _id: string
-  effect: (...args: FlState<any>[])=>void
-  dependants: FlState[]
+  effect: (...args: State<any>[])=>void
+  dependants: State[]
 
-  constructor(fn: (...args: FlState[])=>void){
-    super((...args: FlState[])=>{
+  constructor(fn: (...args: State[])=>void){
+    super((...args: State[])=>{
       this.effect = fn
       this.dependants = args
       this._id = crypto.randomUUID()

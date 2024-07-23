@@ -1,12 +1,17 @@
+import { Computed } from "../primitives/computed"
+import { State } from "../primitives/state"
+import { FDocument } from "./document"
+import { FElement, FHTMLElement } from "../elements/element"
+import { Router } from "../router"
 
-export interface FlTask<A = { [key: string]: any }, R = void> {
+export interface Task<A = { [key: string]: any }, R = void> {
   priority: number
   call(args: A): R
 }
 
-type DOMUpdateArgs = { state: FlState|FlComputed, flDocument: FlDocument, element: FlElement }
+type DOMUpdateArgs = { state: State|Computed, flDocument: FDocument, element: FElement }
 
-export class FlDOMUpdate implements FlTask<DOMUpdateArgs, void> {
+export class DOMUpdate implements Task<DOMUpdateArgs, void> {
   priority: number
   args: DOMUpdateArgs
 
@@ -17,7 +22,7 @@ export class FlDOMUpdate implements FlTask<DOMUpdateArgs, void> {
 
   call(args: DOMUpdateArgs) {
     let newValue = (this.args.state as Function)()
-    let nodeSelector = this.args.flDocument.selector(this.args.element as FlHTMLElement)
+    let nodeSelector = this.args.flDocument.selector(this.args.element as FHTMLElement)
 
     let domElement = this.args.flDocument.document.querySelector(nodeSelector)
     if (domElement) {
@@ -27,11 +32,11 @@ export class FlDOMUpdate implements FlTask<DOMUpdateArgs, void> {
 }
 
 
-export class FlComputedRefresh implements FlTask {
+export class ComputedRefresh implements Task {
   priority: number
-  args: FlComputed
+  args: Computed
 
-  constructor(args: FlComputed){
+  constructor(args: Computed){
     this.args = args
     this.priority = 2
   }
@@ -43,34 +48,34 @@ export class FlComputedRefresh implements FlTask {
 
 }
 
-type FlEffectArgs = { fn: (...args: FlState[]) => void, dependents: FlState[] }
+type EffectArgs = { fn: (...args: State[]) => void, dependents: State[] }
 
-export class FlEffectCall implements FlTask {
+export class EffectCall implements Task {
   priority: number
-  args: FlEffectArgs
+  args: EffectArgs
 
-  constructor(args: FlEffectArgs) {
+  constructor(args: EffectArgs) {
     this.args = args
     this.priority = 3
   }
 
-  call(args: FlEffectArgs) {
+  call(args: EffectArgs) {
     args.fn(...args.dependents)
   }
 }
 
-type FlRouteChangeArgs = {document: FlDocument, router: FlRouter, path: string}
+type RouteChangeArgs = {document: FDocument, router: Router, path: string}
 
-export class FlRouteChange implements FlTask {
+export class RouteChange implements Task {
   priority: number
-  args: FlRouteChangeArgs
+  args: RouteChangeArgs
 
-  constructor(args: FlRouteChangeArgs) {
+  constructor(args: RouteChangeArgs) {
     this.args = args
     this.priority = 4
   }
 
-  call(args: FlRouteChangeArgs) {
+  call(args: RouteChangeArgs) {
     args.router.matchRoute(args.path)
     let activeRoutes = args.router.active
     let previousRoutes = args.router.previous

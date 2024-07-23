@@ -178,27 +178,29 @@ let svgTags = [
   "view"
 ]
 
-function generateHSElementFucntion() {
+function generateFElementFucntions() {
   let __dirname = import.meta.dirname
-  let filePath = join(__dirname, "elements.ts");
-  let fileBuffer = `import {FlHTMLElement, FlSVGElement, FlElement} from './element'\n`;
+  let htmlFilePath = join(__dirname, "html.ts");
+  let svgFilePath = join(__dirname, "svg.ts");
+  let htmlFileBuffer = `import {FHTMLElement, FSVGElement, FElement} from '../elements/element'\n`;
+  let svgFileBuffer = `import {FHTMLElement, FSVGElement, FElement} from '../elements/element'\n`;
   let htmlTemplate = (tag) => {
     return `
-export const ${tag} = (...children: FlElement[]):FlElement => {
-\tlet element = new FlHTMLElement("${tag == '_var' ? 'var' : tag}", children = children)
+export const ${tag} = (...children: FElement[]):FElement => {
+\tlet element = new FHTMLElement("${tag == '_var' ? 'var' : tag}", children = children)
 \treturn element;
 }
 `;
   }
   let htmlLength = htmlTags.length;
   for (let i = 0; i < htmlLength; i++) {
-    fileBuffer += htmlTemplate(htmlTags[i]);
+    htmlFileBuffer += htmlTemplate(htmlTags[i]);
   }
 
   let svgTemplate = (tag) => {
     return `
-export const ${tag} = (...children: FlElement[]):FlElement => {
-\tlet element = new FlSVGElement("${tag == '_a' ? 'a' : tag == '_title' ? 'title' : tag == '_text' ? 'text' : tag == '_switch' ? 'switch' : tag}", children = children)
+export const ${tag} = (...children: FElement[]):FElement => {
+\tlet element = new FSVGElement("${tag == '_a' ? 'a' : tag == '_title' ? 'title' : tag == '_text' ? 'text' : tag == '_switch' ? 'switch' : tag}", children = children)
 \treturn element;
 }
 `
@@ -206,10 +208,15 @@ export const ${tag} = (...children: FlElement[]):FlElement => {
 
   let svgLength = svgTags.length
   for (let i = 0; i < svgLength; i++) {
-    fileBuffer += svgTemplate(svgTags[i]);
+    svgFileBuffer += svgTemplate(svgTags[i]);
   }
 
-  writeFile(filePath, fileBuffer, (err) => {
+  writeFile(htmlFilePath, htmlFileBuffer, (err) => {
+    if (err) console.log('failed to generate file.')
+    console.log('Successfully generated file.')
+  });
+
+  writeFile(svgFilePath, svgFileBuffer, (err) => {
     if (err) console.log('failed to generate file.')
     console.log('Successfully generated file.')
   });

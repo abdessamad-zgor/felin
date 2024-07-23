@@ -1,1 +1,1 @@
-export type FlEvent = Event | CustomEvent
+export type FEvent = Event | CustomEvent
