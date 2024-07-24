@@ -1,6 +1,7 @@
-import { Felin } from "./core";
+import { Felin } from "./core/registry";
 window.Felin = Felin
 
-export * from "./elements";
-export * from "./document";
+export * from "./elements/html";
+export * from "./elements/svg";
+export * from "./core/document";
 export * from "./helpers";

@@ -4,6 +4,7 @@ import { Computed } from "./primitives/computed";
 import { Loop, Conditional } from "./primitives/control-flow";
 import { Component, Route, Router } from "./router";
 import { FElement, FHTMLElement, FText } from "./elements/element";
+import { FDocument } from "./felin";
 
 export function $text(text: string, ...args: any[]) {
   return new FText(text, ...args)
@@ -31,6 +32,10 @@ export function $route(path: string, element: Component<{}>){
 
 export function $params(){
   return Felin.getRouterParams()
+}
+
+export function $document(){
+  return new FDocument()
 }
 
 export function $link(path: string, element: FElement|string){

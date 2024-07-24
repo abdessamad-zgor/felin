@@ -222,4 +222,4 @@ export const ${tag} = (...children: FElement[]):FElement => {
   });
 }
 
-generateHSElementFucntion();
+generateFElementFucntions();
