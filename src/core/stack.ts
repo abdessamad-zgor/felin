@@ -47,15 +47,7 @@ export class Stack {
         break;
       }
       let task = this.pop()
-      if (task instanceof DOMUpdate) {
-        task.call(task.args)
-      } else if (task instanceof ComputedRefresh) {
-        task.call(task.args)
-      } else if (task instanceof EffectCall) {
-        task.call(task.args)
-      } else if (task instanceof RouteChange) {
-        task.call(task.args)
-      }
+      task.call()
     }
   }
 }

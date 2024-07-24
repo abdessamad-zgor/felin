@@ -7,7 +7,8 @@ import { Effect } from "../primitives/effect"
 
 export interface Task<A = { [key: string]: any }, R = void> {
   priority: number
-  call(args: A): R
+  args: A
+  call(): R
 }
 
 type DOMUpdateArgs = { state: State|Computed, document: FDocument }
@@ -21,8 +22,8 @@ export class DOMUpdate implements Task<DOMUpdateArgs, void> {
     this.args = args
   }
 
-  call(args: DOMUpdateArgs) {
-    for(let element of args.state.elements){
+  call() {
+    for(let element of this.args.state.elements){
       let newValue = (this.args.state as Function)()
       let nodeSelector = this.args.document.selector(element as FHTMLElement)
 
@@ -35,7 +36,7 @@ export class DOMUpdate implements Task<DOMUpdateArgs, void> {
 }
 
 
-export class ComputedRefresh implements Task {
+export class ComputedRefresh implements Task<Computed, void> {
   priority: number
   args: Computed
 
@@ -44,7 +45,7 @@ export class ComputedRefresh implements Task {
     this.priority = 2
   }
 
-  call(args) {
+  call() {
     let newValue = this.args.fn(...this.args.states)
     this.args.value = newValue
   }
@@ -60,8 +61,8 @@ export class EffectCall implements Task {
     this.priority = 3
   }
 
-  call(args: Effect) {
-    args.effect()
+  call() {
+    this.args.effect()
   }
 }
 
@@ -71,15 +72,15 @@ export class RouteChange implements Task {
   priority: number
   args: RouteChangeArgs
 
-  constructor(args: RouteChangeArgs) {
+  constructor(args:RouteChangeArgs) {
     this.args = args
     this.priority = 4
   }
 
-  call(args: RouteChangeArgs) {
-    args.router.matchRoute(args.path)
-    let activeRoutes = args.router.active
-    let previousRoutes = args.router.previous
+  call() {
+   this.args.router.matchRoute(this.args.path)
+    let activeRoutes = this.args.router.active
+    let previousRoutes = this.args.router.previous
     if(previousRoutes.length>0){
       for(let previousRoute of previousRoutes){
         let routeParent = previousRoute.parent
@@ -93,9 +94,9 @@ export class RouteChange implements Task {
     let routesParentNodes = activeRoutes.map(route=>route.parent)
     console.log(routesParentNodes)
     for(let targetNode of routesParentNodes){
-      args.document.rerenderElement(targetNode)
+      this.args.document.rerenderElement(targetNode)
     }
-    args.document.window.history.pushState("", "", args.path)
+    this.args.document.window.history.pushState("", "", this.args.path)
   }
 }
 
@@ -104,7 +105,7 @@ export class InitEffectRegistry implements Task {
   priority: number
   args: InitEffectRegistryArgs 
 
-  constructor(args: InitEffectRegistryArgs){
+  constructor(args: InitEffectRegistryArgs ){
     this.priority = 0
     this.args = args
   }
