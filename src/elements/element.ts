@@ -169,7 +169,7 @@ export class FHTMLElement implements FElement{
 export class FSVGElement implements FElement{
   _id: string;
   name: keyof SVGElementTagNameMap;
-  parentNode: FSVGElement|FHTMLElement;
+  parent: FSVGElement|FHTMLElement;
   states: State[] = [];
   _children: FElement[];
   _style: CssStyle | null;
@@ -223,7 +223,7 @@ export class FSVGElement implements FElement{
 
   element(parent?: FSVGElement): SVGElement {
     if (parent) {
-      this.parentNode = parent
+      this.parent = parent
     }
     let element = document.createElementNS("http://www.w3.org/2000/svg", this.name)
     //element.style.cssText = toCssString(this._style)

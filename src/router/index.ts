@@ -111,6 +111,5 @@ export class Route {
       this.parentRoute = parentRoute
     }
   }
-  
 }
 

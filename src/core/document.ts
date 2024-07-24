@@ -1,6 +1,7 @@
-import { FElement, FHTMLElement, FText } from "../elements/element"
+import { FElement, FHTMLElement, FSVGElement, FText } from "../elements/element"
 import { State } from "../primitives/state";
 import { Router } from "../router";
+import { foldElementTree } from "../utils";
 
 export class FDocument {
   window: Window
@@ -62,10 +63,24 @@ export class FDocument {
   }
 
   hasRouter(element: FElement){
-    return new Router()
+    let router: Router|null = null
+    let elementTreeList = foldElementTree(element)
+    elementTreeList.forEach(el=>{
+      if(el instanceof FHTMLElement){
+        if(el.router) router = el.router
+      }
+    })
+    return router
   }
 
   getStates(element: FElement){
-    return [new State(1)]
+    let states: State[] = [];
+    let elementTreeList = foldElementTree(element)
+    for(let el of elementTreeList){
+      states = [...states, ...el.states]
+    }
+    let uniqueStates = [...new Set(states.map(e=>e._id))]
+    states = uniqueStates.map(id=>states.find(s=>s._id == id))
+    return states
   }
 }
