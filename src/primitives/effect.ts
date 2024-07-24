@@ -1,18 +1,15 @@
-import { ExtensibleFunction } from "../utils"
+import { Computed } from "./computed"
 import { State } from "./state"
 
-export class Effect extends ExtensibleFunction {
+export class Effect {
   _id: string
-  effect: (...args: State<any>[])=>void
-  dependants: State[]
+  effect: ()=>void
+  states: State[]
 
-  constructor(fn: (...args: State[])=>void){
-    super((...args: State[])=>{
-      this.effect = fn
-      this.dependants = args
-      this._id = crypto.randomUUID()
-      Felin.registerEffect(this)
-    })
-    
+  constructor(fn: ()=>void, ...states: State[]){
+    this.effect = fn
+    this.states = states
+    this._id = crypto.randomUUID()
+    Felin.registerEffect(this)
   }
 }

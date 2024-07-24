@@ -1,4 +1,5 @@
-import { FHTMLElement, FTextNode } from "../elements/element"
+import { FElement, FHTMLElement, FText } from "../elements/element"
+import { State } from "../primitives/state";
 import { Router } from "../router";
 
 export class FDocument {
@@ -21,17 +22,16 @@ export class FDocument {
       this.rootSelector = selector;
       this.rootElement = element;
       if (target instanceof HTMLElement || element instanceof Node) {
-        element.buildElementTree();
-        let router = element.hasRouter()
+        let router = this.hasRouter(element)
         if(router){
           router.buildRouterTree()
           Felin.registerActiveRouter(this.rootSelector, router)
         }
         let domElementRoot = element.element()
-        let stateCalls = element.getStateCalls()
+        let states = this.getStates(element)
         target.appendChild(domElementRoot)
         Felin.registerFlDocumentRoot(selector, this)
-        Felin.registerStateCalls(selector, stateCalls)
+        Felin.registerStates(selector, states)
         Felin.run()
       } else
         throw Error("FelinError: no element found with selector " + selector)
@@ -42,7 +42,7 @@ export class FDocument {
     let elementPath: FHTMLElement[] = []
     let currentElement = element
     let selector = `${this.rootSelector}>${this.rootElement.name}`
-    while (currentElement.id != this.rootElement.id) {
+    while (currentElement._id != this.rootElement._id) {
       if (currentElement instanceof FHTMLElement) {
         elementPath.push(currentElement)
       }
@@ -59,5 +59,13 @@ export class FDocument {
     let selector = this.selector(element)
     let targetNode = this.document.querySelector(selector)
     targetNode.replaceWith(element.element())
+  }
+
+  hasRouter(element: FElement){
+    return new Router()
+  }
+
+  getStates(element: FElement){
+    return [new State(1)]
   }
 }

@@ -1,7 +1,7 @@
 import { FElement } from "../elements/element"
 import { State } from "./state"
 
-export class FlConditional {
+export class Conditional {
   condition: ()=>boolean
   trueBranch: FElement
   falseBranch: FElement
@@ -26,7 +26,7 @@ export class FlConditional {
   }
 }
 
-export class FlLoop<T = any> {
+export class Loop<T = any> {
   state: State<Array<T>>
   iteration: (element: T)=>FElement
 

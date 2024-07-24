@@ -1,10 +1,11 @@
+import { ComputedRefresh, DOMUpdate, EffectCall, InitEffectRegistry, InitComputedRegistry, Task, RouteChange } from "./tasks";
+import { FText, FHTMLElement, FSVGElement, FElement } from "../elements/element";
 import { Computed } from "../primitives/computed";
 import { Effect } from "../primitives/effect";
 import { State } from "../primitives/state";
 import { Router } from "../router";
 import { FDocument } from "./document";
 import { Stack } from "./stack";
-import { Task } from "./tasks";
 
 type DocumentRegister = {
   document: FDocument,
@@ -23,52 +24,72 @@ export class Registry {
     this.register = {}
   }
 
+  initEffectRegistry(effect: Effect){
+    let root = Object.keys(this.register).find(r=>effect.states.map(s=>s._id).some(s_id=>this.register[r].states.map(s=>s._id).includes(s_id)))
+    if(root){
+      if(!this.register[root].effects) this.register[root].effects = []
+      this.register[root].effects.push(effect)
+    } else {
+      this.stack.push(new InitEffectRegistry(effect))
+    }
+  }
+  
+  initComputedRegistry(computed: Computed){
+    let root = Object.keys(this.register).find(r=>computed.states.map(s=>s._id).some(s_id=>this.register[r].states.map(s=>s._id).includes(s_id)))
+    if(root){
+      if(!this.register[root].computed) this.register[root].computed = []
+      this.register[root].computed.push(computed)
+    } else {
+      this.stack.push(new InitComputedRegistry(computed))
+    }
+  }
+
   registerStates(root: string, states: State[]) {
-    if (!this.register[root].states) this.register[root].states = []
+    this.register[root].states = states
   }
 
   registerStateUpdate(state: State) {
-    let root = Object.keys(this.register).find(r => this.register[r].states.some(s => s.state._id == state._id))
+    let root = Object.keys(this.register).find(r => this.register[r].states.some(s => s._id == state._id))
     if (root) {
       let fdocument = this.register[root].document
-      let states = this.register[root].states.filter(s => s.state._id == state._id);
+      let states = this.register[root].states.filter(s => s._id == state._id);
       for (let state of states) {
-        let targetElement: FHTMLElement = state.element as FHTMLElement
-        if (stateCall.element instanceof FlTextNode) {
-          targetElement = stateCall.element.parentNode as FHTMLElement
-        }
-        let domUpdate = new FlDOMUpdate({ flDocument, state: stateCall.state, element: targetElement })
-        this.runtime.pushTask(domUpdate);
-      }
-    }
-
-    let computed = this.computed.find(e => e.states.some(s => s._id == state._id))
-    if (computed) {
-      let computedRefresh = new FlComputedRefresh(computed)
-      this.runtime.pushTask(computedRefresh)
-      let computedStateRoot = Object.keys(this.documentStates).find(r => this.documentStates[r].some(s => s.state._id == computed._id))
-      if (computedStateRoot) {
-        let computedFlDocument = this.documentRootsMap[computedStateRoot]
-        let computedStateCalls = this.documentStates[computedStateRoot].filter(s => s.state._id == computed._id);
-        for (let computedStateCall of computedStateCalls) {
-          let computedTargetElement: FHTMLElement = computedStateCall.element as FHTMLElement
-          if (computedStateCall.element instanceof FlTextNode) {
-            computedTargetElement = computedStateCall.element.parentNode as FHTMLElement
+      let targets = state.elements as FElement[]
+        for(let target of targets){
+          if (target instanceof FText) {
+            target = target.parent as FHTMLElement
           }
-          let computedDomUpdate = new FlDOMUpdate({ flDocument: computedFlDocument, state: computedStateCall.state, element: computedTargetElement })
-          this.runtime.pushTask(computedDomUpdate)
+          let domUpdate = new DOMUpdate({ document: fdocument, state: state})
+          this.stack.push(domUpdate);
         }
+      }
+      let computed = this.register[root].computed.find(e => e.states.some(s => s._id == state._id))
+      if (computed) {
+        let computedRefresh = new ComputedRefresh(computed)
+        this.stack.push(computedRefresh)
+        let cStates = this.register[root].computed.filter(s => s._id == computed._id);
+        for (let cState of cStates) {
+          let cTargets = cState.elements as FElement[]
+          for(let cTarget of cTargets){
+            if (cTarget instanceof FText) {
+              cTarget = cTarget.parent as FHTMLElement
+            }
+            let computedDomUpdate = new DOMUpdate({ document: fdocument, state: cState })
+            this.stack.push(computedDomUpdate)
+          }
+        }
+      }
+
+      let effect = this.register[root].effects.find(e => e.states.some(s => s._id == state._id))
+      if (effect) {
+        let effectCall = new EffectCall(effect)
+        this.stack.push(effectCall)
       }
     }
 
-    let effect = this.effects.find(e => e.dependants.some(s => s._id == state._id))
-    if (effect) {
-      let effectCall = new FlEffectCall({ fn: effect.effect, dependents: effect.dependants })
-      this.runtime.pushTask(effectCall)
-    }
   }
 
-  registerFlDocumentRoot(root: string, document: FlDocument) {
+  registerFlDocumentRoot(root: string, document: FDocument) {
     if (!Object.keys(this.register).includes(root)) {
       this.register[root].document = document
     }
@@ -78,36 +99,36 @@ export class Registry {
     this.stack.run()
   }
 
-  registerEffect(effect: FlEffect) {
-    if (!this.effects.some(e => e._id == effect._id))
-      this.effects.push(effect)
+  registerEffect(effect: Effect) {
+    let initTask = new InitEffectRegistry(effect)
+    this.stack.push(initTask)
   }
 
-  registerComputedState(state: FlComputed) {
-    if (!this.computed.some(c => c._id == state._id))
-      this.computed.push(state);
+  registerComputed(computed: Computed){
+    let initTask = new InitComputedRegistry(computed)
+    this.stack.push(initTask)
   }
 
-  registerActiveRouter(rootSelector: string, router: FlRouter) {
-    if (!Object.keys(this.router).includes(rootSelector)) {
-      this.router[rootSelector] = router
+  registerActiveRouter(rootSelector: string, router: Router) {
+    if (!Object.keys(this.register).includes(rootSelector)) {
+      this.register[rootSelector].router = router
       this.registerRouteChange(window.location.href.slice(window.location.host.length + window.location.protocol.length + 2), rootSelector)
     }
   }
 
   registerRouteChange(path: string, rootSelector: string) {
-    let args = { path, router: this.router[rootSelector], document: this.documentRootsMap[rootSelector] }
+    let args = { path, router: this.register[rootSelector].router, document: this.register[rootSelector].document }
     console.log(args)
-    let routeChangeTask = new FlRouteChange(args)
-    this.runtime.pushTask(routeChangeTask)
+    let routeChangeTask = new RouteChange(args)
+    this.stack.push(routeChangeTask)
   }
 
   getElementRootSelector(element: FElement, parent?: FHTMLElement): string | boolean {
     let rootSelector: string
     let doesHaveChild: boolean = false
     if (parent) {
-      for (let child of parent.$children) {
-        if (child.id == element.id) {
+      for (let child of parent._children) {
+        if (child._id == element._id) {
           doesHaveChild = true
         } else {
           if (child instanceof FHTMLElement) {
@@ -117,10 +138,10 @@ export class Registry {
       }
       return doesHaveChild
     } else {
-      for (let selector of Object.keys(this.documentRootsMap)) {
-        let selectedDocument = this.documentRootsMap[selector];
-        for (let child of selectedDocument.rootElement.$children) {
-          if (child.id == element.id) {
+      for (let selector of Object.keys(this.register)) {
+        let selectedDocument = this.register[selector].document;
+        for (let child of selectedDocument.rootElement._children) {
+          if (child._id == element._id) {
             rootSelector = selector
           } else {
             if (child instanceof FHTMLElement) {
@@ -136,7 +157,7 @@ export class Registry {
   }
 
   getRouterParams(): { [key: string]: string | number } {
-    let routers = Object.keys(this.router).map(selector => this.router[selector])
+    let routers = Object.keys(this.register).map(selector => this.register[selector].router)
     let params = {}
     for (let router of routers) {
       if (router.active.length > 0) {

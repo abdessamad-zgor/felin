@@ -1,6 +1,6 @@
-import { FlRegistry } from "./core"
+import { Registry } from "./core/registry"
 
 declare global {
-  var Felin: FlRegistry
+  var Felin: Registry
 }
 

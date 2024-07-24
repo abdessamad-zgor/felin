@@ -1,171 +1,146 @@
 import { Properties as CssStyle } from "csstype";
 import { FEvent } from "./event";
 import { State } from "../primitives/state";
-import { toCssString } from "../utils";
+import { ExtensibleFunction, toCssString } from "../utils";
 import { Route, Router } from "../router";
+import { Computed } from "../primitives/computed";
 
-export class FTextNode<T extends any[]> {
-  id: string
-  stateCalls: State[] = [];
-  parentNode?: FHTMLElement|FSVGElement;
+export interface FElement{
+  _id: string,
+  states: State[],
+  parent?: FElement,
+  element(): HTMLElement | SVGElement | Text
+}
+
+type FTextChildren = (State|string|number)[]
+export class FText implements FElement{
+  _id: string
+  states: State[] = [];
+  parent?: FHTMLElement|FSVGElement;
   text: string
 
-  constructor(text: string, ...args: T) {
-    this.id = crypto.randomUUID()
+  constructor(text: string, ...args: FTextChildren) {
+    this._id = crypto.randomUUID()
     if (args.length > 0)
       for (let arg of args) {
-        if (arg instanceof Function) {
-          this.stateCalls.push(arg)
-        } else {
-          text = text.replace("{}", arg)
-        }
+        if (arg instanceof State) {
+          arg.setElement(this)
+          this.states.push(arg)
+          text = text.replace("{}", arg.value)
+          continue;
+        } 
+        text = text.replace("{}", arg as string)
       }
     this.text = text
   }
 
-  element(parent?: FHTMLElement) {
-    if (parent) {
-      this.parentNode = parent
-    }
+  element() {
     let textContent = this.text
-    for (let state of this.stateCalls) {
+    for (let state of this.states) {
       textContent = textContent.replace("{}", state())
     }
     return document.createTextNode(textContent)
   }
-
-  getStateCalls(accumulator?: { state: State, element: FElement }[]) {
-    let acc = accumulator || []
-    let stateCalls = this.stateCalls.map(sc => ({ state: sc, element: this }))
-    acc = acc.concat(...stateCalls)
-    return acc
-  }
-
-  buildElementTree(parent?: FHTMLElement|FSVGElement){
-    if(parent){
-      this.parentNode = parent
-    }
-  }
 }
 
-// TODO: MAKE `element()` ACCEPT AN `FlDocument`
-export class FHTMLElement {
-  id: string;
+export class FHTMLElement implements FElement{
+  _id: string;
   name: keyof HTMLElementTagNameMap;
-  parentNode: FHTMLElement|FSVGElement;
-  stateCalls: State[] = [];
-  $children: FElement[];
-  $style: CssStyle | null;
-  $listeners: Map<keyof HTMLElementEventMap, (event: FEvent) => void>
-  $classname: string
-  $attributes: { [attr: string]: any }
+  parent: FHTMLElement|FSVGElement;
+  states: State[] = [];
+  computed: Computed[] = [];
+  _children: FElement[];
+  _style: CssStyle | null;
+  _listeners: Map<keyof HTMLElementEventMap, (event: FEvent) => void>
+  _classname: string
+  _attributes: { [attr: string]: any }
   router: Router | null = null
   routes: Route[] | null = null;
 
-  constructor(name: keyof HTMLElementTagNameMap, children?: (FElement | string)[] | string, style?: CssStyle) {
-    this.id = crypto.randomUUID()
+  constructor(name: keyof HTMLElementTagNameMap, children?: (FElement|Router|Route|State|Computed) [] | string) {
+    this._id = crypto.randomUUID()
     this.name = name
-    if (typeof children == "string") {
-      this.$children = [new FTextNode(children)]
-    } else if (Array.isArray(children)) {
-      this.$children = []
+    if (Array.isArray(children)) {
+      this._children = []
       for (let i =0; i< children.length; i++) {
         let child = children[i]
-        if (child instanceof Function) {
-          this.$children.push(new FTextNode("{}", child))
+        if (child instanceof State || child instanceof Computed) {
+          this._children.push(new FText("{}", child as State))
+          child.setElement(this)
           //@ts-ignore
-          this.stateCalls.push(child as State)
+          this.states.push(child as State)
         } else if(child instanceof Router) {
           if(this.router){
             throw Error("Cannot have multiple routers in the same element tree.")
           } else {
-            child.parentNode = this
+            child.parent = this
             child.index = i
             this.router = child
             for(let route of this.router.routes){
-              route.parentNode = this
+              route.parent = this
               route.index = i
             }
           }
         } else if (child instanceof Route) {
-          child.parentNode = this
+          child.parent = this
           child.index = i
           if(!Array.isArray(this.routes))
             this.routes = []
           this.routes.push(child)
-        } else {
-          this.$children.push(typeof child == "string" ? new FTextNode(child) : child)
+        } else if(child instanceof FHTMLElement || child instanceof FSVGElement || child instanceof FText){
+          (child as FElement).parent = this
+          this._children.push(child)
         }
       }
     } else {
-      this.$children = []
+      this._children = []
     }
-    this.$style = style || null
-    this.$listeners = new Map()
-    this.$attributes = {}
+    this._style = null
+    this._listeners = new Map()
+    this._attributes = {}
   }
 
   style(style: CssStyle) {
-    this.$style = style
+    this._style = style
     return this
   }
 
   children(children?: FElement[]) {
-    if (!children)
-      return this.$children
-    else {
-      for (let child of children) {
-        if (child instanceof Function) {
-          this.$children.push(new FTextNode("{}", child))
-        } else {
-          this.$children.push(child)
-        }
-      }
-      return this
-    }
-  }
-
-  getStateCalls(accumulator?: { state: State, element: FElement }[]) {
-    let acc = accumulator || []
-    let stateCalls = this.stateCalls.map(sc => ({ state: sc, element: this }))
-    acc = acc.concat(...stateCalls)
-    if (this.$children.length != 0) {
-      for (let child of this.$children) {
-        acc = child.getStateCalls(acc)
+    for (let child of children) {
+      if (child instanceof State || child instanceof Computed) {
+        let textContent = new FText("{}", child.value)
+        textContent.parent = this
+        this._children.push(textContent)
+      } else {
+        this._children.push(child)
       }
     }
-    return acc
-  }
-
-  child() {
     return this
   }
 
-  listen(eventname: keyof HTMLElementEventMap, callback: (event: FEvent) => void) {
-    if (!this.$listeners.has(eventname)) {
-      this.$listeners.set(eventname, callback)
+  listener(eventname: keyof HTMLElementEventMap, callback: (event: FEvent) => void) {
+    if (!this._listeners.has(eventname)) {
+      this._listeners.set(eventname, callback)
     }
     return this
   }
 
   element(): HTMLElement {
     let element = document.createElement(this.name)
-    //element.style.cssText = toCssString(this.$style)
-    for (let entry of this.$listeners.entries()) {
+
+    for (let entry of this._listeners.entries())
       element.addEventListener(entry[0], entry[1])
-    }
-    if (this.$style) {
-      element.style.cssText = toCssString(this.$style)
-    }
-    if (this.$classname) {
-      element.classList.add(...this.$classname.split(" "))
-    }
 
-    for (let key of Object.keys(this.$attributes)) {
-      element.setAttribute(key, this.$attributes[key] as string)
-    }
+    if (this._style)
+      element.style.cssText = toCssString(this._style)
 
-    let elementChildren = this.children() as FElement[]
+    if (this._classname)
+      element.classList.add(...this._classname.split(" "))
+
+    for (let key of Object.keys(this._attributes))
+      element.setAttribute(key, this._attributes[key] as string)
+
+    let elementChildren = this._children as FElement[]
     if (elementChildren.length == 0) {
       return element
     } else {
@@ -177,116 +152,71 @@ export class FHTMLElement {
     }
   }
 
-  buildElementTree(parent?: FHTMLElement|FSVGElement){
-    if(parent){
-      this.parentNode = parent
-    }
-    if(this.$children.length > 0){
-      for(let child of this.$children){
-        child.buildElementTree(this)
-      }
-    }
-  }
-
   class(classname: string) {
-    this.$classname = classname
+    this._classname = classname
   }
 
   attr(name: string, value: any) {
-    this.$attributes[name] = value
+    this._attributes[name] = value
   }
 
   attrs(attrs: { [attr: string]: any }) {
-    this.$attributes = { ...this.$attributes, ...attrs }
+    this._attributes = { ...this._attributes, ...attrs }
   }
 
-  hasRouter(): Router|undefined{
-    if(this.router){
-      return this.router;
-    } else {
-      if(this.$children.length>0){
-        let router: Router
-        for (let child of this.$children){
-          if(child instanceof FHTMLElement){
-            if(child.hasRouter())
-              router = child.hasRouter()
-          }
-        }
-        return router
-      }
-    }
-  }
 }
 
-export class FSVGElement {
-  id: string;
+export class FSVGElement implements FElement{
+  _id: string;
   name: keyof SVGElementTagNameMap;
   parentNode: FSVGElement|FHTMLElement;
-  stateCalls: State[] = [];
-  $children: FElement[];
-  $style: CssStyle | null;
-  $listeners: Map<keyof SVGElementEventMap, (event: FEvent) => void>
-  $classname: string
-  $attributes: { [attr: string]: any }
+  states: State[] = [];
+  _children: FElement[];
+  _style: CssStyle | null;
+  _listeners: Map<keyof SVGElementEventMap, (event: FEvent) => void>
+  _classname: string
+  _attributes: { [attr: string]: any }
 
   constructor(name: keyof SVGElementTagNameMap, children?: FElement[], style?: CssStyle) {
-    this.id = crypto.randomUUID();
+    this._id = crypto.randomUUID();
     this.name = name;
 
-    this.$children = []
+    this._children = []
     for (let child of children) {
-      if (child instanceof Function) {
-        this.$children.push(new FTextNode("{}", child))
+      if (child instanceof State || child instanceof Computed) {
+        let textContent = new FText("{}", child as State)
+        textContent.parent = this
+        this._children.push(textContent)
         //@ts-ignore
-        this.stateCalls.push(child as State)
+        this.states.push(child as State)
       } else {
-        this.$children.push(typeof child == "string" ? new FTextNode(child) : child)
+        this._children.push(typeof child == "string" ? new FText(child) : child)
       }
     }
-    this.$style = style || null
-    this.$listeners = new Map()
-    this.$attributes = {}
+    this._style = style || null
+    this._listeners = new Map()
+    this._attributes = {}
   }
 
   style(style: CssStyle) {
-    this.$style = style
+    this._style = style
     return this
   }
 
   children(children?: FElement[]) {
-    if (!children)
-      return this.$children
-    else {
-      for (let child of children) {
-        if (child instanceof Function) {
-          this.$children.push(new FTextNode("{}", child))
-        } else {
-          this.$children.push(child)
-        }
-      }
-      return this
-    }
-  }
-
-  getStateCalls(accumulator?: { state: State, element: FElement }[]) {
-    let acc = accumulator || []
-    let stateCalls = this.stateCalls.map(sc => ({ state: sc, element: this }))
-    acc = acc.concat(...stateCalls)
-    if (this.$children.length != 0) {
-      for (let child of this.$children) {
-        acc = child.getStateCalls(acc)
+    for (let child of children) {
+      if (child instanceof State) {
+        this._children.push(new FText("{}", child))
+      } else {
+        this._children.push(child)
       }
     }
-    return acc
-  }
-
-  child() {
     return this
   }
 
-  listen(eventname: keyof SVGElementEventMap, callback: (event: FEvent) => void) {
-    if (!this.$listeners.has(eventname)) {
-      this.$listeners.set(eventname, callback)
+  listener(eventname: keyof SVGElementEventMap, callback: (event: FEvent) => void) {
+    if (!this._listeners.has(eventname)) {
+      this._listeners.set(eventname, callback)
     }
     return this
   }
@@ -296,22 +226,22 @@ export class FSVGElement {
       this.parentNode = parent
     }
     let element = document.createElementNS("http://www.w3.org/2000/svg", this.name)
-    //element.style.cssText = toCssString(this.$style)
-    for (let entry of this.$listeners.entries()) {
+    //element.style.cssText = toCssString(this._style)
+    for (let entry of this._listeners.entries()) {
       element.addEventListener(entry[0], entry[1])
     }
-    if (this.$style) {
-      element.style.cssText = toCssString(this.$style)
+    if (this._style) {
+      element.style.cssText = toCssString(this._style)
     }
-    if (this.$classname) {
-      element.classList.add(...this.$classname.split(" "))
-    }
-
-    for (let key of Object.keys(this.$attributes)) {
-      element.setAttribute(key, this.$attributes[key] as string)
+    if (this._classname) {
+      element.classList.add(...this._classname.split(" "))
     }
 
-    let elementChildren = this.children() as FElement[]
+    for (let key of Object.keys(this._attributes)) {
+      element.setAttribute(key, this._attributes[key] as string)
+    }
+
+    let elementChildren = this._children as FElement[]
     if (elementChildren.length == 0) {
       return element
     } else {
@@ -324,27 +254,15 @@ export class FSVGElement {
   }
 
   class(classname: string) {
-    this.$classname = classname
+    this._classname = classname
   }
 
   attr(name: string, value: any) {
-    this.$attributes[name] = value
+    this._attributes[name] = value
   }
 
   attrs(attrs: { [attr: string]: any }) {
-    this.$attributes = { ...this.$attributes, ...attrs }
-  }
-
-  buildElementTree(parent?: FHTMLElement | FSVGElement){
-    if(parent){
-      this.parentNode = parent
-    }
-    if(this.$children.length > 0){
-      for(let child of this.$children){
-        child.buildElementTree(this)
-      }
-    }
+    this._attributes = { ...this._attributes, ...attrs }
   }
 }
 
-export type FElement = FTextNode<any[]> | FHTMLElement | FSVGElement

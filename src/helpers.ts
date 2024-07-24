@@ -1,41 +1,41 @@
-import { FlComputed } from "./computed";
-import { FlEffect } from "./effect";
-import { FlState } from "./state";
-import { FlElement, FlHTMLElement, FlTextNode } from "./element";
-import { FlComponent, FlRoute, FlRouter } from "./router";
-import { FlConditional, FlLoop } from "./control-flow";
+import { State } from "./primitives/state";
+import { Effect } from "./primitives/effect";
+import { Computed } from "./primitives/computed";
+import { Loop, Conditional } from "./primitives/control-flow";
+import { Component, Route, Router } from "./router";
+import { FElement, FHTMLElement, FText } from "./elements/element";
 
-export function $text<T extends any[]>(text: string, ...args: T) {
-  return new FlTextNode(text, ...args)
+export function $text(text: string, ...args: any[]) {
+  return new FText(text, ...args)
 }
 
 export function $state<T>(value: T) {
-  return new FlState<T>(value);
+  return new State<T>(value);
 }
 
-export function $effect(fn: (...args: FlState[])=>void){
-  return new FlEffect(fn)
+export function $effect(fn: ()=>void, ...state: State[]){
+  new Effect(fn)
 }
 
-export function $computed(fn: (...args: FlState[])=>void, ...states: FlState[]){
-  return new FlComputed(fn, ...states)
+export function $computed(fn: (...args: State[])=>void, ...states: State[]){
+  return new Computed(fn, ...states)
 }
 
-export function $router(...routes: FlRoute[]){
-  return new FlRouter(...routes)
+export function $router(...routes: Route[]){
+  return new Router(...routes)
 }
 
-export function $route(path: string, element: FlComponent<{}>){
-  return new FlRoute(path, element)
+export function $route(path: string, element: Component<{}>){
+  return new Route(path, element({}))
 }
 
 export function $params(){
   return Felin.getRouterParams()
 }
 
-export function $link(path: string, element: FlElement|string){
-  let linkElement = (new FlHTMLElement("a", typeof element == "string"? element: [element] ))
-  return linkElement.listen("click", (e)=>{
+export function $link(path: string, element: FElement|string){
+  let linkElement = new FHTMLElement("a", typeof element == "string"? element: [element] )
+  return linkElement.listener("click", (e)=>{
     e.preventDefault()
     let rootSelector = Felin.getElementRootSelector(linkElement)
     if(typeof rootSelector == 'string')
@@ -43,10 +43,10 @@ export function $link(path: string, element: FlElement|string){
   })
 }
 
-export function $if(condition: ()=>boolean, trueBranch: FlElement, falseBranch: FlElement){
-  return new FlConditional(condition, trueBranch, falseBranch)
+export function $if(condition: ()=>boolean, trueBranch: FElement, falseBranch: FElement){
+  return new Conditional(condition, trueBranch, falseBranch)
 }
 
-export function $for<T>(state: FlState<Array<T>>, iteration: (element: T)=>FlElement){
-  return new FlLoop(state, iteration)
+export function $for<T>(state: State<Array<T>>, iteration: (element: T)=>FElement){
+  return new Loop(state, iteration)
 }

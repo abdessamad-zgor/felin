@@ -3,13 +3,14 @@ import { State } from "../primitives/state"
 import { FDocument } from "./document"
 import { FElement, FHTMLElement } from "../elements/element"
 import { Router } from "../router"
+import { Effect } from "../primitives/effect"
 
 export interface Task<A = { [key: string]: any }, R = void> {
   priority: number
   call(args: A): R
 }
 
-type DOMUpdateArgs = { state: State|Computed, flDocument: FDocument, element: FElement }
+type DOMUpdateArgs = { state: State|Computed, document: FDocument }
 
 export class DOMUpdate implements Task<DOMUpdateArgs, void> {
   priority: number
@@ -21,12 +22,14 @@ export class DOMUpdate implements Task<DOMUpdateArgs, void> {
   }
 
   call(args: DOMUpdateArgs) {
-    let newValue = (this.args.state as Function)()
-    let nodeSelector = this.args.flDocument.selector(this.args.element as FHTMLElement)
+    for(let element of args.state.elements){
+      let newValue = (this.args.state as Function)()
+      let nodeSelector = this.args.document.selector(element as FHTMLElement)
 
-    let domElement = this.args.flDocument.document.querySelector(nodeSelector)
-    if (domElement) {
-      domElement.replaceWith(this.args.element.element())
+      let domElement = this.args.document.document.querySelector(nodeSelector)
+      if (domElement) {
+        domElement.replaceWith(element.element())
+      }
     }
   }
 }
@@ -48,19 +51,17 @@ export class ComputedRefresh implements Task {
 
 }
 
-type EffectArgs = { fn: (...args: State[]) => void, dependents: State[] }
-
 export class EffectCall implements Task {
   priority: number
-  args: EffectArgs
+  args: Effect
 
-  constructor(args: EffectArgs) {
+  constructor(args: Effect) {
     this.args = args
     this.priority = 3
   }
 
-  call(args: EffectArgs) {
-    args.fn(...args.dependents)
+  call(args: Effect) {
+    args.effect()
   }
 }
 
@@ -81,19 +82,49 @@ export class RouteChange implements Task {
     let previousRoutes = args.router.previous
     if(previousRoutes.length>0){
       for(let previousRoute of previousRoutes){
-        let routeParent = previousRoute.parentNode
-        routeParent.$children = routeParent.$children.filter(child=>child.id != previousRoute.element.id)
+        let routeParent = previousRoute.parent
+        routeParent._children = routeParent._children.filter(child=>child._id != previousRoute.element._id)
       }
     }
     for(let activeRoute of activeRoutes){
-      let routeParent = activeRoute.parentNode
-      routeParent.$children.splice(activeRoute.index, 0, activeRoute.element)
+      let routeParent = activeRoute.parent
+      routeParent._children.splice(activeRoute.index, 0, activeRoute.element)
     }
-    let routesParentNodes = activeRoutes.map(route=>route.parentNode)
+    let routesParentNodes = activeRoutes.map(route=>route.parent)
     console.log(routesParentNodes)
     for(let targetNode of routesParentNodes){
       args.document.rerenderElement(targetNode)
     }
     args.document.window.history.pushState("", "", args.path)
+  }
+}
+
+type InitEffectRegistryArgs = Effect
+export class InitEffectRegistry implements Task {
+  priority: number
+  args: InitEffectRegistryArgs 
+
+  constructor(args: InitEffectRegistryArgs){
+    this.priority = 0
+    this.args = args
+  }
+
+  call(){
+    Felin.initEffectRegistry(this.args)
+  }
+}
+
+type InitComputedRegistryArgs = Computed
+export class InitComputedRegistry implements Task {
+  priority: number
+  args: InitComputedRegistryArgs 
+
+  constructor(args: InitComputedRegistryArgs){
+    this.priority = 0
+    this.args = args
+  }
+
+  call(){
+    Felin.initComputedRegistry(this.args)
   }
 }

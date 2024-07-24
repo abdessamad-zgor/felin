@@ -10,7 +10,7 @@ export class Router {
   active: Route[]
   previous: Route[]
   history: Route[]
-  parentNode?: FHTMLElement;
+  parent?: FHTMLElement;
   params: {[key: string]: string|number}
 
   constructor(...routes: Route[]){
@@ -101,14 +101,14 @@ export class Route {
   index?: number
   element: FElement
   parentRoute?: Route
-  parentNode?: FHTMLElement
-  children?: Route[]
+  parent?: FHTMLElement
+  children?: Route[] = []
 
-  constructor(path: string, element: FElement, parent?: Route){
+  constructor(path: string, element: FElement, parentRoute?: Route){
     this.path = path
     this.element = element
-    if(parent){
-      this.parentRoute = parent
+    if(parentRoute){
+      this.parentRoute = parentRoute
     }
   }
   

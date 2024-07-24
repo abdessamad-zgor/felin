@@ -1,3 +1,4 @@
+import { FElement } from "../elements/element";
 import { ExtensibleFunction } from "../utils"
 
 type StateTypeMutation<StateType> = StateType extends { [key: string]: any } | any[]
@@ -20,9 +21,10 @@ export class State<T = any> extends ExtensibleFunction implements StateType<T> {
   _id: string;
   value: T | Partial<T>;
   parent?: ParentState;
+  elements: FElement[] = []
 
   constructor(value: T | Partial<T>, parent?: ParentState) {
-    super(() => this.value)
+    super(() => this)
     this.value = value;
     this._id = crypto.randomUUID();
     if (parent) {
@@ -69,5 +71,9 @@ export class State<T = any> extends ExtensibleFunction implements StateType<T> {
       this.value = newValue
       Felin.registerStateUpdate(this)
     }
+  }
+
+  setElement(element: FElement){
+    this.elements.push(element)
   }
 }
