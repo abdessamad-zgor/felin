@@ -45,7 +45,11 @@ export function $link(path: string, element: FElement|string){
     let rootSelector = Felin.getElementRootSelector(linkElement)
     if(typeof rootSelector == 'string')
       Felin.registerRouteChange(path, rootSelector)
-  })
+  }).style({
+      textDecoration: 'underline',
+      color: "blue",
+      cursor: 'pointer'
+    })
 }
 
 export function $if(condition: ()=>boolean, trueBranch: FElement, falseBranch: FElement){
