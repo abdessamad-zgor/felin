@@ -24,7 +24,7 @@ export class State<T = any> extends ExtensibleFunction implements StateType<T> {
   elements: FElement[] = []
 
   constructor(value: T | Partial<T>, parent?: ParentState) {
-    super(() => this)
+    super(() => this.value)
     this.value = value;
     this._id = crypto.randomUUID();
     if (parent) {

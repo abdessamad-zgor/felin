@@ -1,7 +1,7 @@
 import { FElement, FHTMLElement, FSVGElement, FText } from "../elements/element"
 import { State } from "../primitives/state";
 import { Router } from "../router";
-import { foldElementTree } from "../utils";
+import { flattenElementTree } from "../utils";
 
 export class FDocument {
   window: Window
@@ -18,6 +18,7 @@ export class FDocument {
   }
 
   render(selector: string, element: FHTMLElement) {
+    console.log(12233)
     if (this.document instanceof Document) {
       let target = this.document.querySelector(selector)
       this.rootSelector = selector;
@@ -63,8 +64,9 @@ export class FDocument {
   }
 
   hasRouter(element: FElement){
+    console.log(element)
     let router: Router|null = null
-    let elementTreeList = foldElementTree(element)
+    let elementTreeList = flattenElementTree(element)
     elementTreeList.forEach(el=>{
       if(el instanceof FHTMLElement){
         if(el.router) router = el.router
@@ -74,8 +76,9 @@ export class FDocument {
   }
 
   getStates(element: FElement){
+    console.log(element)
     let states: State[] = [];
-    let elementTreeList = foldElementTree(element)
+    let elementTreeList = flattenElementTree(element)
     for(let el of elementTreeList){
       states = [...states, ...el.states]
     }

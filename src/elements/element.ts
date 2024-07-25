@@ -67,7 +67,6 @@ export class FHTMLElement implements FElement{
         if (child instanceof State || child instanceof Computed) {
           this._children.push(new FText("{}", child as State))
           child.setElement(this)
-          //@ts-ignore
           this.states.push(child as State)
         } else if(child instanceof Router) {
           if(this.router){
@@ -145,7 +144,6 @@ export class FHTMLElement implements FElement{
       return element
     } else {
       for (let child of elementChildren) {
-        //@ts-ignore
         element.appendChild(child.element())
       }
       return element
@@ -163,7 +161,6 @@ export class FHTMLElement implements FElement{
   attrs(attrs: { [attr: string]: any }) {
     this._attributes = { ...this._attributes, ...attrs }
   }
-
 }
 
 export class FSVGElement implements FElement{
@@ -187,7 +184,6 @@ export class FSVGElement implements FElement{
         let textContent = new FText("{}", child as State)
         textContent.parent = this
         this._children.push(textContent)
-        //@ts-ignore
         this.states.push(child as State)
       } else {
         this._children.push(typeof child == "string" ? new FText(child) : child)

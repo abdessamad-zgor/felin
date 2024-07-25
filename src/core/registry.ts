@@ -101,12 +101,18 @@ export class Registry {
 
   registerEffect(effect: Effect) {
     let initTask = new InitEffectRegistry(effect)
-    this.stack.push(initTask)
+    setTimeout(() => {
+      this.stack.push(initTask)
+    }, 1000);
   }
 
   registerComputed(computed: Computed){
     let initTask = new InitComputedRegistry(computed)
-    this.stack.push(initTask)
+    console.log(initTask)
+    //this.stack.push(initTask)
+    setTimeout(() => {
+      this.stack.push(initTask)
+    }, 1000);
   }
 
   registerActiveRouter(rootSelector: string, router: Router) {

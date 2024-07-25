@@ -14,8 +14,8 @@ export function $state<T>(value: T) {
   return new State<T>(value);
 }
 
-export function $effect(fn: ()=>void, ...state: State[]){
-  new Effect(fn)
+export function $effect(fn: ()=>void, ...states: State[]){
+  new Effect(fn, ...states)
 }
 
 export function $computed(fn: (...args: State[])=>void, ...states: State[]){
@@ -26,8 +26,8 @@ export function $router(...routes: Route[]){
   return new Router(...routes)
 }
 
-export function $route(path: string, element: Component<{}>){
-  return new Route(path, element({}))
+export function $route(path: string, element: FElement){
+  return new Route(path, element)
 }
 
 export function $params(){
@@ -54,4 +54,8 @@ export function $if(condition: ()=>boolean, trueBranch: FElement, falseBranch: F
 
 export function $for<T>(state: State<Array<T>>, iteration: (element: T)=>FElement){
   return new Loop(state, iteration)
+}
+
+export function $length<T>(state: State<Array<T>>){
+  return new State(state.length)
 }

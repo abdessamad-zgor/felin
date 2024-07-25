@@ -4,13 +4,13 @@ import {
   p,
   h1,
   button,
-  FlDocument,
+  nav,
   span,
+  FDocument,
   $state,
   $text, 
   $effect,
   $computed,
-  nav,
   $if,
   $for,
   $link,
@@ -27,15 +27,15 @@ let home = ()=>{
   }, counter)
 
 
-  $effect((counter) => {
-    console.log("msg is: ", msg())
-  })(counter)
+  //$effect(() => {
+  //  console.log("msg is: ", msg())
+  //}, counter)
 
   return div(
      msg,
      button("increase")
        .style({backgroundColor: 'blue'})
-       .listen('click', (e)=>counter.count.a.set(s=>++s))
+       .listener('click', (e)=>counter.count.a.set(s=>++s))
    )
 }
 
@@ -66,15 +66,15 @@ let blog_post = ()=>{
 
 let page = () => {
   return main(
-    nav($link("/", "Home"), $link("/blogs", "Blog")),
+    nav($link("/", "Home"), $link("/blog", "Blog")),
     $router(
       $route("/", home()),
       $route("/blog", blogs()),
-      $route("/blogs/:slug", blog_post())
+      $route("/blog/:slug", blog_post())
     )
   )
 }
 
-let flDocument = new FlDocument();
-flDocument.render('#page', page())
+let fdocument = new FDocument();
+fdocument.render('#page', page())
 

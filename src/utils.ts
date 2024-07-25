@@ -15,36 +15,47 @@ export function toCssString(style: CssStyle) {
   return styleString
 }
 
-export function foldElementTree(element: FElement, acc?: FElement[]): FElement[] {
-  if(acc){
-    let lastElementParent = (acc.reverse().find(e=>!(e instanceof FText)) as FHTMLElement | FSVGElement).parent;
-    let i = 1;
-    let nextLastElementParent= acc[acc.findIndex(e=>e._id == element._id)+i] 
-    while(nextLastElementParent instanceof FHTMLElement || nextLastElementParent instanceof FSVGElement){
-      i++;
-      nextLastElementParent = acc[acc.findIndex(e=>e._id == element._id)+i]
-    }
-    if(nextLastElementParent){
-      acc = [...acc, ...(nextLastElementParent as  FHTMLElement | FSVGElement )._children]
-      return foldElementTree(nextLastElementParent, acc)
-    }else{
-      return acc
-    }
-  }else{
-    let accumulator = [];
-    if(element instanceof FHTMLElement || element instanceof FSVGElement){
-      if(element._children.length>0){
-        accumulator = [element, ...element._children]
-        return foldElementTree(element, accumulator)
-      }else {
-        accumulator = [element]
-        return accumulator
-      }
-    }else{
-      accumulator = [element]
-      return accumulator
-    }
-  }
+export function flattenElementTree(element: FElement, acc?: FElement[]): FElement[] {
+  //if(acc){
+  //  let lastElementParent = element;
+  //  let i = 1;
+  //  let nextElementParentIndex = acc.findIndex(e=>e._id == element._id)+i
+  //  let nextElementParent: FElement;
+  //  while( nextElementParentIndex < acc.length ){
+  //    nextElementParent = acc[nextElementParentIndex]
+  //    if(nextElementParent instanceof FSVGElement || nextElementParent instanceof FHTMLElement){
+  //      if(nextElementParent._children.length!=0){
+  //        nextElementParent = acc[nextElementParentIndex]
+  //        break;
+  //      }else{
+  //        continue;
+  //      }
+  //    }
+  //    i++;
+  //    nextElementParentIndex = acc.findIndex(e=>e._id == element._id)+i
+  //  }
+  //  if(nextElementParent){
+  //    acc = [...acc, ...(nextElementParent as  FHTMLElement | FSVGElement)._children]
+  //    return flattenElementTree(nextElementParent, acc)
+  //  }else{
+  //    return acc
+  //  }
+  //}else{
+  //  let accumulator = [];
+  //  if(element instanceof FHTMLElement || element instanceof FSVGElement){
+  //    if(element._children.length>0){
+  //      accumulator = [element, ...element._children]
+  //      return flattenElementTree(element, accumulator)
+  //    }else {
+  //      accumulator = [element]
+  //      return accumulator
+  //    }
+  //  }else{
+  //    accumulator = [element]
+  //    return accumulator
+  //  }
+  //}
+  return []
 }
 
 export class ExtensibleFunction extends Function {

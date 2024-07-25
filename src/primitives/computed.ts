@@ -7,12 +7,12 @@ export class Computed extends ExtensibleFunction {
   value: any
   fn: (...args: State[]) => any
   states: State[]
-  elements: FElement[]
+  elements: FElement[] = []
 
   constructor(fn: (...args: State[]) => any, ...states: State[]) {
     super(() => {
       this.value = this.fn(...this.states)
-      return this
+      return this.value
     })
     this.fn = fn
     this.states = states
