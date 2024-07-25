@@ -39,7 +39,7 @@ export function $document(){
 }
 
 export function $link(path: string, element: FElement|string){
-  let linkElement = new FHTMLElement("a", typeof element == "string"? element: [element] )
+  let linkElement = new FHTMLElement("a", [element])
   return linkElement.listener("click", (e)=>{
     e.preventDefault()
     let rootSelector = Felin.getElementRootSelector(linkElement)

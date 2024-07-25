@@ -5,18 +5,18 @@ import { ExtensibleFunction, toCssString } from "../utils";
 import { Route, Router } from "../router";
 import { Computed } from "../primitives/computed";
 
-export interface FElement{
+export interface FElement {
   _id: string,
   states: State[],
   parent?: FElement,
   element(): HTMLElement | SVGElement | Text
 }
 
-type FTextChildren = (State|string|number)[]
-export class FText implements FElement{
+type FTextChildren = (State | string | number)[]
+export class FText implements FElement {
   _id: string
   states: State[] = [];
-  parent?: FHTMLElement|FSVGElement;
+  parent?: FHTMLElement | FSVGElement;
   text: string
 
   constructor(text: string, ...args: FTextChildren) {
@@ -28,10 +28,10 @@ export class FText implements FElement{
           this.states.push(arg)
           text = text.replace("{}", arg.value)
           continue;
-        } 
+        }
         text = text.replace("{}", arg as string)
       }
-    this.text = text
+    this.text = text.toString()
   }
 
   element() {
@@ -43,10 +43,11 @@ export class FText implements FElement{
   }
 }
 
-export class FHTMLElement implements FElement{
+type FHTMLElementChidren = (FElement | Router | Route | State | Computed | string | number)[]
+export class FHTMLElement implements FElement {
   _id: string;
   name: keyof HTMLElementTagNameMap;
-  parent: FHTMLElement|FSVGElement;
+  parent: FHTMLElement | FSVGElement;
   states: State[] = [];
   computed: Computed[] = [];
   _children: FElement[];
@@ -57,25 +58,25 @@ export class FHTMLElement implements FElement{
   router: Router | null = null
   routes: Route[] | null = null;
 
-  constructor(name: keyof HTMLElementTagNameMap, children?: (FElement|Router|Route|State|Computed) [] | string) {
+  constructor(name: keyof HTMLElementTagNameMap, children?: FHTMLElementChidren) {
     this._id = crypto.randomUUID()
     this.name = name
     if (Array.isArray(children)) {
       this._children = []
-      for (let i =0; i< children.length; i++) {
+      for (let i = 0; i < children.length; i++) {
         let child = children[i]
         if (child instanceof State || child instanceof Computed) {
           this._children.push(new FText("{}", child as State))
           child.setElement(this)
           this.states.push(child as State)
-        } else if(child instanceof Router) {
-          if(this.router){
+        } else if (child instanceof Router) {
+          if (this.router) {
             throw Error("Cannot have multiple routers in the same element tree.")
           } else {
             child.parent = this
             child.index = i
             this.router = child
-            for(let route of this.router.routes){
+            for (let route of this.router.routes) {
               route.parent = this
               route.index = i
             }
@@ -83,12 +84,15 @@ export class FHTMLElement implements FElement{
         } else if (child instanceof Route) {
           child.parent = this
           child.index = i
-          if(!Array.isArray(this.routes))
+          if (!Array.isArray(this.routes))
             this.routes = []
           this.routes.push(child)
-        } else if(child instanceof FHTMLElement || child instanceof FSVGElement || child instanceof FText){
+        } else if (child instanceof FHTMLElement || child instanceof FSVGElement || child instanceof FText) {
           (child as FElement).parent = this
           this._children.push(child)
+        } else if (typeof child == "string" || typeof child == "number") {
+          let textContent = new FText(child.toString())
+          this._children.push(textContent)
         }
       }
     } else {
@@ -163,10 +167,10 @@ export class FHTMLElement implements FElement{
   }
 }
 
-export class FSVGElement implements FElement{
+export class FSVGElement implements FElement {
   _id: string;
   name: keyof SVGElementTagNameMap;
-  parent: FSVGElement|FHTMLElement;
+  parent: FSVGElement | FHTMLElement;
   states: State[] = [];
   _children: FElement[];
   _style: CssStyle | null;

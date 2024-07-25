@@ -16,45 +16,41 @@ export function toCssString(style: CssStyle) {
 }
 
 export function flattenElementTree(element: FElement, acc?: FElement[]): FElement[] {
-  //if(acc){
-  //  let lastElementParent = element;
-  //  let i = 1;
-  //  let nextElementParentIndex = acc.findIndex(e=>e._id == element._id)+i
-  //  let nextElementParent: FElement;
-  //  while( nextElementParentIndex < acc.length ){
-  //    nextElementParent = acc[nextElementParentIndex]
-  //    if(nextElementParent instanceof FSVGElement || nextElementParent instanceof FHTMLElement){
-  //      if(nextElementParent._children.length!=0){
-  //        nextElementParent = acc[nextElementParentIndex]
-  //        break;
-  //      }else{
-  //        continue;
-  //      }
-  //    }
-  //    i++;
-  //    nextElementParentIndex = acc.findIndex(e=>e._id == element._id)+i
-  //  }
-  //  if(nextElementParent){
-  //    acc = [...acc, ...(nextElementParent as  FHTMLElement | FSVGElement)._children]
-  //    return flattenElementTree(nextElementParent, acc)
-  //  }else{
-  //    return acc
-  //  }
-  //}else{
-  //  let accumulator = [];
-  //  if(element instanceof FHTMLElement || element instanceof FSVGElement){
-  //    if(element._children.length>0){
-  //      accumulator = [element, ...element._children]
-  //      return flattenElementTree(element, accumulator)
-  //    }else {
-  //      accumulator = [element]
-  //      return accumulator
-  //    }
-  //  }else{
-  //    accumulator = [element]
-  //    return accumulator
-  //  }
-  //}
+  if(acc){
+    let lastElementParent = element;
+    let i = 1;
+    let nextElementParentIndex = acc.findIndex(e=>e._id == element._id)+i
+    let nextElementParent: FElement|null = null;
+    while( nextElementParentIndex < acc.length ){
+      nextElementParent = acc[nextElementParentIndex]
+      if(nextElementParent instanceof FSVGElement || nextElementParent instanceof FHTMLElement){
+        if(nextElementParent._children.length!=0){
+          nextElementParent = acc[nextElementParentIndex]
+          acc = [...acc, ...(nextElementParent as  FHTMLElement | FSVGElement)._children]
+          return flattenElementTree(nextElementParent, acc)
+        }else{
+          continue;
+        }
+      }
+      i++;
+      nextElementParentIndex = acc.findIndex(e=>e._id == element._id)+i
+    }
+    return acc
+  }else{
+    let accumulator = [];
+    if(element instanceof FHTMLElement || element instanceof FSVGElement){
+      if(element._children.length>0){
+        accumulator = [element, ...element._children]
+        return flattenElementTree(element, accumulator)
+      }else {
+        accumulator = [element]
+        return accumulator
+      }
+    }else{
+      accumulator = [element]
+      return accumulator
+    }
+  }
   return []
 }
 

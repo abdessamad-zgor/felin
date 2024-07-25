@@ -92,6 +92,7 @@ export class Router {
         }
       }
     }
+    console.log(this)
     return this
   }
 }
@@ -104,12 +105,9 @@ export class Route {
   parent?: FHTMLElement
   children?: Route[] = []
 
-  constructor(path: string, element: FElement, parentRoute?: Route){
+  constructor(path: string, element: FElement){
     this.path = path
     this.element = element
-    if(parentRoute){
-      this.parentRoute = parentRoute
-    }
   }
 }
 

@@ -91,8 +91,9 @@ export class Registry {
 
   registerFlDocumentRoot(root: string, document: FDocument) {
     if (!Object.keys(this.register).includes(root)) {
-      this.register[root].document = document
+      this.register[root] = {} as DocumentRegister
     }
+    this.register[root].document = document
   }
 
   run() {
@@ -117,14 +118,14 @@ export class Registry {
 
   registerActiveRouter(rootSelector: string, router: Router) {
     if (!Object.keys(this.register).includes(rootSelector)) {
-      this.register[rootSelector].router = router
-      this.registerRouteChange(window.location.href.slice(window.location.host.length + window.location.protocol.length + 2), rootSelector)
+      this.register[rootSelector] = {} as DocumentRegister
     }
+    this.register[rootSelector].router = router
+    this.registerRouteChange(window.location.href.slice(window.location.host.length + window.location.protocol.length + 2), rootSelector)
   }
 
   registerRouteChange(path: string, rootSelector: string) {
     let args = { path, router: this.register[rootSelector].router, document: this.register[rootSelector].document }
-    console.log(args)
     let routeChangeTask = new RouteChange(args)
     this.stack.push(routeChangeTask)
   }

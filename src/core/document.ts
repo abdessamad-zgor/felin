@@ -18,22 +18,22 @@ export class FDocument {
   }
 
   render(selector: string, element: FHTMLElement) {
-    console.log(12233)
     if (this.document instanceof Document) {
       let target = this.document.querySelector(selector)
       this.rootSelector = selector;
       this.rootElement = element;
       if (target instanceof HTMLElement || element instanceof Node) {
         let router = this.hasRouter(element)
-        if(router){
-          router.buildRouterTree()
-          Felin.registerActiveRouter(this.rootSelector, router)
-        }
         let domElementRoot = element.element()
+        console.log(domElementRoot)
         let states = this.getStates(element)
         target.appendChild(domElementRoot)
         Felin.registerFlDocumentRoot(selector, this)
         Felin.registerStates(selector, states)
+        if(router){
+          router.buildRouterTree()
+          Felin.registerActiveRouter(this.rootSelector, router)
+        }
         Felin.run()
       } else
         throw Error("FelinError: no element found with selector " + selector)
@@ -64,7 +64,6 @@ export class FDocument {
   }
 
   hasRouter(element: FElement){
-    console.log(element)
     let router: Router|null = null
     let elementTreeList = flattenElementTree(element)
     elementTreeList.forEach(el=>{
