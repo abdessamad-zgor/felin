@@ -92,7 +92,6 @@ export class RouteChange implements Task {
       routeParent._children.splice(activeRoute.index, 0, activeRoute.element)
     }
     let routesParentNodes = activeRoutes.map(route=>route.parent)
-    console.log(routesParentNodes)
     for(let targetNode of routesParentNodes){
       this.args.document.rerenderElement(targetNode)
     }

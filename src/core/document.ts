@@ -25,7 +25,6 @@ export class FDocument {
       if (target instanceof HTMLElement || element instanceof Node) {
         let router = this.hasRouter(element)
         let domElementRoot = element.element()
-        console.log(domElementRoot)
         let states = this.getStates(element)
         target.appendChild(domElementRoot)
         Felin.registerFlDocumentRoot(selector, this)
@@ -75,7 +74,6 @@ export class FDocument {
   }
 
   getStates(element: FElement){
-    console.log(element)
     let states: State[] = [];
     let elementTreeList = flattenElementTree(element)
     for(let el of elementTreeList){

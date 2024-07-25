@@ -109,8 +109,6 @@ export class Registry {
 
   registerComputed(computed: Computed){
     let initTask = new InitComputedRegistry(computed)
-    console.log(initTask)
-    //this.stack.push(initTask)
     setTimeout(() => {
       this.stack.push(initTask)
     }, 1000);

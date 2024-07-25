@@ -21,8 +21,6 @@ export class Router {
   }
 
   matchRoute(path: string){
-    console.log(this.routes)
-    console.log(path)
     if(this.active.length>0){
       this.previous = [...this.active]
       this.active = []
@@ -36,6 +34,7 @@ export class Router {
       return;
     }
     let pathSegments = path.split('/').filter(s=>s!='')
+    console.log(pathSegments)
     let foundMatch: Route|undefined = undefined
     for(let i=0; i<pathSegments.length; i++){
       if(!foundMatch){
@@ -92,7 +91,6 @@ export class Router {
         }
       }
     }
-    console.log(this)
     return this
   }
 }
