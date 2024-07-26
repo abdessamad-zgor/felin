@@ -39,16 +39,15 @@ export class FDocument {
     }
   }
 
-  selector(element: FHTMLElement) {
-    let elementPath: FHTMLElement[] = []
+  selector(element: FHTMLElement|FSVGElement) {
+    let elementPath: (FHTMLElement|FSVGElement)[] = []
     let currentElement = element
     let selector = `${this.rootSelector}>${this.rootElement.name}`
     while (currentElement._id != this.rootElement._id) {
-      if (currentElement instanceof FHTMLElement) {
+      if (currentElement instanceof FHTMLElement || currentElement instanceof FSVGElement) {
         elementPath.push(currentElement)
       }
-      //@ts-ignore
-      currentElement = currentElement.parentNode
+      currentElement = currentElement.parent 
     }
     for (let pathElement of elementPath) {
       selector += `>${pathElement.name}`

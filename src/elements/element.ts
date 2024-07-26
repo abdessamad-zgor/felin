@@ -1,9 +1,10 @@
 import { Properties as CssStyle } from "csstype";
-import { FEvent } from "./event";
 import { State } from "../primitives/state";
 import { ExtensibleFunction, toCssString } from "../utils";
 import { Route, Router } from "../router";
 import { Computed } from "../primitives/computed";
+
+export type FEvent = Event | CustomEvent
 
 export interface FElement {
   _id: string,
