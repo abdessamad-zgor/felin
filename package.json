@@ -19,12 +19,10 @@
     "vitest": "^2.0.4"
   },
   "scripts": {
-    "build-dev": "tsc && esbuild ./src/felin.js --format=esm --platform=node --keep-names --bundle --outfile=./dist/felin.js",
     "build": "rm -rf .parcel-cache && parcel build",
-    "build-tsc": "tsc",
     "prepublish": "yarn run build",
     "pretest": "node ./src/elements/generate.js && npm run build && npm link && npm link felin",
-    "test": "vitest; parcel examples/cats-blog/index.html"
+    "test": "vitest",
   },
   "repository": {
     "type": "git",

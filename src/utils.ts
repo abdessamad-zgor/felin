@@ -1,6 +1,17 @@
 import { Properties as CssStyle } from "csstype";
 import { FElement, FHTMLElement, FSVGElement, FText } from "./elements/element";
 
+export enum ValueType {
+  NUMBER,
+  STRING,
+  BOOLEAN,
+  OBJECT,
+  MAP,
+  SET,
+  ARRAY,
+  ANY
+}
+
 export function toCssString(style: CssStyle) {
   let styleString = "";
   for (let property of Object.keys(style)) {
@@ -13,6 +24,41 @@ export function toCssString(style: CssStyle) {
     styleString += key.join('') + ": " + style[property] + ";"
   }
   return styleString
+}
+
+function isObjectLiteral(obj) {
+    if (typeof obj !== "object" || obj === null)
+        return false;
+
+    var hasOwnProp = Object.prototype.hasOwnProperty,
+    ObjProto = obj;
+
+    // get obj's Object constructor's prototype
+    while (Object.getPrototypeOf(ObjProto = Object.getPrototypeOf(ObjProto)) !== null);
+
+    return Object.getPrototypeOf(obj) === ObjProto;
+};
+
+export function determineValueType<T>(value: T){
+  if(typeof value == "string"){
+    return ValueType.STRING
+  }else if(typeof value == "number"){
+    return ValueType.NUMBER
+  }else if(typeof value == "boolean"){
+    return ValueType.BOOLEAN
+  }else if(Array.isArray(value)){
+    return ValueType.ARRAY
+  }else if(isObjectLiteral(value)){
+    return ValueType.OBJECT
+  }else {
+    return ValueType.ANY
+  }
+}
+
+export function getObjectMethods(obj){
+  let objectPrototype = obj.prototype
+  let methods = Object.getOwnPropertyNames(objectPrototype).filter(k=>typeof obj[k] == "function" && k!="constructor");
+  return methods
 }
 
 export function flattenElementTree(element: FElement, acc?: FElement[]): FElement[] {

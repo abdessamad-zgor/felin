@@ -3,31 +3,36 @@ import { State } from "../primitives/state";
 import { ExtensibleFunction, toCssString } from "../utils";
 import { Route, Router } from "../router";
 import { Computed } from "../primitives/computed";
+import { Conditional, Loop } from "../primitives/control-flow";
 
 export type FEvent = Event | CustomEvent
 
-export interface FElement {
+export interface FElement<Register = {}> {
   _id: string,
-  states: State[],
+  register: Register,
   parent?: FElement,
   element(): HTMLElement | SVGElement | Text
 }
 
-type FTextChildren = (State | string | number)[]
-export class FText implements FElement {
+type FTextChildren = (State | Computed | string | number)[]
+type FTextRegister = Partial<{states: State[], computed: Computed[]}>
+
+export class FText implements FElement<FTextRegister> {
   _id: string
-  states: State[] = [];
+  register: FTextRegister
   parent?: FHTMLElement | FSVGElement;
   text: string
 
   constructor(text: string, ...args: FTextChildren) {
     this._id = crypto.randomUUID()
+    this.register = {}
     if (args.length > 0)
       for (let arg of args) {
         if (arg instanceof State) {
           arg.setElement(this)
-          this.states.push(arg)
-          text = text.replace("{}", arg.value)
+          if(!this.register.states) this.register.states = []
+          this.register.states.push(arg)
+          text = text.replace("{}", arg())
           continue;
         }
         text = text.replace("{}", arg as string)
@@ -37,47 +42,52 @@ export class FText implements FElement {
 
   element() {
     let textContent = this.text
-    for (let state of this.states) {
+    for (let state of this.register.states) {
       textContent = textContent.replace("{}", state())
     }
     return document.createTextNode(textContent)
   }
 }
 
-type FHTMLElementChidren = (FElement | Router | Route | State | Computed | string | number)[]
-export class FHTMLElement implements FElement {
+type FHTMLElementChidren = (FElement | Router | Route | Conditional | Loop | State | Computed | string | number)[]
+type FHTMLElementRegister = Partial<{states: State[], computed: Computed[], router: Router, routes: Route[], conditionals: Conditional[], loops: Loop[]}>
+export class FHTMLElement implements FElement<FHTMLElementRegister> {
   _id: string;
   name: keyof HTMLElementTagNameMap;
   parent: FHTMLElement | FSVGElement;
-  states: State[] = [];
-  computed: Computed[] = [];
+  register: FHTMLElementRegister
   _children: FElement[];
   _style: CssStyle | null;
   _listeners: Map<keyof HTMLElementEventMap, (event: FEvent) => void>
   _classname: string
   _attributes: { [attr: string]: any }
-  router: Router | null = null
-  routes: Route[] | null = null;
 
   constructor(name: keyof HTMLElementTagNameMap, children?: FHTMLElementChidren) {
     this._id = crypto.randomUUID()
     this.name = name
+    this.register = {}
     if (Array.isArray(children)) {
       this._children = []
       for (let i = 0; i < children.length; i++) {
         let child = children[i]
-        if (child instanceof State || child instanceof Computed) {
+        if (child instanceof State) {
           this._children.push(new FText("{}", child as State))
           child.setElement(this)
-          this.states.push(child as State)
+          if(!this.register.states) this.register.states = []
+          this.register.states.push(child)
+        } else if(child instanceof Computed){
+          this._children.push(new FText("{}", child as Computed))
+          child.setElement(this)
+          if(!this.register.computed) this.register.computed = []
+          this.register.computed.push(child)
         } else if (child instanceof Router) {
-          if (this.router) {
+          if (this.register.router) {
             throw Error("Cannot have multiple routers in the same element tree.")
           } else {
             child.parent = this
             child.index = i
-            this.router = child
-            for (let route of this.router.routes) {
+            this.register.router = child
+            for (let route of this.register.router.routes) {
               route.parent = this
               route.index = i
             }
@@ -85,9 +95,9 @@ export class FHTMLElement implements FElement {
         } else if (child instanceof Route) {
           child.parent = this
           child.index = i
-          if (!Array.isArray(this.routes))
-            this.routes = []
-          this.routes.push(child)
+          if (!Array.isArray(this.register.routes))
+            this.register.routes = []
+          this.register.routes.push(child)
         } else if (child instanceof FHTMLElement || child instanceof FSVGElement || child instanceof FText) {
           (child as FElement).parent = this
           this._children.push(child)
@@ -112,7 +122,7 @@ export class FHTMLElement implements FElement {
   children(children?: FElement[]) {
     for (let child of children) {
       if (child instanceof State || child instanceof Computed) {
-        let textContent = new FText("{}", child.value)
+        let textContent = new FText("{}", (child as ExtensibleFunction)())
         textContent.parent = this
         this._children.push(textContent)
       } else {
@@ -168,33 +178,43 @@ export class FHTMLElement implements FElement {
   }
 }
 
-export class FSVGElement implements FElement {
+type FSVGElementChildren = FHTMLElement | FSVGElement | FText | State | Computed | Conditional | string | number| Loop;
+type FSVGElementRegister = Partial<{states: State[], computed: Computed[], conditionals: Conditional[], loops: Loop[]}>;
+export class FSVGElement implements FElement<FSVGElementRegister> {
   _id: string;
   name: keyof SVGElementTagNameMap;
   parent: FSVGElement | FHTMLElement;
-  states: State[] = [];
+  register: FSVGElementRegister;
   _children: FElement[];
   _style: CssStyle | null;
   _listeners: Map<keyof SVGElementEventMap, (event: FEvent) => void>
   _classname: string
   _attributes: { [attr: string]: any }
 
-  constructor(name: keyof SVGElementTagNameMap, children?: FElement[], style?: CssStyle) {
+  constructor(name: keyof SVGElementTagNameMap, children?: FElement[]) {
     this._id = crypto.randomUUID();
     this.name = name;
-
+    this.register = {}
     this._children = []
     for (let child of children) {
-      if (child instanceof State || child instanceof Computed) {
-        let textContent = new FText("{}", child as State)
+      if (child instanceof State) {
+        let textContent = new FText("{}", child)
         textContent.parent = this
         this._children.push(textContent)
-        this.states.push(child as State)
+        if(!this.register.states) this.register.states = []
+        this.register.states.push(child)
+        this.register.states.push(child as State)
+      }else if (child instanceof Computed){
+        let textContent = new FText("{}", child)
+        textContent.parent = this
+        this._children.push(textContent)
+        if(!this.register.computed) this.register.computed = []
+        this.register.computed.push(child)
       } else {
         this._children.push(typeof child == "string" ? new FText(child) : child)
       }
     }
-    this._style = style || null
+    this._style = null
     this._listeners = new Map()
     this._attributes = {}
   }

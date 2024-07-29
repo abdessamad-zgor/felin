@@ -66,7 +66,7 @@ export class FDocument {
     let elementTreeList = flattenElementTree(element)
     elementTreeList.forEach(el=>{
       if(el instanceof FHTMLElement){
-        if(el.router) router = el.router
+        if(el.register.router) router = el.register.router
       }
     })
     return router
@@ -76,7 +76,7 @@ export class FDocument {
     let states: State[] = [];
     let elementTreeList = flattenElementTree(element)
     for(let el of elementTreeList){
-      states = [...states, ...el.states]
+      states = [...states, ...(el as FElement<{states: State[]}>).register.states]
     }
     let uniqueStates = [...new Set(states.map(e=>e._id))]
     states = uniqueStates.map(id=>states.find(s=>s._id == id))
