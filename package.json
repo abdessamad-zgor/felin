@@ -22,7 +22,7 @@
     "build": "rm -rf .parcel-cache && parcel build",
     "prepublish": "yarn run build",
     "pretest": "node ./src/elements/generate.js && npm run build && npm link && npm link felin",
-    "test": "vitest",
+    "test": "vitest"
   },
   "repository": {
     "type": "git",

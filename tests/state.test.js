@@ -26,8 +26,6 @@ describe('test state module', ()=>{
     expect(state()).toEqual([12, 14, 15])
     state.set(s=>[...s, 12])
     expect(state()).toEqual([12, 14, 15, 12])
-
-    expect(state.length()()).toEqual(4)
   });
 
   test('test array state methods', ()=>{

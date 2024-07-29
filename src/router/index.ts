@@ -79,11 +79,11 @@ export class Router {
     for(let route of this.routes){
       let element = route.element
       if(element instanceof FHTMLElement){
-        if(element.router){
+        if(element.register.router){
           throw Error("Cannot have nested routers inside the same element tree");
         } else {
-          if(element.routes && element.routes.length>0){
-            for(let childRoute of element.routes){
+          if(element.register.routes && element.register.routes.length>0){
+            for(let childRoute of element.register.routes){
               childRoute.parentRoute = route
               route.children.push(childRoute)
             }
