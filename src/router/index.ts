@@ -1,6 +1,5 @@
 import { FElement, FHTMLElement } from "../elements/element"
 
-export type Component<T={}> = (props: T)=> FElement
 
 export type RouterTreeLocation = {router: Router, location: FHTMLElement}
 
@@ -72,7 +71,6 @@ export class Router {
         break;
       }
     }
-    console.log(this.active)
   }
 
   buildRouterTree(): Router {

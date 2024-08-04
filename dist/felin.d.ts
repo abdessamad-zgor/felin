@@ -2,352 +2,504 @@ import { Properties } from "csstype";
 declare class ExtensibleFunction extends Function {
     constructor(f: any);
 }
-type StateTypeMutation<StateType> = StateType extends {
+type FStateMutation<FState> = FState extends {
     [key: string]: any;
-} | any[] ? (state: StateType | Partial<StateType>) => StateType | Partial<StateType> : (state: StateType) => StateType;
-interface FlStateType<T = any> {
-    value: T | Partial<T>;
+} | any[] ? (state: FState | Partial<FState>) => FState | Partial<FState> : (state: FState) => FState;
+interface FState<T = any> {
+    state: StateType<T>;
     _id: string;
     parent?: ParentState;
-    set: (fnOrState: StateTypeMutation<T> | T, child?: FlState<T>) => void;
+    set: (fnOrState: FStateMutation<T> | T, child?: State<T>) => void;
 }
 type ParentState = {
-    state: FlStateType;
+    state: FState;
     key: string;
 };
-declare class FlState<T = any> extends ExtensibleFunction implements FlStateType<T> {
+type StateType<T = any> = (FNumber | FArray | FObject | FBoolean | FString) & ExtensibleFunction;
+export class State<T = any> extends ExtensibleFunction implements FState<T> {
     _id: string;
-    value: T | Partial<T>;
+    state: StateType<T>;
     parent?: ParentState;
-    constructor(value: T | Partial<T>, parent?: ParentState);
-    set(fnOrState: StateTypeMutation<T> | T, child?: FlState<T>): void;
+    elements: FElement[];
+    constructor(value: T, parent?: ParentState);
+    set(fnOrState: FStateMutation<T> | T, child?: State<T>): void;
+    setElement(element: FElement): void;
 }
-type FlEvent = Event | CustomEvent;
-type FlComponent<T = {}> = (props: T) => FlElement;
-declare class FlRouter {
-    routes: FlRoute[];
+export class FArray<T = any> extends ExtensibleFunction {
+    value: Array<T>;
+    parent?: State<T>;
+    constructor(value: T[]);
+    map(): void;
+    filter(): void;
+    reduce(): void;
+    find(): void;
+    every(): void;
+    some(): void;
+}
+export class FBoolean extends ExtensibleFunction {
+    value: boolean;
+    constructor(value: boolean);
+}
+export class FObject<T extends {
+    [key: string]: any;
+} = {}> extends ExtensibleFunction {
+    value: T;
+    parent?: State<T>;
+    constructor(value: T);
+    keys(): Computed;
+    values(): Computed;
+    has(key: string): Computed;
+}
+export class FString extends ExtensibleFunction {
+    value: string;
+    parent?: State;
+    constructor(value: string);
+}
+export class FNumber extends ExtensibleFunction {
+    value: number;
+    parent?: State;
+    constructor(value: number);
+    gt(cmp: number): Computed;
+    gte(cmp: number): Computed;
+    lt(cmp: number): Computed;
+    lte(cmp: number): Computed;
+    eq(cmp: number): Computed;
+}
+export type RouterTreeLocation = {
+    router: Router;
+    location: FHTMLElement;
+};
+export class Router {
+    routes: Route[];
     index?: number;
-    active: FlRoute[];
-    previous: FlRoute[];
-    history: FlRoute[];
-    parentNode?: FlHTMLElement;
+    active: Route[];
+    previous: Route[];
+    history: Route[];
+    parent?: FHTMLElement;
     params: {
         [key: string]: string | number;
     };
-    constructor(...routes: FlRoute[]);
+    constructor(...routes: Route[]);
     matchRoute(path: string): void;
-    buildRouterTree(): FlRouter;
+    buildRouterTree(): Router;
 }
-declare class FlRoute {
+export class Route {
     path: string;
     index?: number;
-    component: FlComponent;
-    parentRoute?: FlRoute;
-    parentNode?: FlHTMLElement;
-    children?: FlRoute[];
-    constructor(path: string, component: FlComponent, parent?: FlRoute);
+    element: FElement;
+    parentRoute?: Route;
+    parent?: FHTMLElement;
+    children?: Route[];
+    constructor(path: string, element: FElement);
 }
-declare class FlTextNode<T extends any[]> {
-    id: string;
-    stateCalls: FlState[];
-    parentNode?: FlHTMLElement | FlSVGElement;
+export class Conditional {
+    condition: () => boolean;
+    _true: FElement;
+    _false: FElement;
+    parent?: FElement;
+    index: number;
+    constructor(condition: () => boolean, _true: FElement, _false: FElement);
+    element(parent?: FElement): HTMLElement | SVGElement | Text;
+}
+export class Loop<T = any> {
+    state: State<Array<T>>;
+    iteration: (element: T) => FElement;
+    index: number;
+    constructor(state: State, iteration: (element: T) => FElement);
+}
+export type FEvent = Event | CustomEvent;
+export interface FElement<Register = {}> {
+    _id: string;
+    register: Register;
+    parent?: FElement;
+    element(): HTMLElement | SVGElement | Text;
+}
+type FTextChildren = (State | Computed | string | number)[];
+type FTextRegister = Partial<{
+    states: State[];
+    computed: Computed[];
+}>;
+export class FText implements FElement<FTextRegister> {
+    _id: string;
+    register: FTextRegister;
+    parent?: FHTMLElement | FSVGElement;
     text: string;
-    constructor(text: string, ...args: T);
-    element(parent?: FlHTMLElement): Text;
-    getStateCalls(accumulator?: {
-        state: FlState;
-        element: FlElement;
-    }[]): {
-        state: FlState;
-        element: FlElement;
-    }[];
-    buildElementTree(parent?: FlHTMLElement | FlSVGElement): void;
+    constructor(text: string, ...args: FTextChildren);
+    element(): Text;
 }
-declare class FlHTMLElement {
-    id: string;
+type FHTMLElementChidren = (FElement | Router | Route | Conditional | Loop | State | Computed | string | number)[];
+type FHTMLElementRegister = Partial<{
+    states: State[];
+    computed: Computed[];
+    router: Router;
+    routes: Route[];
+    conditionals: Conditional[];
+    loops: Loop[];
+}>;
+export class FHTMLElement implements FElement<FHTMLElementRegister> {
+    _id: string;
     name: keyof HTMLElementTagNameMap;
-    parentNode: FlHTMLElement | FlSVGElement;
-    stateCalls: FlState[];
-    $children: FlElement[];
-    $style: Properties | null;
-    $listeners: Map<keyof HTMLElementEventMap, (event: FlEvent) => void>;
-    $classname: string;
-    $attributes: {
+    parent: FHTMLElement | FSVGElement;
+    register: FHTMLElementRegister;
+    _children: FElement[];
+    _style: Properties | null;
+    _listeners: Map<keyof HTMLElementEventMap, (event: FEvent) => void>;
+    _classname: string;
+    _attributes: {
         [attr: string]: any;
     };
-    router: FlRouter | null;
-    routes: FlRoute[] | null;
-    constructor(name: keyof HTMLElementTagNameMap, children?: (FlElement | string)[] | string, style?: Properties);
+    constructor(name: keyof HTMLElementTagNameMap, children?: FHTMLElementChidren);
     style(style: Properties): this;
-    children(children?: FlElement[]): this | FlElement[];
-    getStateCalls(accumulator?: {
-        state: FlState;
-        element: FlElement;
-    }[]): {
-        state: FlState;
-        element: FlElement;
-    }[];
-    child(): this;
-    listen(eventname: keyof HTMLElementEventMap, callback: (event: FlEvent) => void): this;
+    children(children?: FElement[]): this;
+    listener(eventname: keyof HTMLElementEventMap, callback: (event: FEvent) => void): this;
     element(): HTMLElement;
-    buildElementTree(parent?: FlHTMLElement | FlSVGElement): void;
     class(classname: string): void;
     attr(name: string, value: any): void;
     attrs(attrs: {
         [attr: string]: any;
     }): void;
-    hasRouter(): FlRouter | undefined;
 }
-declare class FlSVGElement {
-    id: string;
+type FSVGElementRegister = Partial<{
+    states: State[];
+    computed: Computed[];
+    conditionals: Conditional[];
+    loops: Loop[];
+}>;
+export class FSVGElement implements FElement<FSVGElementRegister> {
+    _id: string;
     name: keyof SVGElementTagNameMap;
-    parentNode: FlSVGElement | FlHTMLElement;
-    stateCalls: FlState[];
-    $children: FlElement[];
-    $style: Properties | null;
-    $listeners: Map<keyof SVGElementEventMap, (event: FlEvent) => void>;
-    $classname: string;
-    $attributes: {
+    parent: FSVGElement | FHTMLElement;
+    register: FSVGElementRegister;
+    _children: FElement[];
+    _style: Properties | null;
+    _listeners: Map<keyof SVGElementEventMap, (event: FEvent) => void>;
+    _classname: string;
+    _attributes: {
         [attr: string]: any;
     };
-    constructor(name: keyof SVGElementTagNameMap, children?: FlElement[], style?: Properties);
+    constructor(name: keyof SVGElementTagNameMap, children?: FElement[]);
     style(style: Properties): this;
-    children(children?: FlElement[]): this | FlElement[];
-    getStateCalls(accumulator?: {
-        state: FlState;
-        element: FlElement;
-    }[]): {
-        state: FlState;
-        element: FlElement;
-    }[];
-    child(): this;
-    listen(eventname: keyof SVGElementEventMap, callback: (event: FlEvent) => void): this;
-    element(parent?: FlSVGElement): SVGElement;
+    children(children?: FElement[]): this;
+    listener(eventname: keyof SVGElementEventMap, callback: (event: FEvent) => void): this;
+    element(parent?: FSVGElement): SVGElement;
     class(classname: string): void;
     attr(name: string, value: any): void;
     attrs(attrs: {
         [attr: string]: any;
     }): void;
-    buildElementTree(parent?: FlHTMLElement | FlSVGElement): void;
 }
-type FlElement = FlTextNode<any[]> | FlHTMLElement | FlSVGElement;
-export class FlDocument {
+export class Computed extends ExtensibleFunction {
+    _id: string;
+    value: any;
+    fn: (...args: State[]) => any;
+    states: State[];
+    elements: FElement[];
+    constructor(fn: (...args: State[]) => any, ...states: State[]);
+    setElement(element: FElement): void;
+}
+export class FDocument {
     window: Window;
     document: Document;
     rootSelector: string;
-    rootElement: FlHTMLElement;
-    router?: FlRouter;
+    rootElement: FHTMLElement;
+    router?: Router;
     constructor();
-    render(selector: string, element: FlHTMLElement): void;
-    selector(element: FlHTMLElement): string;
-    rerenderElement(element: FlHTMLElement): void;
+    render(selector: string, element: FHTMLElement): void;
+    selector(element: FHTMLElement | FSVGElement): string;
+    rerenderElement(element: FHTMLElement): void;
+    hasRouter(element: FElement): Router;
+    getStates(element: FElement): State<any>[];
 }
-declare class FlEffect extends ExtensibleFunction {
+export class Effect {
     _id: string;
-    effect: (...args: FlState<any>[]) => void;
-    dependants: FlState[];
-    constructor(fn: (...args: FlState[]) => void);
+    effect: () => void;
+    states: State[];
+    constructor(fn: () => void, ...states: State[]);
 }
-declare class FlComputed extends ExtensibleFunction {
-    _id: string;
-    value: any;
-    fn: (...args: FlState[]) => any;
-    states: FlState[];
-    constructor(fn: (...args: FlState[]) => any, ...states: FlState[]);
+export interface Task<A = {
+    [key: string]: any;
+}, R = void> {
+    priority: number;
+    args: A;
+    call(): R;
 }
-export const a: (...children: FlElement[]) => FlElement;
-export const abbr: (...children: FlElement[]) => FlElement;
-export const address: (...children: FlElement[]) => FlElement;
-export const area: (...children: FlElement[]) => FlElement;
-export const article: (...children: FlElement[]) => FlElement;
-export const aside: (...children: FlElement[]) => FlElement;
-export const audio: (...children: FlElement[]) => FlElement;
-export const b: (...children: FlElement[]) => FlElement;
-export const base: (...children: FlElement[]) => FlElement;
-export const bdi: (...children: FlElement[]) => FlElement;
-export const bdo: (...children: FlElement[]) => FlElement;
-export const blockquote: (...children: FlElement[]) => FlElement;
-export const body: (...children: FlElement[]) => FlElement;
-export const br: (...children: FlElement[]) => FlElement;
-export const button: (...children: FlElement[]) => FlElement;
-export const canvas: (...children: FlElement[]) => FlElement;
-export const caption: (...children: FlElement[]) => FlElement;
-export const cite: (...children: FlElement[]) => FlElement;
-export const code: (...children: FlElement[]) => FlElement;
-export const col: (...children: FlElement[]) => FlElement;
-export const colgroup: (...children: FlElement[]) => FlElement;
-export const data: (...children: FlElement[]) => FlElement;
-export const datalist: (...children: FlElement[]) => FlElement;
-export const dd: (...children: FlElement[]) => FlElement;
-export const del: (...children: FlElement[]) => FlElement;
-export const details: (...children: FlElement[]) => FlElement;
-export const dfn: (...children: FlElement[]) => FlElement;
-export const dialog: (...children: FlElement[]) => FlElement;
-export const div: (...children: FlElement[]) => FlElement;
-export const dl: (...children: FlElement[]) => FlElement;
-export const dt: (...children: FlElement[]) => FlElement;
-export const em: (...children: FlElement[]) => FlElement;
-export const embed: (...children: FlElement[]) => FlElement;
-export const fieldset: (...children: FlElement[]) => FlElement;
-export const figcaption: (...children: FlElement[]) => FlElement;
-export const figure: (...children: FlElement[]) => FlElement;
-export const footer: (...children: FlElement[]) => FlElement;
-export const form: (...children: FlElement[]) => FlElement;
-export const h1: (...children: FlElement[]) => FlElement;
-export const h2: (...children: FlElement[]) => FlElement;
-export const h3: (...children: FlElement[]) => FlElement;
-export const h4: (...children: FlElement[]) => FlElement;
-export const h5: (...children: FlElement[]) => FlElement;
-export const h6: (...children: FlElement[]) => FlElement;
-export const head: (...children: FlElement[]) => FlElement;
-export const header: (...children: FlElement[]) => FlElement;
-export const hgroup: (...children: FlElement[]) => FlElement;
-export const hr: (...children: FlElement[]) => FlElement;
-export const html: (...children: FlElement[]) => FlElement;
-export const i: (...children: FlElement[]) => FlElement;
-export const iframe: (...children: FlElement[]) => FlElement;
-export const img: (...children: FlElement[]) => FlElement;
-export const input: (...children: FlElement[]) => FlElement;
-export const ins: (...children: FlElement[]) => FlElement;
-export const kbd: (...children: FlElement[]) => FlElement;
-export const label: (...children: FlElement[]) => FlElement;
-export const legend: (...children: FlElement[]) => FlElement;
-export const li: (...children: FlElement[]) => FlElement;
-export const link: (...children: FlElement[]) => FlElement;
-export const main: (...children: FlElement[]) => FlElement;
-export const map: (...children: FlElement[]) => FlElement;
-export const mark: (...children: FlElement[]) => FlElement;
-export const menu: (...children: FlElement[]) => FlElement;
-export const meta: (...children: FlElement[]) => FlElement;
-export const meter: (...children: FlElement[]) => FlElement;
-export const nav: (...children: FlElement[]) => FlElement;
-export const noscript: (...children: FlElement[]) => FlElement;
-export const object: (...children: FlElement[]) => FlElement;
-export const ol: (...children: FlElement[]) => FlElement;
-export const optgroup: (...children: FlElement[]) => FlElement;
-export const option: (...children: FlElement[]) => FlElement;
-export const output: (...children: FlElement[]) => FlElement;
-export const p: (...children: FlElement[]) => FlElement;
-export const picture: (...children: FlElement[]) => FlElement;
-export const pre: (...children: FlElement[]) => FlElement;
-export const progress: (...children: FlElement[]) => FlElement;
-export const q: (...children: FlElement[]) => FlElement;
-export const rp: (...children: FlElement[]) => FlElement;
-export const rt: (...children: FlElement[]) => FlElement;
-export const ruby: (...children: FlElement[]) => FlElement;
-export const s: (...children: FlElement[]) => FlElement;
-export const samp: (...children: FlElement[]) => FlElement;
-export const search: (...children: FlElement[]) => FlElement;
-export const section: (...children: FlElement[]) => FlElement;
-export const select: (...children: FlElement[]) => FlElement;
-export const slot: (...children: FlElement[]) => FlElement;
-export const small: (...children: FlElement[]) => FlElement;
-export const source: (...children: FlElement[]) => FlElement;
-export const span: (...children: FlElement[]) => FlElement;
-export const strong: (...children: FlElement[]) => FlElement;
-export const sub: (...children: FlElement[]) => FlElement;
-export const summary: (...children: FlElement[]) => FlElement;
-export const sup: (...children: FlElement[]) => FlElement;
-export const table: (...children: FlElement[]) => FlElement;
-export const tbody: (...children: FlElement[]) => FlElement;
-export const td: (...children: FlElement[]) => FlElement;
-export const template: (...children: FlElement[]) => FlElement;
-export const textarea: (...children: FlElement[]) => FlElement;
-export const tfoot: (...children: FlElement[]) => FlElement;
-export const th: (...children: FlElement[]) => FlElement;
-export const thead: (...children: FlElement[]) => FlElement;
-export const time: (...children: FlElement[]) => FlElement;
-export const title: (...children: FlElement[]) => FlElement;
-export const tr: (...children: FlElement[]) => FlElement;
-export const track: (...children: FlElement[]) => FlElement;
-export const u: (...children: FlElement[]) => FlElement;
-export const ul: (...children: FlElement[]) => FlElement;
-export const _var: (...children: FlElement[]) => FlElement;
-export const video: (...children: FlElement[]) => FlElement;
-export const wbr: (...children: FlElement[]) => FlElement;
-export const _a: (...children: FlElement[]) => FlElement;
-export const animate: (...children: FlElement[]) => FlElement;
-export const animateMotion: (...children: FlElement[]) => FlElement;
-export const animateTransform: (...children: FlElement[]) => FlElement;
-export const circle: (...children: FlElement[]) => FlElement;
-export const clipPath: (...children: FlElement[]) => FlElement;
-export const defs: (...children: FlElement[]) => FlElement;
-export const desc: (...children: FlElement[]) => FlElement;
-export const ellipse: (...children: FlElement[]) => FlElement;
-export const feBlend: (...children: FlElement[]) => FlElement;
-export const feColorMatrix: (...children: FlElement[]) => FlElement;
-export const feComponentTransfer: (...children: FlElement[]) => FlElement;
-export const feComposite: (...children: FlElement[]) => FlElement;
-export const feConvolveMatrix: (...children: FlElement[]) => FlElement;
-export const feDiffuseLighting: (...children: FlElement[]) => FlElement;
-export const feDisplacementMap: (...children: FlElement[]) => FlElement;
-export const feDistantLight: (...children: FlElement[]) => FlElement;
-export const feDropShadow: (...children: FlElement[]) => FlElement;
-export const feFlood: (...children: FlElement[]) => FlElement;
-export const feFuncA: (...children: FlElement[]) => FlElement;
-export const feFuncB: (...children: FlElement[]) => FlElement;
-export const feFuncG: (...children: FlElement[]) => FlElement;
-export const feFuncR: (...children: FlElement[]) => FlElement;
-export const feGaussianBlur: (...children: FlElement[]) => FlElement;
-export const feImage: (...children: FlElement[]) => FlElement;
-export const feMerge: (...children: FlElement[]) => FlElement;
-export const feMergeNode: (...children: FlElement[]) => FlElement;
-export const feMorphology: (...children: FlElement[]) => FlElement;
-export const feOffset: (...children: FlElement[]) => FlElement;
-export const fePointLight: (...children: FlElement[]) => FlElement;
-export const feSpecularLighting: (...children: FlElement[]) => FlElement;
-export const feSpotLight: (...children: FlElement[]) => FlElement;
-export const feTile: (...children: FlElement[]) => FlElement;
-export const feTurbulence: (...children: FlElement[]) => FlElement;
-export const filter: (...children: FlElement[]) => FlElement;
-export const foreignObject: (...children: FlElement[]) => FlElement;
-export const g: (...children: FlElement[]) => FlElement;
-export const image: (...children: FlElement[]) => FlElement;
-export const line: (...children: FlElement[]) => FlElement;
-export const linearGradient: (...children: FlElement[]) => FlElement;
-export const marker: (...children: FlElement[]) => FlElement;
-export const mask: (...children: FlElement[]) => FlElement;
-export const metadata: (...children: FlElement[]) => FlElement;
-export const mpath: (...children: FlElement[]) => FlElement;
-export const path: (...children: FlElement[]) => FlElement;
-export const pattern: (...children: FlElement[]) => FlElement;
-export const polygon: (...children: FlElement[]) => FlElement;
-export const polyline: (...children: FlElement[]) => FlElement;
-export const radialGradient: (...children: FlElement[]) => FlElement;
-export const rect: (...children: FlElement[]) => FlElement;
-export const set: (...children: FlElement[]) => FlElement;
-export const stop: (...children: FlElement[]) => FlElement;
-export const svg: (...children: FlElement[]) => FlElement;
-export const _switch: (...children: FlElement[]) => FlElement;
-export const symbol: (...children: FlElement[]) => FlElement;
-export const _text: (...children: FlElement[]) => FlElement;
-export const textPath: (...children: FlElement[]) => FlElement;
-export const _title: (...children: FlElement[]) => FlElement;
-export const tspan: (...children: FlElement[]) => FlElement;
-export const use: (...children: FlElement[]) => FlElement;
-export const view: (...children: FlElement[]) => FlElement;
-declare class FlConditional {
-    condition: () => boolean;
-    trueBranch: FlElement;
-    falseBranch: FlElement;
-    parent?: FlElement;
-    constructor(condition: () => boolean, trueBranch: FlElement, falseBranch: FlElement);
-    element(parent?: FlElement): Text | HTMLElement | SVGElement;
+type DOMUpdateArgs = {
+    state: State | Computed;
+    document: FDocument;
+};
+export class DOMUpdate implements Task<DOMUpdateArgs, void> {
+    priority: number;
+    args: DOMUpdateArgs;
+    constructor(args: DOMUpdateArgs);
+    call(): void;
 }
-declare class FlLoop<T = any> {
-    state: FlState<Array<T>>;
-    iteration: (element: T) => FlElement;
-    constructor(state: FlState, iteration: (element: T) => FlElement);
+export class ComputedRefresh implements Task<Computed, void> {
+    priority: number;
+    args: Computed;
+    constructor(args: Computed);
+    call(): void;
 }
-export function $text<T extends any[]>(text: string, ...args: T): FlTextNode<T>;
-export function $state<T>(value: T): FlState<T>;
-export function $effect(fn: (...args: FlState[]) => void): FlEffect;
-export function $computed(fn: (...args: FlState[]) => void, ...states: FlState[]): FlComputed;
-export function $router(...routes: FlRoute[]): FlRouter;
-export function $route(path: string, element: FlComponent<{}>): FlRoute;
+export class EffectCall implements Task {
+    priority: number;
+    args: Effect;
+    constructor(args: Effect);
+    call(): void;
+}
+type RouteChangeArgs = {
+    document: FDocument;
+    router: Router;
+    path: string;
+};
+export class RouteChange implements Task {
+    priority: number;
+    args: RouteChangeArgs;
+    constructor(args: RouteChangeArgs);
+    call(): void;
+}
+type InitEffectRegistryArgs = Effect;
+export class InitEffectRegistry implements Task {
+    priority: number;
+    args: InitEffectRegistryArgs;
+    constructor(args: InitEffectRegistryArgs);
+    call(): void;
+}
+type InitComputedRegistryArgs = Computed;
+export class InitComputedRegistry implements Task {
+    priority: number;
+    args: InitComputedRegistryArgs;
+    constructor(args: InitComputedRegistryArgs);
+    call(): void;
+}
+export class Stack {
+    tasks: Task[];
+    running: boolean;
+    constructor();
+    pop(): Task;
+    push(task: Task): void;
+    empty(): boolean;
+    run(): void;
+}
+type DocumentRegister = {
+    document: FDocument;
+    states: State[];
+    effects: Effect[];
+    computed: Computed[];
+    router: Router;
+};
+export class Registry {
+    stack: Stack;
+    register: {
+        [key: string]: DocumentRegister;
+    };
+    constructor();
+    initEffectRegistry(effect: Effect): void;
+    initComputedRegistry(computed: Computed): void;
+    registerStates(root: string, states: State[]): void;
+    registerStateUpdate(state: State): void;
+    registerFlDocumentRoot(root: string, document: FDocument): void;
+    run(): void;
+    registerEffect(effect: Effect): void;
+    registerComputed(computed: Computed): void;
+    registerActiveRouter(rootSelector: string, router: Router): void;
+    registerRouteChange(path: string, rootSelector: string): void;
+    getElementRootSelector(element: FElement, parent?: FHTMLElement): string | boolean;
+    getRouterParams(): {
+        [key: string]: string | number;
+    };
+}
+export const Felin: Registry;
+export class Component<T extends {
+    [key: string]: any;
+}> extends ExtensibleFunction {
+    fn: (props: T) => FElement;
+    props: T;
+    parentNode?: FElement;
+    constructor(fn: (props: T) => FElement);
+    element(parent?: FElement): HTMLElement | SVGElement | Text;
+}
+export const a: (...children: FElement[]) => FElement;
+export const abbr: (...children: FElement[]) => FElement;
+export const address: (...children: FElement[]) => FElement;
+export const area: (...children: FElement[]) => FElement;
+export const article: (...children: FElement[]) => FElement;
+export const aside: (...children: FElement[]) => FElement;
+export const audio: (...children: FElement[]) => FElement;
+export const b: (...children: FElement[]) => FElement;
+export const base: (...children: FElement[]) => FElement;
+export const bdi: (...children: FElement[]) => FElement;
+export const bdo: (...children: FElement[]) => FElement;
+export const blockquote: (...children: FElement[]) => FElement;
+export const body: (...children: FElement[]) => FElement;
+export const br: (...children: FElement[]) => FElement;
+export const button: (...children: FElement[]) => FElement;
+export const canvas: (...children: FElement[]) => FElement;
+export const caption: (...children: FElement[]) => FElement;
+export const cite: (...children: FElement[]) => FElement;
+export const code: (...children: FElement[]) => FElement;
+export const col: (...children: FElement[]) => FElement;
+export const colgroup: (...children: FElement[]) => FElement;
+export const data: (...children: FElement[]) => FElement;
+export const datalist: (...children: FElement[]) => FElement;
+export const dd: (...children: FElement[]) => FElement;
+export const del: (...children: FElement[]) => FElement;
+export const details: (...children: FElement[]) => FElement;
+export const dfn: (...children: FElement[]) => FElement;
+export const dialog: (...children: FElement[]) => FElement;
+export const div: (...children: FElement[]) => FElement;
+export const dl: (...children: FElement[]) => FElement;
+export const dt: (...children: FElement[]) => FElement;
+export const em: (...children: FElement[]) => FElement;
+export const embed: (...children: FElement[]) => FElement;
+export const fieldset: (...children: FElement[]) => FElement;
+export const figcaption: (...children: FElement[]) => FElement;
+export const figure: (...children: FElement[]) => FElement;
+export const footer: (...children: FElement[]) => FElement;
+export const form: (...children: FElement[]) => FElement;
+export const h1: (...children: FElement[]) => FElement;
+export const h2: (...children: FElement[]) => FElement;
+export const h3: (...children: FElement[]) => FElement;
+export const h4: (...children: FElement[]) => FElement;
+export const h5: (...children: FElement[]) => FElement;
+export const h6: (...children: FElement[]) => FElement;
+export const head: (...children: FElement[]) => FElement;
+export const header: (...children: FElement[]) => FElement;
+export const hgroup: (...children: FElement[]) => FElement;
+export const hr: (...children: FElement[]) => FElement;
+export const html: (...children: FElement[]) => FElement;
+export const i: (...children: FElement[]) => FElement;
+export const iframe: (...children: FElement[]) => FElement;
+export const img: (...children: FElement[]) => FElement;
+export const input: (...children: FElement[]) => FElement;
+export const ins: (...children: FElement[]) => FElement;
+export const kbd: (...children: FElement[]) => FElement;
+export const label: (...children: FElement[]) => FElement;
+export const legend: (...children: FElement[]) => FElement;
+export const li: (...children: FElement[]) => FElement;
+export const link: (...children: FElement[]) => FElement;
+export const main: (...children: FElement[]) => FElement;
+export const map: (...children: FElement[]) => FElement;
+export const mark: (...children: FElement[]) => FElement;
+export const menu: (...children: FElement[]) => FElement;
+export const meta: (...children: FElement[]) => FElement;
+export const meter: (...children: FElement[]) => FElement;
+export const nav: (...children: FElement[]) => FElement;
+export const noscript: (...children: FElement[]) => FElement;
+export const object: (...children: FElement[]) => FElement;
+export const ol: (...children: FElement[]) => FElement;
+export const optgroup: (...children: FElement[]) => FElement;
+export const option: (...children: FElement[]) => FElement;
+export const output: (...children: FElement[]) => FElement;
+export const p: (...children: FElement[]) => FElement;
+export const picture: (...children: FElement[]) => FElement;
+export const pre: (...children: FElement[]) => FElement;
+export const progress: (...children: FElement[]) => FElement;
+export const q: (...children: FElement[]) => FElement;
+export const rp: (...children: FElement[]) => FElement;
+export const rt: (...children: FElement[]) => FElement;
+export const ruby: (...children: FElement[]) => FElement;
+export const s: (...children: FElement[]) => FElement;
+export const samp: (...children: FElement[]) => FElement;
+export const search: (...children: FElement[]) => FElement;
+export const section: (...children: FElement[]) => FElement;
+export const select: (...children: FElement[]) => FElement;
+export const slot: (...children: FElement[]) => FElement;
+export const small: (...children: FElement[]) => FElement;
+export const source: (...children: FElement[]) => FElement;
+export const span: (...children: FElement[]) => FElement;
+export const strong: (...children: FElement[]) => FElement;
+export const sub: (...children: FElement[]) => FElement;
+export const summary: (...children: FElement[]) => FElement;
+export const sup: (...children: FElement[]) => FElement;
+export const table: (...children: FElement[]) => FElement;
+export const tbody: (...children: FElement[]) => FElement;
+export const td: (...children: FElement[]) => FElement;
+export const template: (...children: FElement[]) => FElement;
+export const textarea: (...children: FElement[]) => FElement;
+export const tfoot: (...children: FElement[]) => FElement;
+export const th: (...children: FElement[]) => FElement;
+export const thead: (...children: FElement[]) => FElement;
+export const time: (...children: FElement[]) => FElement;
+export const title: (...children: FElement[]) => FElement;
+export const tr: (...children: FElement[]) => FElement;
+export const track: (...children: FElement[]) => FElement;
+export const u: (...children: FElement[]) => FElement;
+export const ul: (...children: FElement[]) => FElement;
+export const _var: (...children: FElement[]) => FElement;
+export const video: (...children: FElement[]) => FElement;
+export const wbr: (...children: FElement[]) => FElement;
+export const _a: (...children: FElement[]) => FElement;
+export const animate: (...children: FElement[]) => FElement;
+export const animateMotion: (...children: FElement[]) => FElement;
+export const animateTransform: (...children: FElement[]) => FElement;
+export const circle: (...children: FElement[]) => FElement;
+export const clipPath: (...children: FElement[]) => FElement;
+export const defs: (...children: FElement[]) => FElement;
+export const desc: (...children: FElement[]) => FElement;
+export const ellipse: (...children: FElement[]) => FElement;
+export const feBlend: (...children: FElement[]) => FElement;
+export const feColorMatrix: (...children: FElement[]) => FElement;
+export const feComponentTransfer: (...children: FElement[]) => FElement;
+export const feComposite: (...children: FElement[]) => FElement;
+export const feConvolveMatrix: (...children: FElement[]) => FElement;
+export const feDiffuseLighting: (...children: FElement[]) => FElement;
+export const feDisplacementMap: (...children: FElement[]) => FElement;
+export const feDistantLight: (...children: FElement[]) => FElement;
+export const feDropShadow: (...children: FElement[]) => FElement;
+export const feFlood: (...children: FElement[]) => FElement;
+export const feFuncA: (...children: FElement[]) => FElement;
+export const feFuncB: (...children: FElement[]) => FElement;
+export const feFuncG: (...children: FElement[]) => FElement;
+export const feFuncR: (...children: FElement[]) => FElement;
+export const feGaussianBlur: (...children: FElement[]) => FElement;
+export const feImage: (...children: FElement[]) => FElement;
+export const feMerge: (...children: FElement[]) => FElement;
+export const feMergeNode: (...children: FElement[]) => FElement;
+export const feMorphology: (...children: FElement[]) => FElement;
+export const feOffset: (...children: FElement[]) => FElement;
+export const fePointLight: (...children: FElement[]) => FElement;
+export const feSpecularLighting: (...children: FElement[]) => FElement;
+export const feSpotLight: (...children: FElement[]) => FElement;
+export const feTile: (...children: FElement[]) => FElement;
+export const feTurbulence: (...children: FElement[]) => FElement;
+export const filter: (...children: FElement[]) => FElement;
+export const foreignObject: (...children: FElement[]) => FElement;
+export const g: (...children: FElement[]) => FElement;
+export const image: (...children: FElement[]) => FElement;
+export const line: (...children: FElement[]) => FElement;
+export const linearGradient: (...children: FElement[]) => FElement;
+export const marker: (...children: FElement[]) => FElement;
+export const mask: (...children: FElement[]) => FElement;
+export const metadata: (...children: FElement[]) => FElement;
+export const mpath: (...children: FElement[]) => FElement;
+export const path: (...children: FElement[]) => FElement;
+export const pattern: (...children: FElement[]) => FElement;
+export const polygon: (...children: FElement[]) => FElement;
+export const polyline: (...children: FElement[]) => FElement;
+export const radialGradient: (...children: FElement[]) => FElement;
+export const rect: (...children: FElement[]) => FElement;
+export const set: (...children: FElement[]) => FElement;
+export const stop: (...children: FElement[]) => FElement;
+export const svg: (...children: FElement[]) => FElement;
+export const _switch: (...children: FElement[]) => FElement;
+export const symbol: (...children: FElement[]) => FElement;
+export const _text: (...children: FElement[]) => FElement;
+export const textPath: (...children: FElement[]) => FElement;
+export const _title: (...children: FElement[]) => FElement;
+export const tspan: (...children: FElement[]) => FElement;
+export const use: (...children: FElement[]) => FElement;
+export const view: (...children: FElement[]) => FElement;
+export function $text(text: string, ...args: any[]): FText;
+export function $state<T>(value: T): State<T>;
+export function $effect(fn: () => void, ...states: State[]): void;
+export function $computed(fn: (...args: State[]) => void, ...states: State[]): Computed;
+export function $router(...routes: Route[]): Router;
+export function $route(path: string, element: FElement): Route;
 export function $params(): any;
-export function $link(path: string, element: FlElement | string): FlHTMLElement;
-export function $if(condition: () => boolean, trueBranch: FlElement, falseBranch: FlElement): FlConditional;
-export function $for<T>(state: FlState<Array<T>>, iteration: (element: T) => FlElement): FlLoop<T>;
+export function $document(): FDocument;
+export function $link(path: string, element: FElement | string): FHTMLElement;
+export function $if(condition: () => boolean, trueBranch: FElement, falseBranch: FElement): Conditional;
+export function $for<T>(state: State<Array<T>>, iteration: (element: T) => FElement): Loop<T>;
+export function $length<T>(state: State<Array<T>>): State<number>;
+export default Felin;
 
 //# sourceMappingURL=felin.d.ts.map

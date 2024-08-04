@@ -2,7 +2,7 @@ import { State } from "./primitives/state";
 import { Effect } from "./primitives/effect";
 import { Computed } from "./primitives/computed";
 import { Loop, Conditional } from "./primitives/control-flow";
-import { Component, Route, Router } from "./router";
+import { Route, Router } from "./router";
 import { FElement, FHTMLElement, FText } from "./elements/element";
 import { FDocument } from "./felin";
 

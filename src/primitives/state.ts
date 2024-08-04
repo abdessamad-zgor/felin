@@ -1,4 +1,3 @@
-import { throws } from "assert";
 import { FElement } from "../elements/element";
 import { ExtensibleFunction, ValueType, determineValueType, getObjectMethods } from "../utils"
 import { Computed } from "./computed";
@@ -57,53 +56,76 @@ export class State<T = any> extends ExtensibleFunction implements FState<T> {
         break;
     }
 
-    if(this.state instanceof FObject){
+    if (this.state instanceof FObject) {
       let handler: ProxyHandler<State<T>> = {
         get: (target: State<T>, prop: string, reciever) => {
-          if(getObjectMethods(target.state).includes(prop)){
+          if (prop == "value") {
             return target.state[prop]
-          }else if (!Object.keys(target()).includes(prop)) {
+          } else if (getObjectMethods(target.state).includes(prop)) {
+            return target.state[prop]
+          } else if (!Object.keys(target()).includes(prop)) {
             return Reflect.get(target, prop, reciever);
           } else {
             let value = target.state[prop];
-            let childState = new State<typeof value>(value, {state: this, key: prop});
+            let childState = new State<typeof value>(value, { state: this, key: prop });
             return childState;
           }
         }
       }
       return new Proxy(this, handler);
-    } else if(this.state instanceof FArray){
+    } else if (this.state instanceof FArray) {
       let handler: ProxyHandler<State<T>> = {
         get: (target: State<T>, prop: string, reciever) => {
-          if(getObjectMethods(target.state).includes(prop)){
+          if (prop == "value") {
             return target.state[prop]
-          }else if (!Object.keys(target()).includes(prop)) {
+          } else if (getObjectMethods(target.state).includes(prop)) {
+            return target.state[prop]
+          } else if (!Object.keys(target()).includes(prop)) {
             return Reflect.get(target, prop, reciever);
           } else {
             let value = target.state[prop];
-            let childState = new State<typeof value>(value, {state: this, key: prop});
+            let childState = new State<typeof value>(value, { state: this, key: prop });
             return childState;
           }
         }
       }
       return new Proxy(this, handler);
-    } else if(this.state instanceof FNumber){
+    } else if (this.state instanceof FNumber) {
       let handler: ProxyHandler<State<T>> = {
-        get: (target: State<T>, prop: string, reciever)=>{
-          if(getObjectMethods(target.state).includes(prop)){
+        get: (target: State<T>, prop: string, reciever) => {
+          if (prop == "value") {
             return target.state[prop]
-          }else if (!Object.keys(target()).includes(prop)){
+          } else if (getObjectMethods(target.state).includes(prop)) {
+            return target.state[prop]
+          } else if (!Object.keys(target()).includes(prop)) {
             return Reflect.get(target, prop, reciever)
           }
         }
       }
       return new Proxy(this, handler)
-    } 
-   // else if(this.state instanceof FString){
-
-   // } else if(this.state instanceof FBoolean){
-
-   // }
+    } else if (this.state instanceof FString) {
+      let handler: ProxyHandler<State<T>> = {
+        get: (target: State<T>, prop: string, reciever) => {
+          if (prop == "value") {
+            return target.state[prop]
+          } else {
+            return Reflect.get(target, prop, reciever)
+          }
+        }
+      }
+      return new Proxy(this, handler)
+    } else if (this.state instanceof FBoolean) {
+      let handler: ProxyHandler<State<T>> = {
+        get: (target: State<T>, prop: string, reciever) => {
+          if (prop == "value") {
+            return target.state[prop]
+          } else {
+            return Reflect.get(target, prop, reciever)
+          }
+        }
+      }
+      return new Proxy(this, handler)
+    }
   }
 
   set(fnOrState: FStateMutation<T> | T, child?: State<T>) {
@@ -132,22 +154,22 @@ export class State<T = any> extends ExtensibleFunction implements FState<T> {
     }
   }
 
-  setElement(element: FElement){
+  setElement(element: FElement) {
     this.elements.push(element)
   }
 }
 
-export class FArray<T = any> extends ExtensibleFunction{
+export class FArray<T = any> extends ExtensibleFunction {
   value: Array<T>
   parent?: State<T>
-  constructor(value: T[]){
-    super(()=>this.value)
+  constructor(value: T[]) {
+    super(() => this.value)
     this.value = value
     let handler: ProxyHandler<FArray<T>> = {
       get: (target: FArray<T>, prop: string, reciever) => {
-        if(getObjectMethods(target).includes(prop)){
+        if (getObjectMethods(target).includes(prop)) {
           return target[prop]
-        }else if (!Object.keys(target()).includes(prop)) {
+        } else if (!Object.keys(target()).includes(prop)) {
           return Reflect.get(target, prop, reciever);
         } else {
           let value = target.value[prop];
@@ -158,48 +180,48 @@ export class FArray<T = any> extends ExtensibleFunction{
     return new Proxy(this, handler);
   }
 
-  map(){
+  map() {
 
   }
 
-  filter(){
+  filter() {
 
   }
 
-  reduce(){
+  reduce() {
 
   }
 
-  find(){
+  find() {
 
   }
 
-  every(){
+  every() {
 
   }
 
-  some(){
+  some() {
 
   }
 }
 
-export class FBoolean extends ExtensibleFunction{
+export class FBoolean extends ExtensibleFunction {
   value: boolean
-  constructor(value: boolean){
-    super(()=>this.value)
+  constructor(value: boolean) {
+    super(() => this.value)
     this.value = value
   }
 }
 
-export class FObject<T extends {[key: string]: any} = {}> extends ExtensibleFunction {
+export class FObject<T extends { [key: string]: any } = {}> extends ExtensibleFunction {
   value: T
   parent?: State<T>
-  constructor(value: T){
-    super(()=>this.value)
+  constructor(value: T) {
+    super(() => this.value)
     this.value = value
     let handler = {
-      get: (target, prop, reciever)=>{
-        if(!Object.keys(target.value).includes(prop)){
+      get: (target, prop, reciever) => {
+        if (!Object.keys(target.value).includes(prop)) {
           return Reflect.get(target, prop, reciever)
         } else {
           let value = target.value[prop]
@@ -210,24 +232,24 @@ export class FObject<T extends {[key: string]: any} = {}> extends ExtensibleFunc
     return new Proxy(this, handler)
   }
 
-  keys(){
-    return new Computed(()=>Object.keys(this.value), this.parent)
+  keys() {
+    return new Computed(() => Object.keys(this.value), this.parent)
   }
 
-  values(){
-    return new Computed(()=>Object.values(this.value), this.parent)
+  values() {
+    return new Computed(() => Object.values(this.value), this.parent)
   }
 
-  has(key: string){
-    return new Computed(()=>Object.keys(this.value).includes(key), this.parent)
+  has(key: string) {
+    return new Computed(() => Object.keys(this.value).includes(key), this.parent)
   }
 }
 
 export class FString extends ExtensibleFunction {
   value: string
   parent?: State
-  constructor(value: string){
-    super(()=>this.value)
+  constructor(value: string) {
+    super(() => this.value)
     this.value = value
   }
 }
@@ -235,28 +257,28 @@ export class FString extends ExtensibleFunction {
 export class FNumber extends ExtensibleFunction {
   value: number
   parent?: State
-  constructor(value: number){
-    super(()=>this.value)
+  constructor(value: number) {
+    super(() => this.value)
     this.value = value
   }
 
-  gt(cmp: number){
-    return new Computed(()=>this.value > cmp, this.parent)
+  gt(cmp: number) {
+    return new Computed(() => this.value > cmp, this.parent)
   }
 
-  gte(cmp: number){
-    return new Computed(()=>this.value >= cmp, this.parent)
+  gte(cmp: number) {
+    return new Computed(() => this.value >= cmp, this.parent)
   }
 
-  lt(cmp: number){
-    return new Computed(()=>this.value < cmp, this.parent)
+  lt(cmp: number) {
+    return new Computed(() => this.value < cmp, this.parent)
   }
 
-  lte(cmp: number){
-    return new Computed(()=>this.value <= cmp, this.parent)
+  lte(cmp: number) {
+    return new Computed(() => this.value <= cmp, this.parent)
   }
 
-  eq(cmp: number){
-    return new Computed(()=>this.value == cmp, this.parent)
+  eq(cmp: number) {
+    return new Computed(() => this.value == cmp, this.parent)
   }
 }

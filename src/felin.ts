@@ -1,7 +1,9 @@
 import { Felin } from "./core/registry";
-window.Felin = Felin
+window.Felin = Felin;
 
-export * from "./elements/html";
-export * from "./elements/svg";
-export * from "./core/document";
+export default Felin 
+export * from "./primitives";
+export * from "./elements";
+export * from "./core";
 export * from "./helpers";
+export * from "./router"

@@ -14,6 +14,7 @@
     "@types/node": "^20.12.12",
     "csstype": "^3.1.3",
     "esbuild": "^0.23.0",
+    "jsdom": "^24.1.1",
     "parcel": "^2.12.0",
     "typescript": "^5.4.5",
     "vitest": "^2.0.4"
@@ -34,7 +35,10 @@
     "simple"
   ],
   "exports": {
-    ".": "./dist/felin.js"
+    ".": {
+      "types": "./dist/felin.d.ts",
+      "default": "./dist/felin.js"
+    }
   },
   "publishConfig": {
     "files": [
