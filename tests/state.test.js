@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
 import { describe, test, expect, vi } from "vitest";
-import  {Computed, State, $state} from "felin"
+import  {Computed, State, $state, getObjectMethods} from "felin"
 
 describe('test state module', ()=>{
   test('test number state', ()=>{
     let state = $state(12);
     expect(state()).toEqual(12)
+    console.log(getObjectMethods(state))
     state.set(13)
     expect(state()).toEqual(13)
     state.set(s=>s+1)
