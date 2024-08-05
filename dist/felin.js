@@ -119,6 +119,14 @@ $parcel$export($ac765eb06d4b9acd$exports, "FArray", () => $ac765eb06d4b9acd$expo
 $parcel$export($ac765eb06d4b9acd$exports, "FNumber", () => $ac765eb06d4b9acd$export$9dbc5f74ee206e8e);
 $parcel$export($ac765eb06d4b9acd$exports, "FString", () => $ac765eb06d4b9acd$export$7247fc7dfedd58fa);
 $parcel$export($ac765eb06d4b9acd$exports, "FBoolean", () => $ac765eb06d4b9acd$export$636e063718929b4a);
+var $fab42eb3dee39b5b$exports = {};
+
+$parcel$export($fab42eb3dee39b5b$exports, "ValueType", () => $fab42eb3dee39b5b$export$f1921b45c66f982c);
+$parcel$export($fab42eb3dee39b5b$exports, "toCssString", () => $fab42eb3dee39b5b$export$b108bf477f1767a9);
+$parcel$export($fab42eb3dee39b5b$exports, "determineValueType", () => $fab42eb3dee39b5b$export$aaa51b9a4e209041);
+$parcel$export($fab42eb3dee39b5b$exports, "getObjectMethods", () => $fab42eb3dee39b5b$export$7360f1dcbbc79d37);
+$parcel$export($fab42eb3dee39b5b$exports, "flattenElementTree", () => $fab42eb3dee39b5b$export$8c9c8540fba163fe);
+$parcel$export($fab42eb3dee39b5b$exports, "ExtensibleFunction", () => $fab42eb3dee39b5b$export$f38f450dbc1e989);
 
 var $fab42eb3dee39b5b$export$f1921b45c66f982c;
 (function(ValueType) {
@@ -241,25 +249,30 @@ class $af4ecce1f27713e1$export$836eee5a40e84ba8 extends (0, $fab42eb3dee39b5b$ex
 
 class $ac765eb06d4b9acd$export$7254cc27399e90bd extends (0, $fab42eb3dee39b5b$export$f38f450dbc1e989) {
     constructor(value, parent){
-        super(()=>this.state());
+        super(()=>this.state.value);
         this.elements = [];
         this._id = crypto.randomUUID();
         if (parent) this.parent = parent;
         switch((0, $fab42eb3dee39b5b$export$aaa51b9a4e209041)(value)){
             case (0, $fab42eb3dee39b5b$export$f1921b45c66f982c).OBJECT:
                 this.state = new $ac765eb06d4b9acd$export$d5e80676d91e78a1(value);
+                this.state.parent = this;
                 break;
             case (0, $fab42eb3dee39b5b$export$f1921b45c66f982c).ARRAY:
                 this.state = new $ac765eb06d4b9acd$export$822d777b86fe0aa4(value);
+                this.state.parent = this;
                 break;
             case (0, $fab42eb3dee39b5b$export$f1921b45c66f982c).NUMBER:
                 this.state = new $ac765eb06d4b9acd$export$9dbc5f74ee206e8e(value);
+                this.state.parent = this;
                 break;
             case (0, $fab42eb3dee39b5b$export$f1921b45c66f982c).STRING:
                 this.state = new $ac765eb06d4b9acd$export$7247fc7dfedd58fa(value);
+                this.state.parent = this;
                 break;
             case (0, $fab42eb3dee39b5b$export$f1921b45c66f982c).BOOLEAN:
                 this.state = new $ac765eb06d4b9acd$export$636e063718929b4a(value);
+                this.state.parent = this;
                 break;
             case (0, $fab42eb3dee39b5b$export$f1921b45c66f982c).ANY:
                 throw Error("Error: unsupported state data type.");
@@ -269,7 +282,7 @@ class $ac765eb06d4b9acd$export$7254cc27399e90bd extends (0, $fab42eb3dee39b5b$ex
         if (this.state instanceof $ac765eb06d4b9acd$export$d5e80676d91e78a1) {
             let handler = {
                 get: (target, prop, reciever)=>{
-                    if (prop == "value") return target.state[prop];
+                    if (prop == "set") return this.set;
                     else if ((0, $fab42eb3dee39b5b$export$7360f1dcbbc79d37)(target.state).includes(prop)) return target.state[prop];
                     else if (!Object.keys(target()).includes(prop)) return Reflect.get(target, prop, reciever);
                     else {
@@ -286,7 +299,7 @@ class $ac765eb06d4b9acd$export$7254cc27399e90bd extends (0, $fab42eb3dee39b5b$ex
         } else if (this.state instanceof $ac765eb06d4b9acd$export$822d777b86fe0aa4) {
             let handler = {
                 get: (target, prop, reciever)=>{
-                    if (prop == "value") return target.state[prop];
+                    if (prop == "set") return this.set;
                     else if ((0, $fab42eb3dee39b5b$export$7360f1dcbbc79d37)(target.state).includes(prop)) return target.state[prop];
                     else if (!Object.keys(target()).includes(prop)) return Reflect.get(target, prop, reciever);
                     else {
@@ -303,24 +316,8 @@ class $ac765eb06d4b9acd$export$7254cc27399e90bd extends (0, $fab42eb3dee39b5b$ex
         } else if (this.state instanceof $ac765eb06d4b9acd$export$9dbc5f74ee206e8e) {
             let handler = {
                 get: (target, prop, reciever)=>{
-                    if (prop == "value") return target.state[prop];
+                    if (prop == "set") return target.set;
                     else if ((0, $fab42eb3dee39b5b$export$7360f1dcbbc79d37)(target.state).includes(prop)) return target.state[prop];
-                    else if (!Object.keys(target()).includes(prop)) return Reflect.get(target, prop, reciever);
-                }
-            };
-            return new Proxy(this, handler);
-        } else if (this.state instanceof $ac765eb06d4b9acd$export$7247fc7dfedd58fa) {
-            let handler = {
-                get: (target, prop, reciever)=>{
-                    if (prop == "value") return target.state[prop];
-                    else return Reflect.get(target, prop, reciever);
-                }
-            };
-            return new Proxy(this, handler);
-        } else if (this.state instanceof $ac765eb06d4b9acd$export$636e063718929b4a) {
-            let handler = {
-                get: (target, prop, reciever)=>{
-                    if (prop == "value") return target.state[prop];
                     else return Reflect.get(target, prop, reciever);
                 }
             };
@@ -328,12 +325,12 @@ class $ac765eb06d4b9acd$export$7254cc27399e90bd extends (0, $fab42eb3dee39b5b$ex
         }
     }
     set(fnOrState, child) {
-        let newValue = this.state();
+        let newValue = this.state.value;
         if (child) {
-            for (let key of Object.keys(this.state()))if (key == child.parent.key) newValue[key] = child.state.value;
+            for (let key of Object.keys(this.state.value))if (key == child.parent.key) newValue[key] = child.state.value;
         }
         if (fnOrState) {
-            if (typeof fnOrState === "function") newValue = fnOrState(this.state());
+            if (typeof fnOrState === "function") newValue = fnOrState(this.state.value);
             else newValue = fnOrState;
             this.state.value = newValue;
         }
@@ -349,18 +346,16 @@ class $ac765eb06d4b9acd$export$7254cc27399e90bd extends (0, $fab42eb3dee39b5b$ex
         this.elements.push(element);
     }
 }
-class $ac765eb06d4b9acd$export$822d777b86fe0aa4 extends (0, $fab42eb3dee39b5b$export$f38f450dbc1e989) {
+class $ac765eb06d4b9acd$export$822d777b86fe0aa4 {
     constructor(value){
-        super(()=>this.value);
         this.value = value;
         let handler = {
             get: (target, prop, reciever)=>{
                 if ((0, $fab42eb3dee39b5b$export$7360f1dcbbc79d37)(target).includes(prop)) return target[prop];
-                else if (!Object.keys(target()).includes(prop)) return Reflect.get(target, prop, reciever);
-                else {
+                else if (Object.keys(target.value).includes(prop)) {
                     let value = target.value[prop];
                     return value;
-                }
+                } else return Reflect.get(target, prop, reciever);
             }
         };
         return new Proxy(this, handler);
@@ -372,15 +367,13 @@ class $ac765eb06d4b9acd$export$822d777b86fe0aa4 extends (0, $fab42eb3dee39b5b$ex
     every() {}
     some() {}
 }
-class $ac765eb06d4b9acd$export$636e063718929b4a extends (0, $fab42eb3dee39b5b$export$f38f450dbc1e989) {
+class $ac765eb06d4b9acd$export$636e063718929b4a {
     constructor(value){
-        super(()=>this.value);
         this.value = value;
     }
 }
-class $ac765eb06d4b9acd$export$d5e80676d91e78a1 extends (0, $fab42eb3dee39b5b$export$f38f450dbc1e989) {
+class $ac765eb06d4b9acd$export$d5e80676d91e78a1 {
     constructor(value){
-        super(()=>this.value);
         this.value = value;
         let handler = {
             get: (target, prop, reciever)=>{
@@ -403,15 +396,13 @@ class $ac765eb06d4b9acd$export$d5e80676d91e78a1 extends (0, $fab42eb3dee39b5b$ex
         return new (0, $af4ecce1f27713e1$export$836eee5a40e84ba8)(()=>Object.keys(this.value).includes(key), this.parent);
     }
 }
-class $ac765eb06d4b9acd$export$7247fc7dfedd58fa extends (0, $fab42eb3dee39b5b$export$f38f450dbc1e989) {
+class $ac765eb06d4b9acd$export$7247fc7dfedd58fa {
     constructor(value){
-        super(()=>this.value);
         this.value = value;
     }
 }
-class $ac765eb06d4b9acd$export$9dbc5f74ee206e8e extends (0, $fab42eb3dee39b5b$export$f38f450dbc1e989) {
+class $ac765eb06d4b9acd$export$9dbc5f74ee206e8e {
     constructor(value){
-        super(()=>this.value);
         this.value = value;
     }
     gt(cmp) {
@@ -1976,9 +1967,10 @@ function $e2e1ea6dd3b7d2e1$export$418b8c9bcbfeed78(state) {
 
 
 
+
 window.Felin = (0, $b9742d79d7b0a03e$export$76fb3b11e24d7138);
 var $4ea4497816ff7e86$export$2e2bcd8739ae039 = (0, $b9742d79d7b0a03e$export$76fb3b11e24d7138);
 
 
-export {$4ea4497816ff7e86$export$2e2bcd8739ae039 as default, $ac765eb06d4b9acd$export$7254cc27399e90bd as State, $ac765eb06d4b9acd$export$d5e80676d91e78a1 as FObject, $ac765eb06d4b9acd$export$822d777b86fe0aa4 as FArray, $ac765eb06d4b9acd$export$9dbc5f74ee206e8e as FNumber, $ac765eb06d4b9acd$export$7247fc7dfedd58fa as FString, $ac765eb06d4b9acd$export$636e063718929b4a as FBoolean, $e02ab9edca31aa60$export$a32b0b1c1ac59d04 as Effect, $d5b2a6f33979457b$export$2073789870570c87 as Conditional, $d5b2a6f33979457b$export$550acbd06a1f5a6a as Loop, $af4ecce1f27713e1$export$836eee5a40e84ba8 as Computed, $5828278ff3f63a5f$export$16fa2f45be04daa8 as Component, $07accdd0f6e0276a$export$44155b4e60576956 as FText, $07accdd0f6e0276a$export$5aca75b6aace7423 as FHTMLElement, $07accdd0f6e0276a$export$5290f40031d29a0b as FSVGElement, $d8604e77328e28ad$export$407448d2b89b1813 as a, $d8604e77328e28ad$export$2bcb785951133fe5 as abbr, $d8604e77328e28ad$export$f7d3c097ceca6c15 as address, $d8604e77328e28ad$export$bb3edc44842b5f2e as area, $d8604e77328e28ad$export$bba2aacf8566461b as article, $d8604e77328e28ad$export$64a02cd6422b91be as aside, $d8604e77328e28ad$export$592b77e6034db746 as audio, $d8604e77328e28ad$export$8b22cf2602fb60ce as b, $d8604e77328e28ad$export$e2253033e6e1df16 as base, $d8604e77328e28ad$export$2d20a4e9df674436 as bdi, $d8604e77328e28ad$export$fae0db89ef70aab2 as bdo, $d8604e77328e28ad$export$67dc04e652a298ca as blockquote, $d8604e77328e28ad$export$32180ef41b15b513 as body, $d8604e77328e28ad$export$479ac0420f53ed26 as br, $d8604e77328e28ad$export$2ba01fb71ed41cb6 as button, $d8604e77328e28ad$export$67ea982130081db as canvas, $d8604e77328e28ad$export$8e3c2dfdc4f0453d as caption, $d8604e77328e28ad$export$3035df57df42c31a as cite, $d8604e77328e28ad$export$6565f9f03506010b as code, $d8604e77328e28ad$export$aba86695643891f5 as col, $d8604e77328e28ad$export$3db318dd257cd653 as colgroup, $d8604e77328e28ad$export$4051a07651545597 as data, $d8604e77328e28ad$export$d6956b5f6d5ee87d as datalist, $d8604e77328e28ad$export$eaaeafa904fe3ddf as dd, $d8604e77328e28ad$export$1d2f21e549771e67 as del, $d8604e77328e28ad$export$41ee12f6f6f05843 as details, $d8604e77328e28ad$export$771f54d1a902afc9 as dfn, $d8604e77328e28ad$export$518824cf31321346 as dialog, $d8604e77328e28ad$export$159d9494db57879b as div, $d8604e77328e28ad$export$53d26b7a9a23d594 as dl, $d8604e77328e28ad$export$9198f9466fc833e as dt, $d8604e77328e28ad$export$c63c6f932822f543 as em, $d8604e77328e28ad$export$2be46bb7e96db87f as embed, $d8604e77328e28ad$export$a38812d1aa1302d9 as fieldset, $d8604e77328e28ad$export$b75acb72a9c69c26 as figcaption, $d8604e77328e28ad$export$991dc94f816a1d48 as figure, $d8604e77328e28ad$export$adb608be33961c98 as footer, $d8604e77328e28ad$export$6210fa4921d2a466 as form, $d8604e77328e28ad$export$448e4850cad7c7b0 as h1, $d8604e77328e28ad$export$a943aa9a0fca3f0b as h2, $d8604e77328e28ad$export$7edd4a21fac8ce55 as h3, $d8604e77328e28ad$export$51a85cc1b68f452c as h4, $d8604e77328e28ad$export$f44841a11990acb2 as h5, $d8604e77328e28ad$export$c9ccd321d64f47e3 as h6, $d8604e77328e28ad$export$5fd5031fecdacec3 as head, $d8604e77328e28ad$export$38e42c68cf43b5d4 as header, $d8604e77328e28ad$export$e7c17d6cef8bd1c as hgroup, $d8604e77328e28ad$export$b4adb3f464574dcf as hr, $d8604e77328e28ad$export$c0bb0b647f701bb5 as html, $d8604e77328e28ad$export$23f2a1d2818174ef as i, $d8604e77328e28ad$export$8cde213409fd6377 as iframe, $d8604e77328e28ad$export$463b44d9bf3628be as img, $d8604e77328e28ad$export$b7e3ae3d7c15e42e as input, $d8604e77328e28ad$export$27a48efc044c200a as ins, $d8604e77328e28ad$export$1ed45b69d23c052b as kbd, $d8604e77328e28ad$export$1237798dc640739a as label, $d8604e77328e28ad$export$9a9b59e08de24cef as legend, $d8604e77328e28ad$export$19caeaf7d9d84644 as li, $d8604e77328e28ad$export$9c30223ca0a664fb as link, $d8604e77328e28ad$export$f22da7240b7add18 as main, $d8604e77328e28ad$export$871de8747c9eaa88 as map, $d8604e77328e28ad$export$bf7f2fce5c1cf636 as mark, $d8604e77328e28ad$export$b1e5508a851be14d as menu, $d8604e77328e28ad$export$6990040ee07315 as meta, $d8604e77328e28ad$export$82334bbdfcebb57 as meter, $d8604e77328e28ad$export$80e4b313e5e6b30d as nav, $d8604e77328e28ad$export$528ba0e6da49e146 as noscript, $d8604e77328e28ad$export$be5493f9613cbbe as object, $d8604e77328e28ad$export$b2235297ee22a6fe as ol, $d8604e77328e28ad$export$b9d336f245a516e8 as optgroup, $d8604e77328e28ad$export$a75d1723e6bda2ec as option, $d8604e77328e28ad$export$c789db2c85949867 as output, $d8604e77328e28ad$export$ffb5f4729a158638 as p, $d8604e77328e28ad$export$1188214e9d38144e as picture, $d8604e77328e28ad$export$2af2ac64526e2aa9 as pre, $d8604e77328e28ad$export$504d7abb21fa8c9 as progress, $d8604e77328e28ad$export$9e5f44173e64f162 as q, $d8604e77328e28ad$export$6d4c73e3ddf8818b as rp, $d8604e77328e28ad$export$f08282231bb71285 as rt, $d8604e77328e28ad$export$f2b283820b448b35 as ruby, $d8604e77328e28ad$export$2408f22a0fab9ae5 as s, $d8604e77328e28ad$export$8c1cb8fb6818c292 as samp, $d8604e77328e28ad$export$d76128d007d19019 as search, $d8604e77328e28ad$export$fe2e36411d703b3d as section, $d8604e77328e28ad$export$2e6c959c16ff56b8 as select, $d8604e77328e28ad$export$103b78750979eead as slot, $d8604e77328e28ad$export$3c17b0e969a90510 as small, $d8604e77328e28ad$export$b4d5da5f34fb77ad as source, $d8604e77328e28ad$export$afc1bfabebaf28a2 as span, $d8604e77328e28ad$export$59ae2c325a998f89 as strong, $d8604e77328e28ad$export$f93b5905241a7cca as sub, $d8604e77328e28ad$export$9a2dbef7a17e2e58 as summary, $d8604e77328e28ad$export$abe1cd54efe9b9cd as sup, $d8604e77328e28ad$export$9852986a3ec5f6a0 as table, $d8604e77328e28ad$export$7cdd536eaa8f163c as tbody, $d8604e77328e28ad$export$2beef8af2014e5c6 as td, $d8604e77328e28ad$export$ce69bd05624d0c48 as template, $d8604e77328e28ad$export$a3574df893ffa88d as textarea, $d8604e77328e28ad$export$9396b2f97a03ad14 as tfoot, $d8604e77328e28ad$export$d657bc098992a431 as th, $d8604e77328e28ad$export$e3f32a5920890b82 as thead, $d8604e77328e28ad$export$2da9be4cfdb689b1 as time, $d8604e77328e28ad$export$fb184b623420d9be as title, $d8604e77328e28ad$export$72451b88a72ad9c2 as tr, $d8604e77328e28ad$export$6b2a7d5132615086 as track, $d8604e77328e28ad$export$3b14a55fb2447963 as u, $d8604e77328e28ad$export$b5023c870cb34848 as ul, $d8604e77328e28ad$export$65574c28afdf980a as _var, $d8604e77328e28ad$export$5f8d3589eb8441ca as video, $d8604e77328e28ad$export$ee8f8f9447a35bdc as wbr, $984b9bf1478e5592$export$5a462553037f0c2b as _a, $984b9bf1478e5592$export$e3607ec2d7a891c4 as animate, $984b9bf1478e5592$export$5e588c605a4a78b2 as animateMotion, $984b9bf1478e5592$export$729fc4eb9847864b as animateTransform, $984b9bf1478e5592$export$e1d786d2f707b414 as circle, $984b9bf1478e5592$export$a93a2fac2519a03d as clipPath, $984b9bf1478e5592$export$868461b1c6870d10 as defs, $984b9bf1478e5592$export$51987bb50e1f6752 as desc, $984b9bf1478e5592$export$35eec893e28a8a34 as ellipse, $984b9bf1478e5592$export$ba172c53ad3949dd as feBlend, $984b9bf1478e5592$export$5eb95cb0e6566912 as feColorMatrix, $984b9bf1478e5592$export$32d87166552d46e4 as feComponentTransfer, $984b9bf1478e5592$export$a9c456e7f59a922e as feComposite, $984b9bf1478e5592$export$80857957c253f74c as feConvolveMatrix, $984b9bf1478e5592$export$15897bb48f363dc5 as feDiffuseLighting, $984b9bf1478e5592$export$29d24d9a033d4415 as feDisplacementMap, $984b9bf1478e5592$export$189ae3b23835546d as feDistantLight, $984b9bf1478e5592$export$a2a7ecf3147a8160 as feDropShadow, $984b9bf1478e5592$export$d4a3c574e219ec41 as feFlood, $984b9bf1478e5592$export$ff335e1896a0d6ac as feFuncA, $984b9bf1478e5592$export$b413ed7ce780ab62 as feFuncB, $984b9bf1478e5592$export$acd966dff92826df as feFuncG, $984b9bf1478e5592$export$1c8b9a56b85655d7 as feFuncR, $984b9bf1478e5592$export$fab9ed97c28f4d5 as feGaussianBlur, $984b9bf1478e5592$export$5c615a36cad27f2a as feImage, $984b9bf1478e5592$export$f72866be216dad64 as feMerge, $984b9bf1478e5592$export$80304804ee4b74ee as feMergeNode, $984b9bf1478e5592$export$97b2331bbf087a92 as feMorphology, $984b9bf1478e5592$export$c5df7b6020d120a4 as feOffset, $984b9bf1478e5592$export$d886bd6a8560a99b as fePointLight, $984b9bf1478e5592$export$99967a5441a64397 as feSpecularLighting, $984b9bf1478e5592$export$40aa73cef2a57617 as feSpotLight, $984b9bf1478e5592$export$ec9928c0fd729eba as feTile, $984b9bf1478e5592$export$ac27df26d1bb1c75 as feTurbulence, $984b9bf1478e5592$export$3dea766d36a8935f as filter, $984b9bf1478e5592$export$25ef286fa535664a as foreignObject, $984b9bf1478e5592$export$39b482c5e57630a8 as g, $984b9bf1478e5592$export$5c452ff88e35e47d as image, $984b9bf1478e5592$export$53f1d5ea8de3d7c as line, $984b9bf1478e5592$export$46def8197cf4dd4c as linearGradient, $984b9bf1478e5592$export$ffc4d0086f1a4c9 as marker, $984b9bf1478e5592$export$d99f0801a68bbcf1 as mask, $984b9bf1478e5592$export$dbb5e893e736e4ee as metadata, $984b9bf1478e5592$export$d455c2d7dc3122e5 as mpath, $984b9bf1478e5592$export$bb654e07daaf8c3a as path, $984b9bf1478e5592$export$24f82734ea047e6f as pattern, $984b9bf1478e5592$export$b7b19aa0ee06c73 as polygon, $984b9bf1478e5592$export$8d69707c7074d5c0 as polyline, $984b9bf1478e5592$export$3922d1ccb8631cd8 as radialGradient, $984b9bf1478e5592$export$4b409e53cf4df6e6 as rect, $984b9bf1478e5592$export$adaa4cf7ef1b65be as set, $984b9bf1478e5592$export$fa6813432f753b0d as stop, $984b9bf1478e5592$export$7ed1367e7fa1ad68 as svg, $984b9bf1478e5592$export$424b8b2ab9af2944 as _switch, $984b9bf1478e5592$export$8f701197936bc2a6 as symbol, $984b9bf1478e5592$export$a3ca1e9bc4bd5d82 as _text, $984b9bf1478e5592$export$5fc665c586745ec9 as textPath, $984b9bf1478e5592$export$a80dcad378414f77 as _title, $984b9bf1478e5592$export$79063f2f83f17896 as tspan, $984b9bf1478e5592$export$1f96ae73734a86cc as use, $984b9bf1478e5592$export$c4ddc81c7b2c8d7a as view, $1eb28a2bf32712d8$export$e95eef2b09e4b8c0 as FDocument, $b9742d79d7b0a03e$export$4d9facee29974f3 as Registry, $b9742d79d7b0a03e$export$76fb3b11e24d7138 as Felin, $0b8665cef9b4a99e$export$694e0d28c7ffc90c as Stack, $2bb0b494aaead7bf$export$5555872daa4f06f9 as DOMUpdate, $2bb0b494aaead7bf$export$c52e4155f62af1ea as ComputedRefresh, $2bb0b494aaead7bf$export$5828e9a0e553cd23 as EffectCall, $2bb0b494aaead7bf$export$45d7d895b4aac00a as RouteChange, $2bb0b494aaead7bf$export$56ff9fe5a7beeb12 as InitEffectRegistry, $2bb0b494aaead7bf$export$fea67a6c7e2368c7 as InitComputedRegistry, $e2e1ea6dd3b7d2e1$export$68028ad1cb93a754 as $text, $e2e1ea6dd3b7d2e1$export$98a37c23c8479e79 as $state, $e2e1ea6dd3b7d2e1$export$8500887edacda160 as $effect, $e2e1ea6dd3b7d2e1$export$5c8bbe4eacac8365 as $computed, $e2e1ea6dd3b7d2e1$export$b01d3b47943cf0fd as $router, $e2e1ea6dd3b7d2e1$export$64da394a6c00ab6 as $route, $e2e1ea6dd3b7d2e1$export$1804ef204fd3bee1 as $params, $e2e1ea6dd3b7d2e1$export$81dbbbf987bfbc02 as $document, $e2e1ea6dd3b7d2e1$export$c453910a0b76012e as $link, $e2e1ea6dd3b7d2e1$export$24842cd1e1f3d46f as $if, $e2e1ea6dd3b7d2e1$export$3364fcc330baceba as $for, $e2e1ea6dd3b7d2e1$export$418b8c9bcbfeed78 as $length, $6dd8eba6afe36dea$export$55185c17a0fcbe46 as Router, $6dd8eba6afe36dea$export$e7b0ac011bb776c6 as Route};
+export {$4ea4497816ff7e86$export$2e2bcd8739ae039 as default, $ac765eb06d4b9acd$export$7254cc27399e90bd as State, $ac765eb06d4b9acd$export$d5e80676d91e78a1 as FObject, $ac765eb06d4b9acd$export$822d777b86fe0aa4 as FArray, $ac765eb06d4b9acd$export$9dbc5f74ee206e8e as FNumber, $ac765eb06d4b9acd$export$7247fc7dfedd58fa as FString, $ac765eb06d4b9acd$export$636e063718929b4a as FBoolean, $e02ab9edca31aa60$export$a32b0b1c1ac59d04 as Effect, $d5b2a6f33979457b$export$2073789870570c87 as Conditional, $d5b2a6f33979457b$export$550acbd06a1f5a6a as Loop, $af4ecce1f27713e1$export$836eee5a40e84ba8 as Computed, $5828278ff3f63a5f$export$16fa2f45be04daa8 as Component, $07accdd0f6e0276a$export$44155b4e60576956 as FText, $07accdd0f6e0276a$export$5aca75b6aace7423 as FHTMLElement, $07accdd0f6e0276a$export$5290f40031d29a0b as FSVGElement, $d8604e77328e28ad$export$407448d2b89b1813 as a, $d8604e77328e28ad$export$2bcb785951133fe5 as abbr, $d8604e77328e28ad$export$f7d3c097ceca6c15 as address, $d8604e77328e28ad$export$bb3edc44842b5f2e as area, $d8604e77328e28ad$export$bba2aacf8566461b as article, $d8604e77328e28ad$export$64a02cd6422b91be as aside, $d8604e77328e28ad$export$592b77e6034db746 as audio, $d8604e77328e28ad$export$8b22cf2602fb60ce as b, $d8604e77328e28ad$export$e2253033e6e1df16 as base, $d8604e77328e28ad$export$2d20a4e9df674436 as bdi, $d8604e77328e28ad$export$fae0db89ef70aab2 as bdo, $d8604e77328e28ad$export$67dc04e652a298ca as blockquote, $d8604e77328e28ad$export$32180ef41b15b513 as body, $d8604e77328e28ad$export$479ac0420f53ed26 as br, $d8604e77328e28ad$export$2ba01fb71ed41cb6 as button, $d8604e77328e28ad$export$67ea982130081db as canvas, $d8604e77328e28ad$export$8e3c2dfdc4f0453d as caption, $d8604e77328e28ad$export$3035df57df42c31a as cite, $d8604e77328e28ad$export$6565f9f03506010b as code, $d8604e77328e28ad$export$aba86695643891f5 as col, $d8604e77328e28ad$export$3db318dd257cd653 as colgroup, $d8604e77328e28ad$export$4051a07651545597 as data, $d8604e77328e28ad$export$d6956b5f6d5ee87d as datalist, $d8604e77328e28ad$export$eaaeafa904fe3ddf as dd, $d8604e77328e28ad$export$1d2f21e549771e67 as del, $d8604e77328e28ad$export$41ee12f6f6f05843 as details, $d8604e77328e28ad$export$771f54d1a902afc9 as dfn, $d8604e77328e28ad$export$518824cf31321346 as dialog, $d8604e77328e28ad$export$159d9494db57879b as div, $d8604e77328e28ad$export$53d26b7a9a23d594 as dl, $d8604e77328e28ad$export$9198f9466fc833e as dt, $d8604e77328e28ad$export$c63c6f932822f543 as em, $d8604e77328e28ad$export$2be46bb7e96db87f as embed, $d8604e77328e28ad$export$a38812d1aa1302d9 as fieldset, $d8604e77328e28ad$export$b75acb72a9c69c26 as figcaption, $d8604e77328e28ad$export$991dc94f816a1d48 as figure, $d8604e77328e28ad$export$adb608be33961c98 as footer, $d8604e77328e28ad$export$6210fa4921d2a466 as form, $d8604e77328e28ad$export$448e4850cad7c7b0 as h1, $d8604e77328e28ad$export$a943aa9a0fca3f0b as h2, $d8604e77328e28ad$export$7edd4a21fac8ce55 as h3, $d8604e77328e28ad$export$51a85cc1b68f452c as h4, $d8604e77328e28ad$export$f44841a11990acb2 as h5, $d8604e77328e28ad$export$c9ccd321d64f47e3 as h6, $d8604e77328e28ad$export$5fd5031fecdacec3 as head, $d8604e77328e28ad$export$38e42c68cf43b5d4 as header, $d8604e77328e28ad$export$e7c17d6cef8bd1c as hgroup, $d8604e77328e28ad$export$b4adb3f464574dcf as hr, $d8604e77328e28ad$export$c0bb0b647f701bb5 as html, $d8604e77328e28ad$export$23f2a1d2818174ef as i, $d8604e77328e28ad$export$8cde213409fd6377 as iframe, $d8604e77328e28ad$export$463b44d9bf3628be as img, $d8604e77328e28ad$export$b7e3ae3d7c15e42e as input, $d8604e77328e28ad$export$27a48efc044c200a as ins, $d8604e77328e28ad$export$1ed45b69d23c052b as kbd, $d8604e77328e28ad$export$1237798dc640739a as label, $d8604e77328e28ad$export$9a9b59e08de24cef as legend, $d8604e77328e28ad$export$19caeaf7d9d84644 as li, $d8604e77328e28ad$export$9c30223ca0a664fb as link, $d8604e77328e28ad$export$f22da7240b7add18 as main, $d8604e77328e28ad$export$871de8747c9eaa88 as map, $d8604e77328e28ad$export$bf7f2fce5c1cf636 as mark, $d8604e77328e28ad$export$b1e5508a851be14d as menu, $d8604e77328e28ad$export$6990040ee07315 as meta, $d8604e77328e28ad$export$82334bbdfcebb57 as meter, $d8604e77328e28ad$export$80e4b313e5e6b30d as nav, $d8604e77328e28ad$export$528ba0e6da49e146 as noscript, $d8604e77328e28ad$export$be5493f9613cbbe as object, $d8604e77328e28ad$export$b2235297ee22a6fe as ol, $d8604e77328e28ad$export$b9d336f245a516e8 as optgroup, $d8604e77328e28ad$export$a75d1723e6bda2ec as option, $d8604e77328e28ad$export$c789db2c85949867 as output, $d8604e77328e28ad$export$ffb5f4729a158638 as p, $d8604e77328e28ad$export$1188214e9d38144e as picture, $d8604e77328e28ad$export$2af2ac64526e2aa9 as pre, $d8604e77328e28ad$export$504d7abb21fa8c9 as progress, $d8604e77328e28ad$export$9e5f44173e64f162 as q, $d8604e77328e28ad$export$6d4c73e3ddf8818b as rp, $d8604e77328e28ad$export$f08282231bb71285 as rt, $d8604e77328e28ad$export$f2b283820b448b35 as ruby, $d8604e77328e28ad$export$2408f22a0fab9ae5 as s, $d8604e77328e28ad$export$8c1cb8fb6818c292 as samp, $d8604e77328e28ad$export$d76128d007d19019 as search, $d8604e77328e28ad$export$fe2e36411d703b3d as section, $d8604e77328e28ad$export$2e6c959c16ff56b8 as select, $d8604e77328e28ad$export$103b78750979eead as slot, $d8604e77328e28ad$export$3c17b0e969a90510 as small, $d8604e77328e28ad$export$b4d5da5f34fb77ad as source, $d8604e77328e28ad$export$afc1bfabebaf28a2 as span, $d8604e77328e28ad$export$59ae2c325a998f89 as strong, $d8604e77328e28ad$export$f93b5905241a7cca as sub, $d8604e77328e28ad$export$9a2dbef7a17e2e58 as summary, $d8604e77328e28ad$export$abe1cd54efe9b9cd as sup, $d8604e77328e28ad$export$9852986a3ec5f6a0 as table, $d8604e77328e28ad$export$7cdd536eaa8f163c as tbody, $d8604e77328e28ad$export$2beef8af2014e5c6 as td, $d8604e77328e28ad$export$ce69bd05624d0c48 as template, $d8604e77328e28ad$export$a3574df893ffa88d as textarea, $d8604e77328e28ad$export$9396b2f97a03ad14 as tfoot, $d8604e77328e28ad$export$d657bc098992a431 as th, $d8604e77328e28ad$export$e3f32a5920890b82 as thead, $d8604e77328e28ad$export$2da9be4cfdb689b1 as time, $d8604e77328e28ad$export$fb184b623420d9be as title, $d8604e77328e28ad$export$72451b88a72ad9c2 as tr, $d8604e77328e28ad$export$6b2a7d5132615086 as track, $d8604e77328e28ad$export$3b14a55fb2447963 as u, $d8604e77328e28ad$export$b5023c870cb34848 as ul, $d8604e77328e28ad$export$65574c28afdf980a as _var, $d8604e77328e28ad$export$5f8d3589eb8441ca as video, $d8604e77328e28ad$export$ee8f8f9447a35bdc as wbr, $984b9bf1478e5592$export$5a462553037f0c2b as _a, $984b9bf1478e5592$export$e3607ec2d7a891c4 as animate, $984b9bf1478e5592$export$5e588c605a4a78b2 as animateMotion, $984b9bf1478e5592$export$729fc4eb9847864b as animateTransform, $984b9bf1478e5592$export$e1d786d2f707b414 as circle, $984b9bf1478e5592$export$a93a2fac2519a03d as clipPath, $984b9bf1478e5592$export$868461b1c6870d10 as defs, $984b9bf1478e5592$export$51987bb50e1f6752 as desc, $984b9bf1478e5592$export$35eec893e28a8a34 as ellipse, $984b9bf1478e5592$export$ba172c53ad3949dd as feBlend, $984b9bf1478e5592$export$5eb95cb0e6566912 as feColorMatrix, $984b9bf1478e5592$export$32d87166552d46e4 as feComponentTransfer, $984b9bf1478e5592$export$a9c456e7f59a922e as feComposite, $984b9bf1478e5592$export$80857957c253f74c as feConvolveMatrix, $984b9bf1478e5592$export$15897bb48f363dc5 as feDiffuseLighting, $984b9bf1478e5592$export$29d24d9a033d4415 as feDisplacementMap, $984b9bf1478e5592$export$189ae3b23835546d as feDistantLight, $984b9bf1478e5592$export$a2a7ecf3147a8160 as feDropShadow, $984b9bf1478e5592$export$d4a3c574e219ec41 as feFlood, $984b9bf1478e5592$export$ff335e1896a0d6ac as feFuncA, $984b9bf1478e5592$export$b413ed7ce780ab62 as feFuncB, $984b9bf1478e5592$export$acd966dff92826df as feFuncG, $984b9bf1478e5592$export$1c8b9a56b85655d7 as feFuncR, $984b9bf1478e5592$export$fab9ed97c28f4d5 as feGaussianBlur, $984b9bf1478e5592$export$5c615a36cad27f2a as feImage, $984b9bf1478e5592$export$f72866be216dad64 as feMerge, $984b9bf1478e5592$export$80304804ee4b74ee as feMergeNode, $984b9bf1478e5592$export$97b2331bbf087a92 as feMorphology, $984b9bf1478e5592$export$c5df7b6020d120a4 as feOffset, $984b9bf1478e5592$export$d886bd6a8560a99b as fePointLight, $984b9bf1478e5592$export$99967a5441a64397 as feSpecularLighting, $984b9bf1478e5592$export$40aa73cef2a57617 as feSpotLight, $984b9bf1478e5592$export$ec9928c0fd729eba as feTile, $984b9bf1478e5592$export$ac27df26d1bb1c75 as feTurbulence, $984b9bf1478e5592$export$3dea766d36a8935f as filter, $984b9bf1478e5592$export$25ef286fa535664a as foreignObject, $984b9bf1478e5592$export$39b482c5e57630a8 as g, $984b9bf1478e5592$export$5c452ff88e35e47d as image, $984b9bf1478e5592$export$53f1d5ea8de3d7c as line, $984b9bf1478e5592$export$46def8197cf4dd4c as linearGradient, $984b9bf1478e5592$export$ffc4d0086f1a4c9 as marker, $984b9bf1478e5592$export$d99f0801a68bbcf1 as mask, $984b9bf1478e5592$export$dbb5e893e736e4ee as metadata, $984b9bf1478e5592$export$d455c2d7dc3122e5 as mpath, $984b9bf1478e5592$export$bb654e07daaf8c3a as path, $984b9bf1478e5592$export$24f82734ea047e6f as pattern, $984b9bf1478e5592$export$b7b19aa0ee06c73 as polygon, $984b9bf1478e5592$export$8d69707c7074d5c0 as polyline, $984b9bf1478e5592$export$3922d1ccb8631cd8 as radialGradient, $984b9bf1478e5592$export$4b409e53cf4df6e6 as rect, $984b9bf1478e5592$export$adaa4cf7ef1b65be as set, $984b9bf1478e5592$export$fa6813432f753b0d as stop, $984b9bf1478e5592$export$7ed1367e7fa1ad68 as svg, $984b9bf1478e5592$export$424b8b2ab9af2944 as _switch, $984b9bf1478e5592$export$8f701197936bc2a6 as symbol, $984b9bf1478e5592$export$a3ca1e9bc4bd5d82 as _text, $984b9bf1478e5592$export$5fc665c586745ec9 as textPath, $984b9bf1478e5592$export$a80dcad378414f77 as _title, $984b9bf1478e5592$export$79063f2f83f17896 as tspan, $984b9bf1478e5592$export$1f96ae73734a86cc as use, $984b9bf1478e5592$export$c4ddc81c7b2c8d7a as view, $1eb28a2bf32712d8$export$e95eef2b09e4b8c0 as FDocument, $b9742d79d7b0a03e$export$4d9facee29974f3 as Registry, $b9742d79d7b0a03e$export$76fb3b11e24d7138 as Felin, $0b8665cef9b4a99e$export$694e0d28c7ffc90c as Stack, $2bb0b494aaead7bf$export$5555872daa4f06f9 as DOMUpdate, $2bb0b494aaead7bf$export$c52e4155f62af1ea as ComputedRefresh, $2bb0b494aaead7bf$export$5828e9a0e553cd23 as EffectCall, $2bb0b494aaead7bf$export$45d7d895b4aac00a as RouteChange, $2bb0b494aaead7bf$export$56ff9fe5a7beeb12 as InitEffectRegistry, $2bb0b494aaead7bf$export$fea67a6c7e2368c7 as InitComputedRegistry, $e2e1ea6dd3b7d2e1$export$68028ad1cb93a754 as $text, $e2e1ea6dd3b7d2e1$export$98a37c23c8479e79 as $state, $e2e1ea6dd3b7d2e1$export$8500887edacda160 as $effect, $e2e1ea6dd3b7d2e1$export$5c8bbe4eacac8365 as $computed, $e2e1ea6dd3b7d2e1$export$b01d3b47943cf0fd as $router, $e2e1ea6dd3b7d2e1$export$64da394a6c00ab6 as $route, $e2e1ea6dd3b7d2e1$export$1804ef204fd3bee1 as $params, $e2e1ea6dd3b7d2e1$export$81dbbbf987bfbc02 as $document, $e2e1ea6dd3b7d2e1$export$c453910a0b76012e as $link, $e2e1ea6dd3b7d2e1$export$24842cd1e1f3d46f as $if, $e2e1ea6dd3b7d2e1$export$3364fcc330baceba as $for, $e2e1ea6dd3b7d2e1$export$418b8c9bcbfeed78 as $length, $6dd8eba6afe36dea$export$55185c17a0fcbe46 as Router, $6dd8eba6afe36dea$export$e7b0ac011bb776c6 as Route, $fab42eb3dee39b5b$export$f1921b45c66f982c as ValueType, $fab42eb3dee39b5b$export$b108bf477f1767a9 as toCssString, $fab42eb3dee39b5b$export$aaa51b9a4e209041 as determineValueType, $fab42eb3dee39b5b$export$7360f1dcbbc79d37 as getObjectMethods, $fab42eb3dee39b5b$export$8c9c8540fba163fe as flattenElementTree, $fab42eb3dee39b5b$export$f38f450dbc1e989 as ExtensibleFunction};
 //# sourceMappingURL=felin.js.map

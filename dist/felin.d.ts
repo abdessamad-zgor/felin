@@ -1,31 +1,46 @@
 import { Properties } from "csstype";
-declare class ExtensibleFunction extends Function {
+export enum ValueType {
+    NUMBER = 0,
+    STRING = 1,
+    BOOLEAN = 2,
+    OBJECT = 3,
+    MAP = 4,
+    SET = 5,
+    ARRAY = 6,
+    ANY = 7
+}
+export function toCssString(style: Properties): string;
+export function determineValueType<T>(value: T): ValueType.NUMBER | ValueType.STRING | ValueType.BOOLEAN | ValueType.OBJECT | ValueType.ARRAY | ValueType.ANY;
+export function getObjectMethods(obj: any): string[];
+export function flattenElementTree(element: FElement, acc?: FElement[]): FElement[];
+export class ExtensibleFunction extends Function {
     constructor(f: any);
 }
-type FStateMutation<FState> = FState extends {
-    [key: string]: any;
-} | any[] ? (state: FState | Partial<FState>) => FState | Partial<FState> : (state: FState) => FState;
+type FStateMutation<T, R> = (state: T) => R;
 interface FState<T = any> {
     state: StateType<T>;
     _id: string;
     parent?: ParentState;
-    set: (fnOrState: FStateMutation<T> | T, child?: State<T>) => void;
+    set: <R>(fnOrState: FStateMutation<T, R> | T, child?: State<T>) => void;
 }
 type ParentState = {
     state: FState;
     key: string;
 };
-type StateType<T = any> = (FNumber | FArray | FObject | FBoolean | FString) & ExtensibleFunction;
-export class State<T = any> extends ExtensibleFunction implements FState<T> {
+type FStateType = string | boolean | number | {
+    [key: string]: any;
+} | any[];
+type StateType<T = FStateType> = FNumber | FArray | FObject | FBoolean | FString;
+export class State<T = FStateType> extends ExtensibleFunction implements FState<T> {
     _id: string;
     state: StateType<T>;
     parent?: ParentState;
     elements: FElement[];
     constructor(value: T, parent?: ParentState);
-    set(fnOrState: FStateMutation<T> | T, child?: State<T>): void;
+    set<R>(fnOrState: FStateMutation<FStateType, R> | FStateType, child?: State<T>): void;
     setElement(element: FElement): void;
 }
-export class FArray<T = any> extends ExtensibleFunction {
+export class FArray<T = any> {
     value: Array<T>;
     parent?: State<T>;
     constructor(value: T[]);
@@ -36,13 +51,14 @@ export class FArray<T = any> extends ExtensibleFunction {
     every(): void;
     some(): void;
 }
-export class FBoolean extends ExtensibleFunction {
+export class FBoolean {
     value: boolean;
+    parent?: State;
     constructor(value: boolean);
 }
 export class FObject<T extends {
     [key: string]: any;
-} = {}> extends ExtensibleFunction {
+} = {}> {
     value: T;
     parent?: State<T>;
     constructor(value: T);
@@ -50,12 +66,12 @@ export class FObject<T extends {
     values(): Computed;
     has(key: string): Computed;
 }
-export class FString extends ExtensibleFunction {
+export class FString {
     value: string;
     parent?: State;
     constructor(value: string);
 }
-export class FNumber extends ExtensibleFunction {
+export class FNumber {
     value: number;
     parent?: State;
     constructor(value: number);
@@ -208,7 +224,9 @@ export class FDocument {
     selector(element: FHTMLElement | FSVGElement): string;
     rerenderElement(element: FHTMLElement): void;
     hasRouter(element: FElement): Router;
-    getStates(element: FElement): State<any>[];
+    getStates(element: FElement): State<string | number | boolean | any[] | {
+        [key: string]: any;
+    }>[];
 }
 export class Effect {
     _id: string;
