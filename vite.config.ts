@@ -1,11 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig } from "vite";
 
 export default defineConfig({
-  test: {
-    disableConsoleIntercept: false,
-    browser: {
-      enabled: true,
-      name: 'chrome'
-    }
-  }
 })

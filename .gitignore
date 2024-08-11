@@ -1,5 +1,2 @@
 node_modules
-lib/generate.js
-.parcel-cache/
 .github/
-tests/test.ts
