@@ -1,5 +1,8 @@
 import { Felin } from "./core/registry";
-window.Felin = Felin;
+
+if(window){
+  window.Felin = Felin;
+}
 
 export default Felin 
 export * from "./primitives";

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect } from "vitest";
 import  {Computed, State, $state, getObjectMethods, $document} from "felin"
 
 describe('test state module', ()=>{

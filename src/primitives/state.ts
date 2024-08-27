@@ -1,3 +1,4 @@
+import { Assert } from "../debug";
 import { FElement } from "../elements/element";
 import { ExtensibleFunction, ValueType, determineValueType, getObjectMethods } from "../utils"
 import { Computed } from "./computed";
@@ -10,7 +11,6 @@ interface FState<T = any> {
   parent?: ParentState,
   set: <R>(fnOrState: FStateMutation<T, R> | T, child?: State<T>) => void,
 }
-
 
 type ParentState = {
   state: FState,
@@ -32,6 +32,8 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
     if (parent) {
       this.parent = parent;
     }
+    let dataType = determineValueType(value)
+    Assert.debug(dataType)
     switch (determineValueType(value)) {
       case ValueType.OBJECT:
         this.state = new FObject(value)
@@ -53,6 +55,9 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
         this.state = new FBoolean(value as boolean)
         this.state.parent = this
         break;
+      case ValueType.PROMISE:
+        this.state = new FPromise(value as Promise<any>)
+        this.state.parent = this
       case ValueType.ANY:
         throw Error("Error: unsupported state data type.")
         break;
@@ -260,5 +265,31 @@ export class FNumber {
 
   eq(cmp: number) {
     return new Computed(() => this.value == cmp, this.parent)
+  }
+}
+
+export class FPromise {
+  value: any|null
+  pending: boolean
+  resolved: boolean
+  rejected: boolean
+  error: Error|null
+  parent?: State
+
+  constructor(value: Promise<any>){
+    this.pending = true
+    this.resolved = false
+    this.rejected = false
+    this.error = null
+    this.value = null
+    value.then(result=>{
+      this.pending = false
+      this.resolved = true
+      this.value = result
+    }).catch(err=>{
+        this.pending = false
+        this.rejected = true
+        this.error = err
+      })
   }
 }

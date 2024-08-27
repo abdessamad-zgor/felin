@@ -9,6 +9,7 @@ export enum ValueType {
   MAP,
   SET,
   ARRAY,
+  PROMISE,
   ANY
 }
 
@@ -50,6 +51,8 @@ export function determineValueType<T>(value: T){
     return ValueType.ARRAY
   }else if(isObjectLiteral(value)){
     return ValueType.OBJECT
+  }else if(value instanceof Promise){
+    return ValueType.PROMISE
   }else {
     return ValueType.ANY
   }

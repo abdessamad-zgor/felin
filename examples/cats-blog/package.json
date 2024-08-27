@@ -1,0 +1,18 @@
+{
+  "name": "cats-blog",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "rm -r .parcel-cache; parcel index.html"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "parcel": "^2.12.0"
+  },
+  "dependencies": {
+    "felin": "file:../.."
+  }
+}
