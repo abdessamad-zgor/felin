@@ -75,7 +75,7 @@ export class Assert extends ExtensibleFunction {
   }
 
   static debug(value: any){
-    console.log(value)
+    console.trace(value)
   }
 }
 

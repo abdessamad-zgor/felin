@@ -1076,11 +1076,17 @@ class FSVGElement {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "State", ()=>State);
+//export class ReadonlyState extends State {
+//override set<R>(fnOrState: FStateType | FStateMutation<FStateType, R>, child?: State<FStateType>): void {
+//throw Error("Connot set on a read-only state.")
+//}
+//}
 parcelHelpers.export(exports, "FArray", ()=>FArray);
 parcelHelpers.export(exports, "FBoolean", ()=>FBoolean);
 parcelHelpers.export(exports, "FObject", ()=>FObject);
 parcelHelpers.export(exports, "FString", ()=>FString);
 parcelHelpers.export(exports, "FNumber", ()=>FNumber);
+parcelHelpers.export(exports, "FPromise", ()=>FPromise);
 var _debug = require("../debug");
 var _utils = require("../utils");
 var _computed = require("./computed");
@@ -1091,6 +1097,7 @@ class State extends (0, _utils.ExtensibleFunction) {
         this._id = crypto.randomUUID();
         if (parent) this.parent = parent;
         let dataType = (0, _utils.determineValueType)(value);
+        (0, _debug.Assert).debug(value);
         (0, _debug.Assert).debug(dataType);
         switch((0, _utils.determineValueType)(value)){
             case (0, _utils.ValueType).OBJECT:
@@ -1113,6 +1120,10 @@ class State extends (0, _utils.ExtensibleFunction) {
                 this.state = new FBoolean(value);
                 this.state.parent = this;
                 break;
+            case (0, _utils.ValueType).PROMISE:
+                (0, _debug.Assert).assert("block reached")(dataType, value);
+                this.state = new FPromise(value);
+                this.state.parent = this;
             case (0, _utils.ValueType).ANY:
                 throw Error("Error: unsupported state data type.");
             default:
@@ -1121,17 +1132,15 @@ class State extends (0, _utils.ExtensibleFunction) {
         if (this.state instanceof FObject) {
             let handler = {
                 get: (target, prop, reciever)=>{
-                    if (prop == "set") return this.set;
-                    else if ((0, _utils.getObjectMethods)(target.state).includes(prop)) return target.state[prop];
-                    else if (!Object.keys(target()).includes(prop)) return Reflect.get(target, prop, reciever);
-                    else {
+                    if ((0, _utils.getObjectMethods)(target.state).includes(prop)) return target.state[prop];
+                    else if (Object.keys(target.state.value).includes(prop)) {
                         let value = target.state[prop];
                         let childState = new State(value, {
                             state: this,
                             key: prop
                         });
                         return childState;
-                    }
+                    } else return Reflect.get(target, prop, reciever);
                 }
             };
             return new Proxy(this, handler);
@@ -1140,23 +1149,37 @@ class State extends (0, _utils.ExtensibleFunction) {
                 get: (target, prop, reciever)=>{
                     if (prop == "set") return this.set;
                     else if ((0, _utils.getObjectMethods)(target.state).includes(prop)) return target.state[prop];
-                    else if (!Object.keys(target()).includes(prop)) return Reflect.get(target, prop, reciever);
-                    else {
+                    else if (Object.keys(target.state.value).includes(prop)) {
                         let value = target.state[prop];
                         let childState = new State(value, {
                             state: this,
                             key: prop
                         });
                         return childState;
-                    }
+                    } else return Reflect.get(target, prop, reciever);
                 }
             };
             return new Proxy(this, handler);
         } else if (this.state instanceof FNumber) {
             let handler = {
                 get: (target, prop, reciever)=>{
-                    if (prop == "set") return target.set;
-                    else if ((0, _utils.getObjectMethods)(target.state).includes(prop)) return target.state[prop];
+                    if ((0, _utils.getObjectMethods)(target.state).includes(prop)) return target.state[prop];
+                    else return Reflect.get(target, prop, reciever);
+                }
+            };
+            return new Proxy(this, handler);
+        } else if (this.state instanceof FPromise) {
+            let handler = {
+                get: (target, prop, reciever)=>{
+                    (0, _debug.Assert).assert("value to exist")(target.state);
+                    if (Object.keys(target.state.value).includes(prop)) {
+                        let value = target.state[prop];
+                        let childState = new State(value, {
+                            state: this,
+                            key: prop
+                        });
+                        return childState;
+                    } else if ((0, _utils.getObjectMethods)(target.state).includes(prop)) return target.state[prop];
                     else return Reflect.get(target, prop, reciever);
                 }
             };
@@ -1188,16 +1211,6 @@ class State extends (0, _utils.ExtensibleFunction) {
 class FArray {
     constructor(value){
         this.value = value;
-        let handler = {
-            get: (target, prop, reciever)=>{
-                if ((0, _utils.getObjectMethods)(target).includes(prop)) return target[prop];
-                else if (Object.keys(target.value).includes(prop)) {
-                    let value = target.value[prop];
-                    return value;
-                } else return Reflect.get(target, prop, reciever);
-            }
-        };
-        return new Proxy(this, handler);
     }
     map() {}
     filter() {}
@@ -1214,16 +1227,6 @@ class FBoolean {
 class FObject {
     constructor(value){
         this.value = value;
-        let handler = {
-            get: (target, prop, reciever)=>{
-                if (!Object.keys(target.value).includes(prop)) return Reflect.get(target, prop, reciever);
-                else {
-                    let value = target.value[prop];
-                    return value;
-                }
-            }
-        };
-        return new Proxy(this, handler);
     }
     keys() {
         return new (0, _computed.Computed)(()=>Object.keys(this.value), this.parent);
@@ -1258,6 +1261,32 @@ class FNumber {
     }
     eq(cmp) {
         return new (0, _computed.Computed)(()=>this.value == cmp, this.parent);
+    }
+}
+class FPromise {
+    constructor(value){
+        this._error = null;
+        this.value = null;
+        this.status = new State("pending");
+        value.then((result)=>{
+            this.value = result;
+            this.status.set("resolved");
+        }).catch((err)=>{
+            this._error = err;
+            this.status.set("rejected");
+        });
+    }
+    pending() {
+        return new (0, _computed.Computed)(()=>this.status() == "pending" ? true : false, this.status);
+    }
+    resolved() {
+        return new (0, _computed.Computed)(()=>this.status() == "resolved" ? true : false, this.status);
+    }
+    rejected() {
+        return new (0, _computed.Computed)(()=>this.status() == "rejected" ? true : false, this.status);
+    }
+    error() {
+        return new (0, _computed.Computed)(()=>this.status() == "rejected" ? this._error : null, this.status);
     }
 }
 
@@ -1322,7 +1351,7 @@ class Assert extends (0, _utils.ExtensibleFunction) {
         return expectation;
     }
     static debug(value) {
-        console.log(value);
+        console.trace(value);
     }
 }
 class Expectation {
@@ -1384,7 +1413,8 @@ var ValueType;
     ValueType[ValueType["MAP"] = 4] = "MAP";
     ValueType[ValueType["SET"] = 5] = "SET";
     ValueType[ValueType["ARRAY"] = 6] = "ARRAY";
-    ValueType[ValueType["ANY"] = 7] = "ANY";
+    ValueType[ValueType["PROMISE"] = 7] = "PROMISE";
+    ValueType[ValueType["ANY"] = 8] = "ANY";
 })(ValueType || (ValueType = {}));
 function toCssString(style) {
     let styleString = "";
@@ -1410,7 +1440,8 @@ function determineValueType(value) {
     else if (typeof value == "boolean") return 2;
     else if (Array.isArray(value)) return 6;
     else if (isObjectLiteral(value)) return 3;
-    else return 7;
+    else if (value instanceof Promise) return 7;
+    else return 8;
 }
 function getObjectMethods(obj) {
     let objectPrototype = obj.prototype;

@@ -17,8 +17,8 @@ type ParentState = {
   key: string
 }
 
-type FStateType = string | boolean | number | {[key: string]: any} | any[] 
-type StateType<T = FStateType> = FNumber | FArray | FObject | FBoolean | FString
+type FStateType = string | boolean | number | {[key: string]: any} | any[] | Promise<any> 
+type StateType<T = FStateType> = FNumber | FArray | FObject | FBoolean | FString | FPromise
 
 export class State<T = FStateType> extends ExtensibleFunction implements FState<T> {
   _id: string;
@@ -33,6 +33,7 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
       this.parent = parent;
     }
     let dataType = determineValueType(value)
+    Assert.debug(value)
     Assert.debug(dataType)
     switch (determineValueType(value)) {
       case ValueType.OBJECT:
@@ -56,6 +57,7 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
         this.state.parent = this
         break;
       case ValueType.PROMISE:
+        Assert.assert("block reached")(dataType, value)
         this.state = new FPromise(value as Promise<any>)
         this.state.parent = this
       case ValueType.ANY:
@@ -68,16 +70,14 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
     if (this.state instanceof FObject) {
       let handler: ProxyHandler<State<T>> = {
         get: (target: State<T>, prop: string, reciever) => {
-          if(prop=="set"){
-              return this.set
-          }else if (getObjectMethods(target.state).includes(prop)) {
+          if (getObjectMethods(target.state).includes(prop)) {
             return target.state[prop]
-          } else if (!Object.keys(target()).includes(prop)) {
-            return Reflect.get(target, prop, reciever);
-          } else {
+          } else if (Object.keys(target.state.value).includes(prop)) {
             let value = target.state[prop];
             let childState = new State<typeof value>(value, { state: this, key: prop });
             return childState;
+          } else {
+            return Reflect.get(target, prop, reciever);
           }
         }
       }
@@ -90,12 +90,12 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
           }else 
           if (getObjectMethods(target.state).includes(prop)) {
             return target.state[prop]
-          } else if (!Object.keys(target()).includes(prop)) {
-            return Reflect.get(target, prop, reciever);
-          } else {
+          } else if (Object.keys(target.state.value).includes(prop)) {
             let value = target.state[prop];
             let childState = new State<typeof value>(value, { state: this, key: prop });
             return childState;
+          } else {
+            return Reflect.get(target, prop, reciever);
           }
         }
       }
@@ -103,9 +103,6 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
     } else if (this.state instanceof FNumber) {
       let handler: ProxyHandler<State<T>> = {
         get: (target: State<T>, prop: string, reciever) => {
-          if(prop=="set"){
-              return target.set
-          }else 
           if (getObjectMethods(target.state).includes(prop)) {
             return target.state[prop]
           } else {
@@ -114,7 +111,23 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
         }
       }
       return new Proxy(this, handler)
-    } 
+    } else if(this.state instanceof FPromise) {
+      let handler: ProxyHandler<State<T>> = {
+        get: (target: State<T>, prop: string, reciever) => {
+          Assert.assert("value to exist")(target.state)
+          if(Object.keys(target.state.value).includes(prop)){
+            let value = target.state[prop];
+            let childState = new State<typeof value>(value, { state: this, key: prop });
+            return childState;
+          }else if(getObjectMethods(target.state).includes(prop)){
+            return target.state[prop]
+          }else{
+            return Reflect.get(target, prop, reciever);
+          }
+        }
+      }
+      return new Proxy(this, handler)
+    }
   }
 
   set<R>(fnOrState: FStateMutation<FStateType, R> | FStateType, child?: State<T>) {
@@ -148,24 +161,17 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
   }
 }
 
+//export class ReadonlyState extends State {
+  //override set<R>(fnOrState: FStateType | FStateMutation<FStateType, R>, child?: State<FStateType>): void {
+    //throw Error("Connot set on a read-only state.")
+  //}
+//}
+
 export class FArray<T = any> {
   value: Array<T>
   parent?: State<T>
   constructor(value: T[]) {
     this.value = value
-    let handler: ProxyHandler<FArray<T>> = {
-      get: (target: FArray<T>, prop: string, reciever) => {
-        if (getObjectMethods(target).includes(prop)) {
-          return target[prop]
-        } else if (Object.keys(target.value).includes(prop)) {
-          let value = target.value[prop];
-          return value;
-        } else {
-          return Reflect.get(target, prop, reciever);
-        }
-      }
-    }
-    return new Proxy(this, handler);
   }
 
   map() {
@@ -206,17 +212,6 @@ export class FObject<T extends { [key: string]: any } = {}> {
   parent?: State<T>
   constructor(value: T) {
     this.value = value
-    let handler = {
-      get: (target, prop, reciever) => {
-        if (!Object.keys(target.value).includes(prop)) {
-          return Reflect.get(target, prop, reciever)
-        } else {
-          let value = target.value[prop]
-          return value
-        }
-      }
-    }
-    return new Proxy(this, handler)
   }
 
   keys() {
@@ -270,26 +265,36 @@ export class FNumber {
 
 export class FPromise {
   value: any|null
-  pending: boolean
-  resolved: boolean
-  rejected: boolean
-  error: Error|null
+  private status: State<string>
+  _error: Error|null
   parent?: State
 
   constructor(value: Promise<any>){
-    this.pending = true
-    this.resolved = false
-    this.rejected = false
-    this.error = null
+    this._error = null
     this.value = null
+    this.status = new State("pending")
     value.then(result=>{
-      this.pending = false
-      this.resolved = true
       this.value = result
+      this.status.set("resolved")
     }).catch(err=>{
-        this.pending = false
-        this.rejected = true
-        this.error = err
+        this._error = err
+        this.status.set("rejected")
       })
+  }
+
+  pending(){
+    return new Computed(()=> this.status()=="pending"? true: false, this.status)
+  }
+
+  resolved(){
+    return new Computed(()=> this.status()=="resolved"? true: false, this.status)
+  }
+
+  rejected(){
+    return new Computed(()=> this.status()=="rejected"? true: false, this.status)
+  }
+
+  error(){
+    return new Computed(()=> this.status()=="rejected"? this._error : null, this.status)
   }
 }
