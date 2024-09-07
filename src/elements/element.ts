@@ -42,8 +42,10 @@ export class FText implements FElement<FTextRegister> {
 
   element() {
     let textContent = this.text
-    for (let state of this.register.states) {
-      textContent = textContent.replace("{}", state())
+    if(this.register.states && this.register.states.length){
+      for (let state of this.register.states) {
+        textContent = textContent.replace("{}", state())
+      }
     }
     return document.createTextNode(textContent)
   }

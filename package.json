@@ -28,6 +28,7 @@
   },
   "scripts": {
     "build": "vite build",
+    "watch": "vite build --watch",
     "prepublish": "yarn run build",
     "pretest": "node ./src/elements/generate.js && npm run build && npm link && npm link felin && tsc --outDir ./tests --moduleResolution node16 --module node16 ./tests/test.ts",
     "test": "node tests/test.js"

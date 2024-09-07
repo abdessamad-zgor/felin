@@ -16,7 +16,6 @@ import {
   $link,
   $router,
   $route,
-
   $params
 } from "felin";
 

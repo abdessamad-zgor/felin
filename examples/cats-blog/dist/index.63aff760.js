@@ -909,7 +909,7 @@ class FText {
     }
     element() {
         let textContent = this.text;
-        for (let state of this.register.states)textContent = textContent.replace("{}", state());
+        if (this.register.states && this.register.states.length) for (let state of this.register.states)textContent = textContent.replace("{}", state());
         return document.createTextNode(textContent);
     }
 }
@@ -1124,6 +1124,7 @@ class State extends (0, _utils.ExtensibleFunction) {
                 (0, _debug.Assert).assert("block reached")(dataType, value);
                 this.state = new FPromise(value);
                 this.state.parent = this;
+                break;
             case (0, _utils.ValueType).ANY:
                 throw Error("Error: unsupported state data type.");
             default:
@@ -1172,7 +1173,7 @@ class State extends (0, _utils.ExtensibleFunction) {
             let handler = {
                 get: (target, prop, reciever)=>{
                     (0, _debug.Assert).assert("value to exist")(target.state);
-                    if (Object.keys(target.state.value).includes(prop)) {
+                    if (target.state.value && Object.keys(target.state.value).includes(prop)) {
                         let value = target.state[prop];
                         let childState = new State(value, {
                             state: this,
@@ -1440,11 +1441,12 @@ function determineValueType(value) {
     else if (typeof value == "boolean") return 2;
     else if (Array.isArray(value)) return 6;
     else if (isObjectLiteral(value)) return 3;
-    else if (value instanceof Promise) return 7;
+    else if (value && typeof value.then == "function") return 7;
     else return 8;
 }
 function getObjectMethods(obj) {
-    let objectPrototype = obj.prototype;
+    console.log(obj);
+    let objectPrototype = obj.__proto__;
     let methods = Object.getOwnPropertyNames(objectPrototype).filter((k)=>typeof obj[k] == "function" && k != "constructor");
     return methods;
 }
@@ -2683,7 +2685,7 @@ class FDocument {
     getStates(element) {
         let states = [];
         let elementTreeList = (0, _utils.flattenElementTree)(element);
-        for (let el of elementTreeList)states = [
+        for (let el of elementTreeList)if (el.register.states) states = [
             ...states,
             ...el.register.states
         ];

@@ -60,6 +60,7 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
         Assert.assert("block reached")(dataType, value)
         this.state = new FPromise(value as Promise<any>)
         this.state.parent = this
+        break;
       case ValueType.ANY:
         throw Error("Error: unsupported state data type.")
         break;
@@ -72,7 +73,7 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
         get: (target: State<T>, prop: string, reciever) => {
           if (getObjectMethods(target.state).includes(prop)) {
             return target.state[prop]
-          } else if (Object.keys(target.state.value).includes(prop)) {
+          } else if ( Object.keys(target.state.value).includes(prop)) {
             let value = target.state[prop];
             let childState = new State<typeof value>(value, { state: this, key: prop });
             return childState;
@@ -87,8 +88,7 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
         get: (target: State<T>, prop: string, reciever) => {
           if(prop=="set"){
               return this.set
-          }else 
-          if (getObjectMethods(target.state).includes(prop)) {
+          }else if (getObjectMethods(target.state).includes(prop)) {
             return target.state[prop]
           } else if (Object.keys(target.state.value).includes(prop)) {
             let value = target.state[prop];
@@ -115,7 +115,7 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
       let handler: ProxyHandler<State<T>> = {
         get: (target: State<T>, prop: string, reciever) => {
           Assert.assert("value to exist")(target.state)
-          if(Object.keys(target.state.value).includes(prop)){
+          if(target.state.value && Object.keys(target.state.value).includes(prop)){
             let value = target.state[prop];
             let childState = new State<typeof value>(value, { state: this, key: prop });
             return childState;

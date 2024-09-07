@@ -51,7 +51,8 @@ export function determineValueType<T>(value: T){
     return ValueType.ARRAY
   }else if(isObjectLiteral(value)){
     return ValueType.OBJECT
-  }else if(value instanceof Promise){
+    //@ts-ignore
+  }else if(value && typeof value.then == "function"){
     return ValueType.PROMISE
   }else {
     return ValueType.ANY
@@ -59,7 +60,8 @@ export function determineValueType<T>(value: T){
 }
 
 export function getObjectMethods(obj){
-  let objectPrototype = obj.prototype
+  console.log(obj)
+  let objectPrototype = obj.__proto__
   let methods = Object.getOwnPropertyNames(objectPrototype).filter(k=>typeof obj[k] == "function" && k!="constructor");
   return methods
 }

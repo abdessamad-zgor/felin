@@ -76,7 +76,9 @@ export class FDocument {
     let states: State[] = [];
     let elementTreeList = flattenElementTree(element)
     for(let el of elementTreeList){
-      states = [...states, ...(el as FElement<{states: State[]}>).register.states]
+      if((el as FElement<{states: State[]}>).register.states){
+        states = [...states, ...(el as FElement<{states: State[]}>).register.states]
+      }
     }
     let uniqueStates = [...new Set(states.map(e=>e._id))]
     states = uniqueStates.map(id=>states.find(s=>s._id == id))

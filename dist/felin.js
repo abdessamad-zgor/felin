@@ -79,10 +79,11 @@ function $(e) {
   return Object.getPrototypeOf(e) === t;
 }
 function C(e) {
-  return typeof e == "string" ? 1 : typeof e == "number" ? 0 : typeof e == "boolean" ? 2 : Array.isArray(e) ? 6 : $(e) ? 3 : e instanceof Promise ? 7 : 8;
+  return typeof e == "string" ? 1 : typeof e == "number" ? 0 : typeof e == "boolean" ? 2 : Array.isArray(e) ? 6 : $(e) ? 3 : e && typeof e.then == "function" ? 7 : 8;
 }
 function d(e) {
-  let t = e.prototype;
+  console.log(e);
+  let t = e.__proto__;
   return Object.getOwnPropertyNames(t).filter((r) => typeof e[r] == "function" && r != "constructor");
 }
 function b(e, t) {
@@ -156,7 +157,7 @@ class p extends y {
     return n.assertion = r, n;
   }
   static debug(t) {
-    console.log(t);
+    console.trace(t);
   }
 }
 class G {
@@ -220,7 +221,8 @@ class f extends y {
         this.state = new Y(t), this.state.parent = this;
         break;
       case g.PROMISE:
-        this.state = new P(t), this.state.parent = this;
+        p.assert("block reached")(r, t), this.state = new P(t), this.state.parent = this;
+        break;
       case g.ANY:
         throw Error("Error: unsupported state data type.");
     }
@@ -260,7 +262,7 @@ class f extends y {
     } else if (this.state instanceof P) {
       let s = {
         get: (i, u, a) => {
-          if (p.assert("value to exist")(i.state), Object.keys(i.state.value).includes(u)) {
+          if (p.assert("value to exist")(i.state), i.state.value && Object.keys(i.state.value).includes(u)) {
             let c = i.state[u];
             return new f(c, { state: this, key: u });
           } else return d(i.state).includes(u) ? i.state[u] : Reflect.get(i, u, a);
@@ -443,8 +445,9 @@ class h {
   }
   element() {
     let t = this.text;
-    for (let n of this.register.states)
-      t = t.replace("{}", n());
+    if (this.register.states && this.register.states.length)
+      for (let n of this.register.states)
+        t = t.replace("{}", n());
     return document.createTextNode(t);
   }
 }
@@ -758,7 +761,7 @@ class Z {
   getStates(t) {
     let n = [], r = b(t);
     for (let i of r)
-      n = [...n, ...i.register.states];
+      i.register.states && (n = [...n, ...i.register.states]);
     return n = [...new Set(n.map((i) => i._id))].map((i) => n.find((u) => u._id == i)), n;
   }
 }
