@@ -33,8 +33,6 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
       this.parent = parent;
     }
     let dataType = determineValueType(value)
-    Assert.debug(value)
-    Assert.debug(dataType)
     switch (determineValueType(value)) {
       case ValueType.OBJECT:
         this.state = new FObject(value)
@@ -57,7 +55,6 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
         this.state.parent = this
         break;
       case ValueType.PROMISE:
-        Assert.assert("block reached")(dataType, value)
         this.state = new FPromise(value as Promise<any>)
         this.state.parent = this
         break;
@@ -73,8 +70,9 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
         get: (target: State<T>, prop: string, reciever) => {
           if (getObjectMethods(target.state).includes(prop)) {
             return target.state[prop]
-          } else if ( Object.keys(target.state.value).includes(prop)) {
-            let value = target.state[prop];
+          } else if (Object.keys(target.state.value).includes(prop)) {
+            let value = target.state.value[prop];
+            Assert.assert("value-exists", "value exists", "value does not exist")(value!=undefined, value, target)
             let childState = new State<typeof value>(value, { state: this, key: prop });
             return childState;
           } else {
@@ -91,7 +89,7 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
           }else if (getObjectMethods(target.state).includes(prop)) {
             return target.state[prop]
           } else if (Object.keys(target.state.value).includes(prop)) {
-            let value = target.state[prop];
+            let value = target.state.value[prop];
             let childState = new State<typeof value>(value, { state: this, key: prop });
             return childState;
           } else {
@@ -114,9 +112,8 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
     } else if(this.state instanceof FPromise) {
       let handler: ProxyHandler<State<T>> = {
         get: (target: State<T>, prop: string, reciever) => {
-          Assert.assert("value to exist")(target.state)
           if(target.state.value && Object.keys(target.state.value).includes(prop)){
-            let value = target.state[prop];
+            let value = target.state.value[prop];
             let childState = new State<typeof value>(value, { state: this, key: prop });
             return childState;
           }else if(getObjectMethods(target.state).includes(prop)){
@@ -160,12 +157,6 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
     this.elements.push(element)
   }
 }
-
-//export class ReadonlyState extends State {
-  //override set<R>(fnOrState: FStateType | FStateMutation<FStateType, R>, child?: State<FStateType>): void {
-    //throw Error("Connot set on a read-only state.")
-  //}
-//}
 
 export class FArray<T = any> {
   value: Array<T>

@@ -9,61 +9,29 @@ const templateError = (strings, values)=>{
   return template
 }
 
-const FelinErrorMap = new Map([
-  ["error", (value?: any)=>templateError`Unexpected error ${value}`]
-]);
-
-export class FelinError {
-  code: string
-  message: string
-
-  constructor(code: string, message?: string, ...args: any[]){
-    this.code = code
-    if(message){
-      this.message = message
-    }else{
-      if(FelinErrorMap.has(code as string)){
-        let templateMessage = FelinErrorMap.get(code as string)
-        if(typeof templateMessage == "function"){
-          this.message = templateMessage(...args)
-        }else{
-          this.message = message
-        }
-      }
-    }
-  }
-
-  toString(){
-    return `FelinError: ${this.code as string}: ${this.message}`
-  }
-
-  throw(){
-    throw new Error(this.toString())
-  }
-}
-
 export class Assert extends ExtensibleFunction {
   code: string
-  message: string
-  constructor(code?: string, message?: string){
+  _success: string = "Assertion successful"
+  _error: string = "Assertion failed"
+  constructor(code?:string, success?: string, error?: string){
     super(
       (condition, ...args)=>{
         if(condition){
-          console.log(this.message || "Assertion successful")
-        }else{
-          let error = new FelinError(this.code)
-          for(let arg of args){
-            console.log(arg)
-          }
-          error.throw()
+          console.info(this._success)
+          for(let arg of args) console.info(arg)
+        } else {
+          console.error(this._error)
+          for(let arg of args) console.error(arg)
         }
-      })
-    this.message = message
+      }
+    )
+    this._success = success
+    this._error = error
     this.code = code
   }
 
-  static assert(message: string){
-    return new Assert(message)
+  static assert(code?: string, success?: string, error?: string){
+    return new Assert(code, success, error)
   }
 
   static expect(value: any){
@@ -89,7 +57,7 @@ export class Expectation {
   toBe<T>(value: T){
     //preforms shallow compairaison on objects and premitive values
     if(typeof value != "number" && !value.toString().includes(".")){
-      this.assertion.message = "succesfull match."
+      this.assertion._success = "succesfull match."
       this.assertion.code = "error"
 
       this.assertion(Object.is(this.value, value)==true, this.value, value)
@@ -101,7 +69,7 @@ export class Expectation {
   toEqual<T>(value: T){
     //preforms deep compairaison on objects and premitive values
     if(typeof value != "number" && !value.toString().includes(".")){
-      this.assertion.message = "succesfull match."
+      this.assertion._success = "succesfull match."
       this.assertion.code = "error"
       if(typeof value == "object" && typeof this.value == "object"){
         this.assertion(deepCompare(this.value, value), this.value, value)

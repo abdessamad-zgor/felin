@@ -591,13 +591,13 @@ let home = ()=>{
             a: 1
         }
     });
-    //let msg = $computed((count) => {
-    //  return `the count is ${count.count.a()}`
-    //}, counter)
-    //$effect(() => {
-    //  console.log("msg is: ", msg())
-    //}, counter)
-    return (0, _felin.div)("hello", (0, _felin.button)("increase").style({
+    let msg = (0, _felin.$computed)((count)=>{
+        return `the count is ${count.count.a()}`;
+    }, counter);
+    (0, _felin.$effect)(()=>{
+        console.log("msg is: ", msg());
+    }, counter);
+    return (0, _felin.div)(msg, (0, _felin.button)("increase").style({
         backgroundColor: "blue"
     }).listener("click", (e)=>counter.count.a.set((s)=>++s)));
 };

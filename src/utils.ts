@@ -60,7 +60,6 @@ export function determineValueType<T>(value: T){
 }
 
 export function getObjectMethods(obj){
-  console.log(obj)
   let objectPrototype = obj.__proto__
   let methods = Object.getOwnPropertyNames(objectPrototype).filter(k=>typeof obj[k] == "function" && k!="constructor");
   return methods

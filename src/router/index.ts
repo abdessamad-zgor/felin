@@ -33,8 +33,7 @@ export class Router {
       return;
     }
     let pathSegments = path.split('/').filter(s=>s!='')
-    console.log(pathSegments)
-    let foundMatch: Route|undefined = undefined
+    let foundMatch: Route | undefined = undefined
     for(let i=0; i<pathSegments.length; i++){
       if(!foundMatch){
         for(let route of this.routes){

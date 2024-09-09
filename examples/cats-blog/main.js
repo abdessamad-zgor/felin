@@ -22,17 +22,17 @@ import {
 let home = ()=>{
   let counter = $state({ count: { a: 1 } })
 
-  //let msg = $computed((count) => {
-  //  return `the count is ${count.count.a()}`
-  //}, counter)
+  let msg = $computed((count) => {
+    return `the count is ${count.count.a()}`
+  }, counter)
 
 
-  //$effect(() => {
-  //  console.log("msg is: ", msg())
-  //}, counter)
+  $effect(() => {
+    console.log("msg is: ", msg())
+  }, counter)
 
   return div(
-     "hello",
+     msg,
      button("increase")
        .style({backgroundColor: 'blue'})
        .listener('click', (e)=>counter.count.a.set(s=>++s))
