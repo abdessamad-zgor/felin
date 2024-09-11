@@ -1076,11 +1076,6 @@ class FSVGElement {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "State", ()=>State);
-//export class ReadonlyState extends State {
-//override set<R>(fnOrState: FStateType | FStateMutation<FStateType, R>, child?: State<FStateType>): void {
-//throw Error("Connot set on a read-only state.")
-//}
-//}
 parcelHelpers.export(exports, "FArray", ()=>FArray);
 parcelHelpers.export(exports, "FBoolean", ()=>FBoolean);
 parcelHelpers.export(exports, "FObject", ()=>FObject);
@@ -1097,8 +1092,6 @@ class State extends (0, _utils.ExtensibleFunction) {
         this._id = crypto.randomUUID();
         if (parent) this.parent = parent;
         let dataType = (0, _utils.determineValueType)(value);
-        (0, _debug.Assert).debug(value);
-        (0, _debug.Assert).debug(dataType);
         switch((0, _utils.determineValueType)(value)){
             case (0, _utils.ValueType).OBJECT:
                 this.state = new FObject(value);
@@ -1121,7 +1114,6 @@ class State extends (0, _utils.ExtensibleFunction) {
                 this.state.parent = this;
                 break;
             case (0, _utils.ValueType).PROMISE:
-                (0, _debug.Assert).assert("block reached")(dataType, value);
                 this.state = new FPromise(value);
                 this.state.parent = this;
                 break;
@@ -1135,7 +1127,8 @@ class State extends (0, _utils.ExtensibleFunction) {
                 get: (target, prop, reciever)=>{
                     if ((0, _utils.getObjectMethods)(target.state).includes(prop)) return target.state[prop];
                     else if (Object.keys(target.state.value).includes(prop)) {
-                        let value = target.state[prop];
+                        let value = target.state.value[prop];
+                        (0, _debug.Assert).assert("value-exists", "value exists", "value does not exist")(value != undefined, value, target);
                         let childState = new State(value, {
                             state: this,
                             key: prop
@@ -1148,10 +1141,9 @@ class State extends (0, _utils.ExtensibleFunction) {
         } else if (this.state instanceof FArray) {
             let handler = {
                 get: (target, prop, reciever)=>{
-                    if (prop == "set") return this.set;
-                    else if ((0, _utils.getObjectMethods)(target.state).includes(prop)) return target.state[prop];
+                    if ((0, _utils.getObjectMethods)(target.state).includes(prop)) return target.state[prop];
                     else if (Object.keys(target.state.value).includes(prop)) {
-                        let value = target.state[prop];
+                        let value = target.state.value[prop];
                         let childState = new State(value, {
                             state: this,
                             key: prop
@@ -1172,9 +1164,8 @@ class State extends (0, _utils.ExtensibleFunction) {
         } else if (this.state instanceof FPromise) {
             let handler = {
                 get: (target, prop, reciever)=>{
-                    (0, _debug.Assert).assert("value to exist")(target.state);
                     if (target.state.value && Object.keys(target.state.value).includes(prop)) {
-                        let value = target.state[prop];
+                        let value = target.state.value[prop];
                         let childState = new State(value, {
                             state: this,
                             key: prop
@@ -1294,7 +1285,6 @@ class FPromise {
 },{"../debug":"eZp3W","../utils":"lXRiZ","./computed":"lCiwy","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eZp3W":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "FelinError", ()=>FelinError);
 parcelHelpers.export(exports, "Assert", ()=>Assert);
 parcelHelpers.export(exports, "Expectation", ()=>Expectation);
 var _utils = require("./utils");
@@ -1306,44 +1296,25 @@ const templateError = (strings, values)=>{
     }
     return template;
 };
-const FelinErrorMap = new Map([
-    [
-        "error",
-        (value)=>templateError`Unexpected error ${value}`
-    ]
-]);
-class FelinError {
-    constructor(code, message, ...args){
-        this.code = code;
-        if (message) this.message = message;
-        else if (FelinErrorMap.has(code)) {
-            let templateMessage = FelinErrorMap.get(code);
-            if (typeof templateMessage == "function") this.message = templateMessage(...args);
-            else this.message = message;
-        }
-    }
-    toString() {
-        return `FelinError: ${this.code}: ${this.message}`;
-    }
-    throw() {
-        throw new Error(this.toString());
-    }
-}
 class Assert extends (0, _utils.ExtensibleFunction) {
-    constructor(code, message){
+    constructor(code, success, error){
         super((condition, ...args)=>{
-            if (condition) console.log(this.message || "Assertion successful");
-            else {
-                let error = new FelinError(this.code);
-                for (let arg of args)console.log(arg);
-                error.throw();
+            if (condition) {
+                console.info(this._success);
+                for (let arg of args)console.info(arg);
+            } else {
+                console.error(this._error);
+                for (let arg of args)console.error(arg);
             }
         });
-        this.message = message;
+        this._success = "Assertion successful";
+        this._error = "Assertion failed";
+        this._success = success;
+        this._error = error;
         this.code = code;
     }
-    static assert(message) {
-        return new Assert(message);
+    static assert(code, success, error) {
+        return new Assert(code, success, error);
     }
     static expect(value) {
         let expectation = new Expectation(value);
@@ -1362,7 +1333,7 @@ class Expectation {
     toBe(value) {
         //preforms shallow compairaison on objects and premitive values
         if (typeof value != "number" && !value.toString().includes(".")) {
-            this.assertion.message = "succesfull match.";
+            this.assertion._success = "succesfull match.";
             this.assertion.code = "error";
             this.assertion(Object.is(this.value, value) == true, this.value, value);
         } else throw new Error("floating point numbers cannot be matched with toBe consider using toBeCloseTo.");
@@ -1370,7 +1341,7 @@ class Expectation {
     toEqual(value) {
         //preforms deep compairaison on objects and premitive values
         if (typeof value != "number" && !value.toString().includes(".")) {
-            this.assertion.message = "succesfull match.";
+            this.assertion._success = "succesfull match.";
             this.assertion.code = "error";
             if (typeof value == "object" && typeof this.value == "object") this.assertion(deepCompare(this.value, value), this.value, value);
             else if (typeof value != typeof this.value) {
@@ -1445,7 +1416,6 @@ function determineValueType(value) {
     else return 8;
 }
 function getObjectMethods(obj) {
-    console.log(obj);
     let objectPrototype = obj.__proto__;
     let methods = Object.getOwnPropertyNames(objectPrototype).filter((k)=>typeof obj[k] == "function" && k != "constructor");
     return methods;
@@ -1557,7 +1527,6 @@ class Router {
             return;
         }
         let pathSegments = path.split("/").filter((s)=>s != "");
-        console.log(pathSegments);
         let foundMatch = undefined;
         for(let i = 0; i < pathSegments.length; i++){
             if (!foundMatch) for (let route of this.routes){

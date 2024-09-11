@@ -84,9 +84,7 @@ export class State<T = FStateType> extends ExtensibleFunction implements FState<
     } else if (this.state instanceof FArray) {
       let handler: ProxyHandler<State<T>> = {
         get: (target: State<T>, prop: string, reciever) => {
-          if(prop=="set"){
-              return this.set
-          }else if (getObjectMethods(target.state).includes(prop)) {
+          if (getObjectMethods(target.state).includes(prop)) {
             return target.state[prop]
           } else if (Object.keys(target.state.value).includes(prop)) {
             let value = target.state.value[prop];

@@ -212,8 +212,6 @@ class f extends _ {
     } else if (this.state instanceof x) {
       let r = {
         get: (s, i, u) => {
-          if (i == "set")
-            return this.set;
           if (g(s.state).includes(i))
             return s.state[i];
           if (Object.keys(s.state.value).includes(i)) {
